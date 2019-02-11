@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+.explorer {
+  height: 300px;
+  width: 100%;
+  background-color: powderblue;
+  border: solid 1px black;
+  resize: both;
+}
+
+.explorer > .toolbar {
+  height: 44px;
+  width: 100%;
+  background-color: lightblue;
+  border-bottom: solid 1px black;
+  box-sizing: border-box;
+}
+
+.explorer > .content {
+  height: calc(100% - 44px);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.explorer > .content > .favorites {
+  height: 100%;
+  width: 120px;
+  border-right: solid 1px black;
+  box-sizing: border-box;
+  float: left;
+}
+
+.explorer > .content > .columns-view {
+  height: calc(100% - 44px);
+  width: calc(100% - 120px);
+  box-sizing: border-box;
+  float: left;
+}
+
+.explorer > .content > .columns-view > .column {
+  height: 100%;
+  width: 130px;
+  border-right: solid 1px black;
+  box-sizing: border-box;
+  float: left;
+}
+
+
+.explorer > .content > .columns-view > .breadcrumb {
+  height: 44px;
+  width: 100%;
+  border-top: solid 1px black;
+  box-sizing: border-box;
+  clear: both;
+}
+</style>
+</head>
+<body>
+<h2>Exploring the Resource Navigator Layout</h2>
+<p>These nested div's with they styles create the layout:</p>
+
+<div class='explorer'>
+  <div class='toolbar'></div>
+  <div class='content'>
+    <div class='favorites'></div>
+    <div class='columns-view'>
+      <div class='column'></div>
+      <div class='column'></div>
+            <div class='breadcrumb'></div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+</body>
+</html>
+
