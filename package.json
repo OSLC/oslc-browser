@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "ajv": "^6.5.4",
+    "ajv": "^6.12.3",
     "async": "^2.6.1",
     "carbon-components": "^9.20.0",
     "carbon-components-react": "^6.32.4",
@@ -16,7 +16,7 @@
     "react-contextmenu": "^2.9.3",
     "react-cytoscape": "^1.0.6",
     "react-dom": "^16.5.2",
-    "react-scripts": "1.1.5",
+    "react-scripts": "2.0.0",
     "react-treeview": "^0.4.7"
   },
   "scripts": {
