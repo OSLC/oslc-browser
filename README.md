@@ -49,7 +49,7 @@ Start the OSLC Browser app
 Start Chrome web browser with CORS disabled
 ```
 open -n -a Google\ Chrome --args --disable-web-security --user-data-dir
-cd ~/Developer/resource-navigator
+cd ~/Developer/oslc-browser
 npm install
 npm start
 # Say Y to choose a different port
