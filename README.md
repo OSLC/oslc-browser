@@ -1,5 +1,7 @@
 # OSLC Resource Browser
 
+## Introduction
+
 OSLC defines a set of standards that enable loosely coupled integration between applications. This allows applications to use creation and selection dialogs to create links between resources managed by different applications, and it provides a standard way for an application to view the properties of resources managed by some other application. 
 
 Although OSLC enables this integration, it can become quite difficult to view federated information across a set of integrated applications as a single system. Navigation often starts at a specific application which provides its own views for displaying and navigating its managed resources, and links to resources managed by other applications. In order to navigate a system of shared information, users have to follow links from one application to another. This can be inconvenient and inefficient as each application opens its own window and may provide a different user experience for viewing and editing related resourcers.
@@ -48,6 +50,7 @@ Start Chrome web browser with CORS disabled
 ```
 open -n -a Google\ Chrome --args --disable-web-security --user-data-dir
 cd ~/Developer/resource-navigator
+npm install
 npm start
 # Say Y to choose a different port
 ```
