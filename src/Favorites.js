@@ -43,9 +43,9 @@ class Favorites extends Component {
           	<div href='https://ce4iot.rtp.raleigh.ibm.com:9443/ccm/resource/itemName/com.ibm.team.workitem.WorkItem/84'
           		onClick={self.navigateResource}
           		>Change request 84</div>
-          	<div href='https://ce4iot.rtp.raleigh.ibm.com:9443/rm/resources/_YwhMQGZdEeil-f7Jvz9H-g'
+          	<div href='https://elmdemo.smartfacts.com:9443/rm/resources/TX_gLR3UBSnEfCQ7eullXDrzg'
           		onClick={self.navigateResource}
-          		>Requirement 277</div>
+          		>Test requirement</div>
         </TreeView>
       </div>      
     )
