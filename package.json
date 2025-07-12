@@ -12,12 +12,14 @@
     "jquery": "^3.3.1",
     "oslc-client": "~1.0.6",
     "prop-types": "^15.6.2",
+    "psl": "^1.8.0",
     "react": "^16.5.2",
     "react-contextmenu": "^2.9.3",
     "react-cytoscape": "^1.0.6",
     "react-dom": "^16.5.2",
-    "react-scripts": "1.1.5",
-    "react-treeview": "^0.4.7"
+    "react-scripts": "2.1.8",
+    "react-treeview": "^0.4.7",
+    "tough-cookie": "^2.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -28,11 +30,17 @@
     "build-storybook": "build-storybook -s public"
   },
   "devDependencies": {
-    "@storybook/react": "^3.4.11",
     "@storybook/addon-actions": "^3.4.11",
     "@storybook/addon-links": "^3.4.11",
     "@storybook/addons": "^3.4.11",
+    "@storybook/react": "^3.4.11",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0"
-  }
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
