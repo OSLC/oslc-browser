@@ -8,8 +8,7 @@ import async from 'async';
 import PreviewDialog from './PreviewDialog';
 import filter from './DefaultFilters';
 
-const Entities = require('html-entities').XmlEntities;
-const entities = new Entities();
+const { decode } = require('html-entities');
 
 
 class ResourceGraph extends Component {
@@ -39,7 +38,7 @@ class ResourceGraph extends Component {
         group: 'nodes',
         data: {
           id: resource.getURI(),
-          label: entities.decode(resource.getTitle()),
+          label: decode(resource.getTitle()),
           expanded: false
         },
         scratch: {_resource: resource},
@@ -172,7 +171,7 @@ class ResourceGraph extends Component {
 						    let label = targetResource.getTitle();
 						    if (!label) label = targetResource.getTitle();
 						    if (!label) label = targetResource.getURI(); // the label of last resort 
-						    label = entities.decode(label);  // Some dcterms:title properties are HTML encoded
+						    label = decode(label);  // Some dcterms:title properties are HTML encoded
                 elements.push({
                   group: 'nodes',
 			            data: {

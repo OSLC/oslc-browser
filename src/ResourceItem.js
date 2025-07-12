@@ -9,8 +9,7 @@ import { MenuItem } from 'react-contextmenu';
 
 import filter from './DefaultFilters';
 
-const Entities = require('html-entities').XmlEntities;
-const entities = new Entities();
+const { decode } = require('html-entities');
 
 /*
  * A ResourceItem renders a specific OSLC Compact resource, and
@@ -145,7 +144,7 @@ class ResourceItem extends Component {
     if (!label) label = resource.getTitle();
     if (!label) label = resource.getShortTitle();
     if (!label) label = resource.getURI(); // the label of last resort 
-    label = entities.decode(label);  // Some dcterms:title properties are HTML encoded
+    label = decode(label);  // Some dcterms:title properties are HTML encoded
     let menuId = `R${rowIndex}C${columnIndex}`;
 
     return (
