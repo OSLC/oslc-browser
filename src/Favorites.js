@@ -37,15 +37,15 @@ class Favorites extends Component {
       <div className='favorites'>
         <TreeView
           key={1}
-          nodeLabel='JKE Banking'
+          nodeLabel='RefImpl'
           collapsed={self.state.collapsed}
           onClick={self.expandFolder.bind(null, 1)}>
-          	<div href='https://ce4iot.rtp.raleigh.ibm.com:9443/ccm/resource/itemName/com.ibm.team.workitem.WorkItem/84'
+          	{/* <div href='https://cm.refimpl.oslc.ldsw.eu/services/change_request/d1922b2f-d56a-4fa1-b26b-ec7d4cfb7224'
           		onClick={self.navigateResource}
-          		>Change request 84</div>
-          	<div href='https://elmdemo.smartfacts.com:9443/rm/resources/TX_gLR3UBSnEfCQ7eullXDrzg'
+          		>Change request 84</div> */}
+          	<div href='https://rm.refimpl.oslc.ldsw.eu/services/Requirement/sp_single/req_1'
           		onClick={self.navigateResource}
-          		>Test requirement</div>
+          		>Requirement SP_SINGLE-R1</div>
         </TreeView>
       </div>      
     )
