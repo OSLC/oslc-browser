@@ -6,8 +6,7 @@ import IconView from './IconView';
 import ListView from './ListView';
 import ColumnsView from './ColumnsView';
 import ResourceGraph from './ResourceGraph';
-
-var OSLCServer = require('oslc-client/server');
+import OSLCClient from './OSLCClient';
 
 /*
  * ResourceNavigator renders the OSLC resource from the ToolBar
@@ -28,7 +27,7 @@ class ResourceNavigator extends Component {
       resource: null,
       explorerResource: null
     }
-    this.server = new OSLCServer(undefined, 'devonce','devonce');
+    this.server = new OSLCClient(undefined, 'devonce','devonce');
     this.handleResourceURIChanged = this.handleResourceURIChanged.bind(this);
     this.showInExplorer = this.showInExplorer.bind(this);
   }
