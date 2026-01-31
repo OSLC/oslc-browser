@@ -17,7 +17,7 @@
     "react-contextmenu": "^2.9.3",
     "react-cytoscape": "^1.0.6",
     "react-dom": "^16.5.2",
-    "react-scripts": "2.1.8",
+    "react-scripts": "5.0.1",
     "react-treeview": "^0.4.7",
     "tough-cookie": "^2.5.0"
   },
