@@ -1,0 +1,5 @@
+.resources-column {
+  border-right: 1px solid #000;
+  padding-right: 10px;
+  overflow-y: auto;
+}

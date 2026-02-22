@@ -1,0 +1,52 @@
+{
+  "name": "React based resource-navigator",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.14",
+    "@fortawesome/free-solid-svg-icons": "^5.7.1",
+    "@fortawesome/react-fontawesome": "^0.1.4",
+    "ajv": "^6.5.4",
+    "async": "^2.6.1",
+    "bootstrap": "^4.3.1",
+    "carbon-components": "^9.20.0",
+    "carbon-components-react": "^6.32.4",
+    "carbon-icons": "^7.0.7",
+    "cytoscape-context-menus": "^3.0.6",
+    "i": "^0.3.6",
+    "jquery": "^3.3.1",
+    "npm": "^6.7.0",
+    "oslc-client": "^3.0.0",
+    "prop-types": "^15.6.2",
+    "react": "^16.5.2",
+    "react-bootstrap": "^1.0.0-beta.5",
+    "react-contextmenu": "^2.9.3",
+    "react-cytoscape": "^1.0.6",
+    "react-dom": "^16.5.2",
+    "react-scripts": "1.1.5",
+    "react-sidebar": "^3.0.2",
+    "react-treeview": "^0.4.7"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
+  },
+  "devDependencies": {
+    "@storybook/addon-actions": "^3.4.11",
+    "@storybook/addon-links": "^3.4.11",
+    "@storybook/addons": "^3.4.11",
+    "@storybook/react": "^3.4.11",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.0.1",
+    "babel-runtime": "^6.26.0",
+    "eslint": "^5.13.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-react": "^7.12.4"
+  }
+}
