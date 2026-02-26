@@ -32,12 +32,7 @@ function App() {
     await navigateToItem(columnIndex, item.uri, fetchResource);
   }, [navigateToItem, fetchResource]);
 
-  const handleLinkClick = useCallback(async (uri: string) => {
-    const resource = await fetchResource(uri);
-    if (resource) navigateToRoot(resource);
-  }, [fetchResource, navigateToRoot]);
-
-  const handleNavigateToFavorite = useCallback(async (uri: string) => {
+  const handleNavigateToResource = useCallback(async (uri: string) => {
     const resource = await fetchResource(uri);
     if (resource) navigateToRoot(resource);
   }, [fetchResource, navigateToRoot]);
@@ -76,10 +71,9 @@ function App() {
           favorites={favorites}
           onColumnItemClick={handleColumnItemClick}
           onColumnItemContextMenu={handleItemContextMenu}
-          onLinkClick={handleLinkClick}
-          onNavigateToFavorite={handleNavigateToFavorite}
+          onLinkClick={handleNavigateToResource}
+          onNavigateToFavorite={handleNavigateToResource}
           onAddFolder={addFolder}
-          onAddResource={addResource}
           onRemoveFavorite={removeItem}
           onRenameFavorite={rename}
           onToggleFolder={toggleFolder}

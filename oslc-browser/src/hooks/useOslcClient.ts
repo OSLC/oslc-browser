@@ -75,13 +75,15 @@ function saveConnection(state: ConnectionState): void {
 }
 
 export function useOslcClient(): UseOslcClientReturn {
-  const saved = loadSavedConnection();
-  const [connection, setConnection] = useState<ConnectionState>({
-    serverURL: saved.serverURL ?? '',
-    username: saved.username ?? '',
-    password: '',
-    connected: false,
-    connecting: false,
+  const [connection, setConnection] = useState<ConnectionState>(() => {
+    const saved = loadSavedConnection();
+    return {
+      serverURL: saved.serverURL ?? '',
+      username: saved.username ?? '',
+      password: '',
+      connected: false,
+      connecting: false,
+    };
   });
   const clientRef = useRef<OSLCClient | null>(null);
 

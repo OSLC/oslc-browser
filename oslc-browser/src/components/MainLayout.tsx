@@ -13,7 +13,6 @@ interface MainLayoutProps {
   onLinkClick: (uri: string) => void;
   onNavigateToFavorite: (uri: string) => void;
   onAddFolder: (name: string, parentId?: string) => void;
-  onAddResource: (name: string, uri: string, parentId?: string) => void;
   onRemoveFavorite: (id: string) => void;
   onRenameFavorite: (id: string, name: string) => void;
   onToggleFolder: (id: string) => void;
@@ -28,7 +27,6 @@ export function MainLayoutComponent({
   onLinkClick,
   onNavigateToFavorite,
   onAddFolder,
-  onAddResource,
   onRemoveFavorite,
   onRenameFavorite,
   onToggleFolder,
@@ -40,7 +38,6 @@ export function MainLayoutComponent({
         <FavoritesPanelComponent
           favorites={favorites}
           onAddFolder={onAddFolder}
-          onAddResource={onAddResource}
           onRemoveItem={onRemoveFavorite}
           onRenameItem={onRenameFavorite}
           onToggleFolder={onToggleFolder}

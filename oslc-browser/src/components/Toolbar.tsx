@@ -9,6 +9,7 @@ import {
   Breadcrumbs,
   Link,
   Alert,
+  Chip,
 } from '@mui/material';
 import type { ConnectionState, NavigationColumn } from '../models/types.js';
 
@@ -74,6 +75,9 @@ export function ToolbarComponent({
         >
           {connection.connecting ? 'Connecting' : 'Connect'}
         </Button>
+        {connection.connected && (
+          <Chip label="Connected" color="success" size="small" variant="outlined" />
+        )}
       </MuiToolbar>
 
       {connection.error && (

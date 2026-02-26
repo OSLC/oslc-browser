@@ -31,7 +31,6 @@ import type { FavoriteItem } from '../models/types.js';
 interface FavoritesPanelProps {
   favorites: FavoriteItem[];
   onAddFolder: (name: string, parentId?: string) => void;
-  onAddResource: (name: string, uri: string, parentId?: string) => void;
   onRemoveItem: (id: string) => void;
   onRenameItem: (id: string, name: string) => void;
   onToggleFolder: (id: string) => void;
