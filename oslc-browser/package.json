@@ -14,11 +14,9 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.3.1",
     "@mui/material": "^7.3.1",
-    "@types/react-window": "^1.8.8",
     "oslc-client": "file:../oslc-client",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-window": "^1.8.11"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
