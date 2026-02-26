@@ -29,21 +29,13 @@ function App() {
   }, [connect, navigateToRoot]);
 
   const handleColumnItemClick = useCallback(async (columnIndex: number, item: ColumnItem) => {
-    await navigateToItem(columnIndex, item.uri, fetchResource);
+    await navigateToItem(columnIndex, item, fetchResource);
   }, [navigateToItem, fetchResource]);
 
   const handleNavigateToResource = useCallback(async (uri: string) => {
     const resource = await fetchResource(uri);
     if (resource) navigateToRoot(resource);
   }, [fetchResource, navigateToRoot]);
-
-  const handleBreadcrumbClick = useCallback(async (columnIndex: number) => {
-    const col = navState.columns[columnIndex];
-    if (col) {
-      const resource = await fetchResource(col.uri);
-      if (resource) navigateToRoot(resource);
-    }
-  }, [navState.columns, fetchResource, navigateToRoot]);
 
   const handleItemContextMenu = useCallback((event: React.MouseEvent, item: ColumnItem) => {
     event.preventDefault();
@@ -58,12 +50,10 @@ function App() {
       <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <ToolbarComponent
           connection={connection}
-          columns={navState.columns}
           onServerURLChange={setServerURL}
           onUsernameChange={setUsername}
           onPasswordChange={setPassword}
           onConnect={handleConnect}
-          onBreadcrumbClick={handleBreadcrumbClick}
         />
         <MainLayoutComponent
           columns={navState.columns}

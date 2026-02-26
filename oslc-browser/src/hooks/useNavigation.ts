@@ -1,4 +1,4 @@
-import { useReducer, useCallback } from 'react';
+import { useReducer, useCallback, useRef } from 'react';
 import type {
   NavigationState,
   NavigationColumn,
@@ -75,18 +75,46 @@ function reducer(state: NavigationState, action: NavigationAction): NavigationSt
   }
 }
 
+/** Create a column showing unique link predicates for a resource. */
 function resourceToColumn(resource: LoadedResource): NavigationColumn {
-  const items: ColumnItem[] = resource.links.map(link => ({
-    uri: link.targetURI,
-    title: link.targetTitle ?? localName(link.targetURI),
-    predicate: link.predicate,
-    predicateLabel: link.predicateLabel,
-    selected: false,
-  }));
+  const seen = new Set<string>();
+  const items: ColumnItem[] = [];
+  for (const link of resource.links) {
+    if (seen.has(link.predicate)) continue;
+    seen.add(link.predicate);
+    items.push({
+      uri: link.predicate,
+      title: link.predicateLabel,
+      predicate: link.predicate,
+      predicateLabel: link.predicateLabel,
+      selected: false,
+      kind: 'predicate',
+    });
+  }
 
   return {
     uri: resource.uri,
     title: resource.title,
+    items,
+    loading: false,
+    resource,
+  };
+}
+
+/** Create a column listing the targets of a specific predicate from a resource. */
+function predicateTargetsColumn(resource: LoadedResource, predicate: string): NavigationColumn {
+  const items: ColumnItem[] = resource.links
+    .filter(link => link.predicate === predicate)
+    .map(link => ({
+      uri: link.targetURI,
+      title: link.targetTitle ?? localName(link.targetURI),
+      selected: false,
+      kind: 'resource' as const,
+    }));
+
+  return {
+    uri: predicate,
+    title: localName(predicate),
     items,
     loading: false,
   };
@@ -102,13 +130,15 @@ export interface UseNavigationReturn {
   navigateToRoot: (resource: LoadedResource) => void;
   navigateToItem: (
     columnIndex: number,
-    itemUri: string,
+    item: ColumnItem,
     fetchResource: (uri: string) => Promise<LoadedResource | null>
   ) => Promise<void>;
 }
 
 export function useNavigation(): UseNavigationReturn {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const navigateToRoot = useCallback((resource: LoadedResource) => {
     dispatch({ type: 'SET_ROOT', column: resourceToColumn(resource), resource });
@@ -116,12 +146,28 @@ export function useNavigation(): UseNavigationReturn {
 
   const navigateToItem = useCallback(async (
     columnIndex: number,
-    itemUri: string,
+    item: ColumnItem,
     fetchResource: (uri: string) => Promise<LoadedResource | null>
   ) => {
+    if (item.kind === 'predicate') {
+      // Predicate clicked — show its targets in the next column (no fetch needed)
+      const column = stateRef.current.columns[columnIndex];
+      if (column?.resource) {
+        const targetsCol = predicateTargetsColumn(column.resource, item.uri);
+        dispatch({
+          type: 'ADD_COLUMN',
+          column: targetsCol,
+          afterIndex: columnIndex,
+          resource: column.resource,
+        });
+      }
+      return;
+    }
+
+    // Resource clicked — fetch and show its predicates in the next column
     dispatch({ type: 'SET_COLUMN_LOADING', columnIndex });
 
-    const resource = await fetchResource(itemUri);
+    const resource = await fetchResource(item.uri);
     if (!resource) {
       dispatch({ type: 'SET_COLUMN_ERROR', columnIndex: columnIndex + 1, error: 'Failed to load resource' });
       return;

@@ -28,6 +28,7 @@ export interface ColumnItem {
   predicate?: string;
   predicateLabel?: string;
   selected: boolean;
+  kind: 'predicate' | 'resource';
 }
 
 export interface NavigationColumn {
@@ -36,6 +37,7 @@ export interface NavigationColumn {
   items: ColumnItem[];
   loading: boolean;
   error?: string;
+  resource?: LoadedResource;
 }
 
 export interface NavigationState {
