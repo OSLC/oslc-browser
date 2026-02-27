@@ -17,10 +17,81 @@ export interface UseOslcClientReturn {
   fetchResource: (uri: string) => Promise<LoadedResource | null>;
 }
 
+interface RdfStatement {
+  subject: { value: string; termType: string };
+  predicate: { value: string };
+  object: { value: string; termType: string };
+}
+
+const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+
+/**
+ * Extract a blank node's properties and links from the store.
+ * Recursively handles nested blank nodes.
+ */
+function extractBlankNode(
+  statements: RdfStatement[],
+  blankNodeId: string,
+  inlineResources: Record<string, LoadedResource>,
+  visited: Set<string>
+): LoadedResource {
+  const bnUri = '_:' + blankNodeId;
+  if (inlineResources[bnUri]) return inlineResources[bnUri];
+  visited.add(blankNodeId);
+
+  const properties: ResourceProperty[] = [];
+  const links: ResourceLink[] = [];
+  const resourceTypes: string[] = [];
+
+  for (const st of statements) {
+    if (st.subject.value !== blankNodeId) continue;
+    const pred = st.predicate.value;
+    const obj = st.object;
+
+    if (pred === RDF_TYPE) {
+      resourceTypes.push(obj.value);
+    } else if (obj.termType === 'NamedNode') {
+      links.push({
+        predicate: pred,
+        predicateLabel: localName(pred),
+        targetURI: obj.value,
+        targetTitle: localName(obj.value),
+      });
+    } else if (obj.termType === 'BlankNode' && !visited.has(obj.value)) {
+      const childUri = '_:' + obj.value;
+      links.push({
+        predicate: pred,
+        predicateLabel: localName(pred),
+        targetURI: childUri,
+        targetTitle: localName(pred),
+      });
+      extractBlankNode(statements, obj.value, inlineResources, visited);
+    } else if (obj.termType === 'Literal') {
+      properties.push({
+        predicate: pred,
+        predicateLabel: localName(pred),
+        value: obj.value,
+        isLink: false,
+      });
+    }
+  }
+
+  // Use first rdf:type local name or blank node ID as title
+  const title = resourceTypes.length > 0
+    ? localName(resourceTypes[0])
+    : blankNodeId;
+
+  const loaded: LoadedResource = {
+    uri: bnUri, title, properties, links, resourceTypes, inlineResources,
+  };
+  inlineResources[bnUri] = loaded;
+  return loaded;
+}
+
 function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource {
   const properties: ResourceProperty[] = [];
   const resourceTypes: string[] = [];
-  const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+  const inlineResources: Record<string, LoadedResource> = {};
 
   // The resource.uri may not match the store subjects (e.g., trailing slash mismatch).
   // If getOutgoingLinks() is empty but the store has statements, read directly from the store.
@@ -28,23 +99,35 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
 
   if (outgoing.length === 0 && resource.store?.statements?.length > 0) {
     // Build links and properties directly from the store statements
-    const statements = resource.store.statements as Array<{
-      subject: { value: string };
-      predicate: { value: string };
-      object: { value: string; termType: string };
-    }>;
+    const statements = resource.store.statements as RdfStatement[];
+    const links: ResourceLink[] = [];
 
     for (const st of statements) {
+      // Skip statements about blank node subjects (handled by extractBlankNode)
+      if (st.subject.termType === 'BlankNode') continue;
+
       const pred = st.predicate.value;
       const obj = st.object;
 
       if (pred === RDF_TYPE) {
         resourceTypes.push(obj.value);
       } else if (obj.termType === 'NamedNode') {
-        outgoing.push({
-          sourceURL: st.subject.value,
-          linkType: pred,
-          targetURL: obj.value,
+        links.push({
+          predicate: pred,
+          predicateLabel: localName(pred),
+          targetURI: obj.value,
+          targetTitle: localName(obj.value),
+        });
+      } else if (obj.termType === 'BlankNode') {
+        const bnUri = '_:' + obj.value;
+        const bnResource = extractBlankNode(
+          statements, obj.value, inlineResources, new Set()
+        );
+        links.push({
+          predicate: pred,
+          predicateLabel: localName(pred),
+          targetURI: bnUri,
+          targetTitle: bnResource.title,
         });
       } else {
         properties.push({
@@ -57,17 +140,9 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
     }
 
     const title = resource.getTitle() ?? localName(uri);
-    const links: ResourceLink[] = outgoing
-      .filter(link => link.linkType !== RDF_TYPE)
-      .map(link => ({
-        predicate: link.linkType,
-        predicateLabel: localName(link.linkType),
-        targetURI: link.targetURL,
-        targetTitle: localName(link.targetURL),
-      }));
-
-    return { uri, title, properties, links, resourceTypes };
+    return { uri, title, properties, links, resourceTypes, inlineResources };
   }
+
   // Normal path: getOutgoingLinks() found results
   const title = resource.getTitle() ?? localName(uri);
   const linkSet = new Set<string>();
@@ -86,6 +161,31 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
     linkSet.add(link.linkType + '|' + link.targetURL);
   }
 
+  // Check for blank node objects in the store (getOutgoingLinks skips them)
+  if (resource.store?.statements?.length > 0) {
+    const statements = resource.store.statements as RdfStatement[];
+    for (const st of statements) {
+      if (st.subject.termType === 'BlankNode') continue;
+      if (st.predicate.value === RDF_TYPE) continue;
+      if (st.object.termType === 'BlankNode') {
+        const bnUri = '_:' + st.object.value;
+        const bnResource = extractBlankNode(
+          statements, st.object.value, inlineResources, new Set()
+        );
+        const key = st.predicate.value + '|' + bnUri;
+        if (!linkSet.has(key)) {
+          links.push({
+            predicate: st.predicate.value,
+            predicateLabel: localName(st.predicate.value),
+            targetURI: bnUri,
+            targetTitle: bnResource.title,
+          });
+          linkSet.add(key);
+        }
+      }
+    }
+  }
+
   const allProps = resource.getProperties();
   for (const [predicate, value] of Object.entries(allProps)) {
     if (predicate === RDF_TYPE) continue;
@@ -101,7 +201,7 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
     }
   }
 
-  return { uri, title, properties, links, resourceTypes };
+  return { uri, title, properties, links, resourceTypes, inlineResources };
 }
 
 const STORAGE_KEY = 'oslc-browser-connection';

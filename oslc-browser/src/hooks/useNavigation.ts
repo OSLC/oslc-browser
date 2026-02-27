@@ -164,7 +164,29 @@ export function useNavigation(): UseNavigationReturn {
       return;
     }
 
-    // Resource clicked — fetch and show its predicates in the next column
+    // Resource clicked — check for inline blank node or fetch from server
+    if (item.uri.startsWith('_:')) {
+      // Blank node: find inline resource from a parent column's resource
+      const columns = stateRef.current.columns;
+      let inlineResource: LoadedResource | undefined;
+      for (let i = columnIndex; i >= 0; i--) {
+        const col = columns[i];
+        if (col.resource?.inlineResources?.[item.uri]) {
+          inlineResource = col.resource.inlineResources[item.uri];
+          break;
+        }
+      }
+      if (inlineResource) {
+        dispatch({
+          type: 'ADD_COLUMN',
+          column: resourceToColumn(inlineResource),
+          afterIndex: columnIndex,
+          resource: inlineResource,
+        });
+        return;
+      }
+    }
+
     dispatch({ type: 'SET_COLUMN_LOADING', columnIndex });
 
     const resource = await fetchResource(item.uri);

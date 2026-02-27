@@ -20,6 +20,7 @@ export interface LoadedResource {
   properties: ResourceProperty[];
   links: ResourceLink[];
   resourceTypes: string[];
+  inlineResources?: Record<string, LoadedResource>;
 }
 
 export interface ColumnItem {
