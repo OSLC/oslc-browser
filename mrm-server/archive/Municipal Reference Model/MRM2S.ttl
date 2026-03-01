@@ -1,0 +1,1116 @@
+prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix ns0: <http://spinrdf.org/spin#> .
+@prefix dc11: <http://purl.org/dc/elements/1.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix geo: <http://www.w3.org/2003/01/geo/wgs84_pos#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<http://www.misa.org.ca/mrms>
+  a owl:Ontology ;
+  ns0:imports <http://topbraid.org/spin/owlrl-all> ;
+  owl:imports <http://open-services.net/ns/am>, dc11: .
+
+<http://www.misa.org.ca/mrms#ProcessResponsibilities>
+  a owl:Class ;
+  rdfs:label "Process Responsibilities"^^xsd:string ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#ServiceAccountabilities> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  dc11:description "Specifies information about the process responsibilities of an organization unit in terms of roles and budget allocations."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Program>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#Element>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#AccountableElement> ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Service> ;
+  dc11:description "A Program is a Mandate to achieve Outcomes by delivering Services. Organization Units are accountable for Programs that administer Services."^^xsd:string ;
+  rdfs:label "Program"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Resource>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#Element>, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#ImpcatableElement> ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#OrganizationUnit> ;
+  dc11:description "A tangible or intangible asset used to perform or consumed by activities in a process."^^xsd:string ;
+  rdfs:label "Resource"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#OrganizationUnit>
+  a owl:Class ;
+  dc11:description "A point of authority, accountability or responsibility commanding resources commensurate with its obligations."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#DeliverableElement> ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Output> ;
+  rdfs:label "Organization Unit"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#TargetGroup>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Location> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description """A set of Parties that share intrinsic or extrinsic characteristics causing a Program to identify (target) them. A Population Segment with a Recognized Need. The set of legal entities defined by common extrinsic and/or intrinsic properties the government proposes to serve (meet needs) by policy. The most important notion is that the definition be independent of program or service context. Distinguish from:
+1) outreach: the set of legal entities the government reaches/contacts with the intent to serve. The set may be smaller or larger than the target group. 
+
+2) served: the set of legal entities the government actually serves. Most people call this set 'clients', and give them a name that reflects the service context. Sometimes known as 'client set'."""^^xsd:string ;
+  rdfs:label "Target Group"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Outcome>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#OrganizationUnit> ;
+  dc11:description "A desirable change in the level of a Target Group Need resulting from Service delivery."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  rdfs:label "Outcome"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Need>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#PerformanceIndicator> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description "A Need is defined as a condition wanting or requiring relief."^^xsd:string ;
+  rdfs:label "Need"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#ChangeDriver>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#ProcessResponsibilities> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description "Something that is expected to cause material change to programs, services, processes or resources. Called an Influencer in BMM."^^xsd:string ;
+  rdfs:label "Change Driver"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#ServiceValue>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Location> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description "Defines the expectations of parties receiving the Service's Output directly or indirectly, and ensures their alignment with associated Service Objectives and Outcomes. The way in which delivering the Service Output to the Target Groups contributes to Program and Service Outcomes."^^xsd:string ;
+  rdfs:label "Service Value"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Output>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Project> ;
+  rdfs:label "Output"^^xsd:string ;
+  dc11:description "A unit of value produced by a Service and conveyed to a Service Recipient."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> .
+
+<http://www.misa.org.ca/mrms#Location>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ResourceAuthorities> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description "A business concept that defines a location of interest to the business where processes are carried out, resources are located and parties are located"^^xsd:string ;
+  rdfs:label "Location"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#ResourceAuthorities>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#ServiceAccountabilities> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  rdfs:label "Resource Authorities"^^xsd:string ;
+  dc11:description "Specifies information about the resources authorized by organization units in terms of roles and budget allocations."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#AccountabilityElement>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#AssessableElement>, skos:Concept, <http://www.misa.org.ca/mrms#LocatableElement>, foaf:Project, <http://www.misa.org.ca/mrms#TypeClassifier>, owl:Nothing, foaf:Image, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:ConceptScheme, <http://www.misa.org.ca/mrms#AccountableElement>, geo:SpatialThing, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#BudgetableItem>, foaf:Document, skos:Collection, foaf:OnlineAccount, foaf:Agent, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#ImpcatableElement> ;
+  rdfs:label "Accountability Element"^^xsd:string ;
+  dc11:description "An element that can be accountable for Accountable Elements"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> .
+
+<http://www.misa.org.ca/mrms#ServiceLevelAgreement>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#TargetGroup> ;
+  rdfs:label "Service Level Agreements"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description "Information about the relationship that one Provider / Internal Service has with zero, one or more Public and/or other Provider / Internal Services."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Process>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#TargetGroup> ;
+  rdfs:label "Process"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#Element>, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#AssessableElement> ;
+  dc11:description "A business concept that deals with a sequence of tasks, executed by a role, using input resources to produce higher value outputs. Processes are triggered by events. Processes participate in a value chain to produce service outputs."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Service>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Process> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element>, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#DeliverableElement> ;
+  dc11:description "A commitment to deliver Outputs that have Service Value and contribute to Outcomes."^^xsd:string ;
+  rdfs:label "Service"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#PerformanceIndicator>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Outcome> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  rdfs:label "Performance Indicator"^^xsd:string ;
+  dc11:description "A measure of the efficiency, effectiveness and quality of a Program, a Service, a Process, an Activity, a Task or a Resource."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Project>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#ServiceAccountabilities>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#TargetGroup>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Location> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Element> ;
+  dc11:description "Encapsulates discrete initiatives that an organization may approve to transform the business of the organization (e.g. business process re-engineering project), to develop assets (e.g. construction project), provide programs and services, etc. A collaborative initiative that is planned to achieve a particular aim."^^xsd:string ;
+  rdfs:label "Project"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#ServiceAccountabilities>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#OrganizationUnit>, <http://www.misa.org.ca/mrms#ServiceValue>, <http://www.misa.org.ca/mrms#Service>, <http://www.misa.org.ca/mrms#Need>, <http://www.misa.org.ca/mrms#PerformanceIndicator>, <http://www.misa.org.ca/mrms#Project>, <http://www.misa.org.ca/mrms#Program>, <http://www.misa.org.ca/mrms#Process>, <http://www.misa.org.ca/mrms#Resource>, <http://www.misa.org.ca/mrms#ServiceLevelAgreement>, <http://www.misa.org.ca/mrms#Outcome>, <http://www.misa.org.ca/mrms#ChangeDriver>, <http://www.misa.org.ca/mrms#ProcessResponsibilities>, <http://www.misa.org.ca/mrms#ResourceAuthorities>, <http://www.misa.org.ca/mrms#Location>, <http://www.misa.org.ca/mrms#Output>, <http://www.misa.org.ca/mrms#TargetGroup> ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  rdfs:label "Service Accountabilities"^^xsd:string ;
+  dc11:description "Specifies information about the services organization units are accountable for in terms of roles and budget allocations. Different organization units can play different roles in their accountability for services, and there can be separate budget allocations for those different roles."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#ResourceType>
+  a owl:Class ;
+  dc11:description "An open classification of Resources."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#TypeClassifier>
+  a owl:Class ;
+  owl:disjointWith skos:Concept, <http://www.misa.org.ca/mrms#ImpcatableElement>, skos:ConceptScheme, foaf:Image, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#OutputProducer>, foaf:OnlineAccount, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, owl:Nothing, <http://www.misa.org.ca/mrms#AccountabilityElement>, foaf:Project, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#LocatableElement>, geo:SpatialThing, <http://www.misa.org.ca/mrms#AssessableElement>, skos:Collection, foaf:Document, <http://open-services.net/ns/am#Resource>, foaf:Agent ;
+  dc11:description "A generic classifier, the root of all MRM classifiers"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  rdfs:label "Type Classifier"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Political>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> .
+
+<http://www.misa.org.ca/mrms#ChangeDriverType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Transformational>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProgramType> .
+
+<http://www.misa.org.ca/mrms#ProgramType>
+  a owl:Class ;
+  dc11:description "A closed classification of Programs."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Element>
+  a owl:Class ;
+  rdfs:label "Element"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  dc11:description "The root superclass of all MRM elements"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Branch>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#OrganizationUnitType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> ;
+  rdfs:label "Organization Unit Type"^^xsd:string ;
+  dc11:description "An open classification of Organization Units. "^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Information>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ResourceType> .
+
+<http://www.misa.org.ca/mrms#Financial>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> .
+
+<http://www.misa.org.ca/mrms#Direct>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ReportingRelationshipType> .
+
+<http://www.misa.org.ca/mrms#ReportingRelationshipType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#ProjectType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Executing>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#ProcessType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Supports>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#RoleType> .
+
+<http://www.misa.org.ca/mrms#RoleType>
+  a owl:Class ;
+  dc11:description "A closed classification of roles organization units play in relationship to the other organizaiton units, programs, services, processes and resources. Can be used to establish a RACI matrix."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Inactive>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#StatusType> .
+
+<http://www.misa.org.ca/mrms#StatusType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> ;
+  dc11:title "Internal Enabling"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Planning>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#AssessableElement>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#AccountabilityElement>, foaf:Project, skos:Collection, foaf:OnlineAccount, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#LocatableElement>, foaf:Document, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#TypeClassifier>, foaf:Agent, foaf:Image, skos:ConceptScheme, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#OutputProducer>, owl:Nothing, skos:Concept, geo:SpatialThing ;
+  rdfs:label "Assessable Element"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  dc11:description "An element that can be assessed by performance indicators."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#BudgetableItem>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#AssessableElement>, skos:Concept, <http://www.misa.org.ca/mrms#OutputProducer>, foaf:Agent, foaf:Project, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:Collection, foaf:Image, <http://www.misa.org.ca/mrms#LocatableElement>, foaf:Document, <http://www.misa.org.ca/mrms#DeliverableElement>, skos:ConceptScheme, owl:Nothing, <http://www.misa.org.ca/mrms#TypeClassifier>, foaf:OnlineAccount, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#AccountableElement>, geo:SpatialThing ;
+  rdfs:label "Budgetable Item"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  dc11:description "An element that can have associated budget information."^^xsd:string .
+
+foaf:Project owl:disjointWith <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, foaf:Document, <http://www.misa.org.ca/mrms#LocatableElement>, skos:Concept, geo:SpatialThing, <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#AccountabilityElement>, foaf:Agent, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#AssessableElement>, foaf:OnlineAccount, owl:Nothing, foaf:Image, <http://www.misa.org.ca/mrms#BudgetableItem>, skos:Collection, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://open-services.net/ns/am#Resource>, skos:ConceptScheme, <http://www.misa.org.ca/mrms#AccountableElement> .
+<http://www.misa.org.ca/mrms#ImpcatableElement>
+  a owl:Class ;
+  owl:disjointWith foaf:Agent, <http://www.misa.org.ca/mrms#AssessableElement>, foaf:Image, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#DeliverableElement>, skos:Concept, foaf:Project, skos:ConceptScheme, foaf:OnlineAccount, owl:Nothing, foaf:Document, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://open-services.net/ns/am#Resource>, geo:SpatialThing, skos:Collection, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#AccountableElement> ;
+  dc11:description "An element that can be impacted by a change driver."^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  rdfs:label "Impactable Element"^^xsd:string .
+
+foaf:Document owl:disjointWith foaf:Image, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:Concept, owl:Nothing, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#OutputProducer>, foaf:OnlineAccount, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#ImpcatableElement>, foaf:Project, foaf:Agent, geo:SpatialThing, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#BudgetableItem>, skos:ConceptScheme, skos:Collection .
+foaf:Image owl:disjointWith <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:Concept, foaf:Agent, <http://open-services.net/ns/am#Resource>, foaf:Document, <http://www.misa.org.ca/mrms#AccountableElement>, geo:SpatialThing, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#ImpcatableElement>, foaf:OnlineAccount, foaf:Project, <http://www.misa.org.ca/mrms#AccountabilityElement>, skos:ConceptScheme, <http://www.misa.org.ca/mrms#OutputProducer>, owl:Nothing, skos:Collection, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#TypeClassifier> .
+<http://www.misa.org.ca/mrms#DeliverableElement>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#AssessableElement>, foaf:Document, skos:ConceptScheme, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#OutputProducer>, foaf:Image, geo:SpatialThing, <http://www.misa.org.ca/mrms#TypeClassifier>, foaf:Agent, owl:Nothing, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:Collection, <http://www.misa.org.ca/mrms#AccountableElement>, skos:Concept, foaf:Project, foaf:OnlineAccount, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#LocatableElement> ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  rdfs:label "Deliverable Element"^^xsd:string ;
+  dc11:description "An element that can be delivered by a project that changes the municipal business architecture in some way."^^xsd:string .
+
+<http://www.misa.org.ca/mrms#ImpactAssessment>
+  a owl:Class ;
+  owl:disjointWith foaf:Image, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, owl:Nothing, <http://www.misa.org.ca/mrms#AccountabilityElement>, skos:Concept, skos:Collection, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://open-services.net/ns/am#Resource>, foaf:Agent, <http://www.misa.org.ca/mrms#AccountableElement>, foaf:Project, <http://www.misa.org.ca/mrms#AssessableElement>, foaf:Document, foaf:OnlineAccount, skos:ConceptScheme, <http://www.misa.org.ca/mrms#DeliverableElement>, geo:SpatialThing ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  dc11:description "The impact a Change Driver has on some impacted element"^^xsd:string ;
+  rdfs:label "Impact Assessment"^^xsd:string .
+
+skos:Concept owl:disjointWith <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#AccountableElement>, foaf:Project, skos:ConceptScheme, <http://open-services.net/ns/am#Resource>, skos:Collection, <http://www.misa.org.ca/mrms#AssessableElement>, owl:Nothing, <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#DeliverableElement>, foaf:Image, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#ImpcatableElement>, foaf:OnlineAccount, foaf:Agent, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#AccountabilityElement>, geo:SpatialThing, foaf:Document .
+<http://www.misa.org.ca/mrms#AccountableElement>
+  a owl:Class ;
+  owl:disjointWith foaf:Image, foaf:Agent, foaf:Document, <http://www.misa.org.ca/mrms#AccountabilityElement>, skos:Collection, skos:Concept, geo:SpatialThing, <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#AssessableElement>, skos:ConceptScheme, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#BudgetableItem>, owl:Nothing, foaf:Project, <http://www.misa.org.ca/mrms#OutputProducer>, foaf:OnlineAccount ;
+  dc11:description "An element for which an organization unit can be held accountable."^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  rdfs:label "Accountable Element"^^xsd:string .
+
+skos:ConceptScheme owl:disjointWith skos:Collection, skos:Concept, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#OutputProducer>, foaf:OnlineAccount, foaf:Document, foaf:Image, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#DeliverableElement>, owl:Nothing, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#AccountabilityElement>, geo:SpatialThing, foaf:Agent, foaf:Project .
+skos:Collection owl:disjointWith <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#OutputProducer>, skos:Concept, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#BudgetableItem>, foaf:Image, geo:SpatialThing, owl:Nothing, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, foaf:Agent, skos:ConceptScheme, <http://open-services.net/ns/am#Resource>, foaf:Project, <http://www.misa.org.ca/mrms#DeliverableElement>, foaf:OnlineAccount, foaf:Document .
+<http://www.misa.org.ca/mrms#OutputProducer>
+  a owl:Class ;
+  dc11:description "An element that can produce an output (a service or process)."^^xsd:string ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#DeliverableElement>, foaf:Document, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#LocatableElement>, foaf:Image, <http://open-services.net/ns/am#Resource>, skos:Collection, skos:ConceptScheme, skos:Concept, geo:SpatialThing, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, foaf:Agent, <http://www.misa.org.ca/mrms#AccountabilityElement>, foaf:OnlineAccount, owl:Nothing, foaf:Project, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#AssessableElement> ;
+  rdfs:label "Output Producer"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> .
+
+geo:SpatialThing owl:disjointWith <http://www.misa.org.ca/mrms#OutputProducer>, skos:Collection, <http://www.misa.org.ca/mrms#DeliverableElement>, foaf:Agent, foaf:OnlineAccount, <http://open-services.net/ns/am#Resource>, foaf:Image, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, skos:ConceptScheme, <http://www.misa.org.ca/mrms#BudgetableItem>, foaf:Project, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, owl:Nothing, foaf:Document, skos:Concept, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#ImpcatableElement> .
+foaf:Agent owl:disjointWith <http://www.misa.org.ca/mrms#ImpactAssessment>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#AssessableElement>, foaf:OnlineAccount, foaf:Document, <http://www.misa.org.ca/mrms#LocatableElement>, <http://www.misa.org.ca/mrms#ImpcatableElement>, skos:Collection, <http://www.misa.org.ca/mrms#AccountableElement>, owl:Nothing, geo:SpatialThing, foaf:Project, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#AccountabilityElement>, skos:ConceptScheme, foaf:Image, skos:Concept .
+<http://open-services.net/ns/am#Resource>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#ImpcatableElement>, foaf:Agent, foaf:Document, skos:ConceptScheme, skos:Collection, <http://www.misa.org.ca/mrms#BudgetableItem>, foaf:OnlineAccount, skos:Concept, <http://www.misa.org.ca/mrms#ImpactAssessment>, owl:Nothing, <http://www.misa.org.ca/mrms#TypeClassifier>, foaf:Project, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#LocatableElement>, foaf:Image, <http://www.misa.org.ca/mrms#DeliverableElement>, geo:SpatialThing, <http://www.misa.org.ca/mrms#AssessableElement> ;
+  dc11:description "Any OSLC Architecure Management Resource"^^xsd:string ;
+  rdfs:label "Resource"^^xsd:string ;
+  rdfs:subClassOf owl:Thing .
+
+foaf:OnlineAccount owl:disjointWith foaf:Document, skos:Collection, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#ImpactAssessment>, foaf:Project, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://open-services.net/ns/am#Resource>, skos:Concept, <http://www.misa.org.ca/mrms#BudgetableItem>, foaf:Image, skos:ConceptScheme, <http://www.misa.org.ca/mrms#ImpcatableElement>, foaf:Agent, geo:SpatialThing, <http://www.misa.org.ca/mrms#AssessableElement>, owl:Nothing, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#DeliverableElement> .
+<http://www.misa.org.ca/mrms#LocatableElement>
+  a owl:Class ;
+  owl:disjointWith <http://www.misa.org.ca/mrms#BudgetableItem>, foaf:Agent, foaf:Image, <http://www.misa.org.ca/mrms#ImpcatableElement>, foaf:Project, <http://www.misa.org.ca/mrms#OutputProducer>, skos:Concept, foaf:OnlineAccount, geo:SpatialThing, owl:Nothing, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#AssessableElement>, <http://www.misa.org.ca/mrms#AccountabilityElement>, <http://www.misa.org.ca/mrms#DeliverableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, foaf:Document, skos:ConceptScheme, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:Collection, <http://open-services.net/ns/am#Resource> ;
+  rdfs:label "Locatable Element"^^xsd:string ;
+  rdfs:subClassOf <http://open-services.net/ns/am#Resource> ;
+  dc11:description "An element that can have a location"^^xsd:string .
+
+owl:Nothing owl:disjointWith foaf:OnlineAccount, <http://www.misa.org.ca/mrms#OutputProducer>, <http://www.misa.org.ca/mrms#ImpcatableElement>, <http://www.misa.org.ca/mrms#TypeClassifier>, <http://www.misa.org.ca/mrms#AssessableElement>, geo:SpatialThing, <http://www.misa.org.ca/mrms#AccountableElement>, <http://www.misa.org.ca/mrms#BudgetableItem>, <http://www.misa.org.ca/mrms#LocatableElement>, <http://open-services.net/ns/am#Resource>, <http://www.misa.org.ca/mrms#ImpactAssessment>, skos:Collection, foaf:Document, <http://www.misa.org.ca/mrms#AccountabilityElement>, skos:ConceptScheme, foaf:Project, skos:Concept, <http://www.misa.org.ca/mrms#DeliverableElement>, foaf:Image, foaf:Agent .
+<http://www.misa.org.ca/mrms#Responsible>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#RoleType> .
+
+<http://www.misa.org.ca/mrms#Technology>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#Infrastructure>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Asset> .
+
+<http://www.misa.org.ca/mrms#Economic>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> ;
+  rdfs:label "Economic"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Other>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#Animal>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Asset> .
+
+<http://www.misa.org.ca/mrms#Asset>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ResourceType> .
+
+<http://www.misa.org.ca/mrms#Equipment>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Asset> .
+
+<http://www.misa.org.ca/mrms#Formal>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProgramClassType> .
+
+<http://www.misa.org.ca/mrms#ProgramClassType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Legislative>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> .
+
+<http://www.misa.org.ca/mrms#ProcesLevelType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#OutputType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#ActivityLevel>
+  a owl:Class ;
+  dc11:title "Activity"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcesLevelType> .
+
+<http://www.misa.org.ca/mrms#GoverningBody>
+  a owl:Class ;
+  dc11:title "Governing Body"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#Commission>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#TargetGroupType>
+  a owl:Class ;
+  dc11:description "A closed classification of Target Groups.  There are three types of Target Groups: Individual, Group of Individuals, and Legal Entity.  "^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#ProcessOutput>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OutputType> .
+
+<http://www.misa.org.ca/mrms#Environmental>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> .
+
+<http://www.misa.org.ca/mrms#Internal>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProgramType> .
+
+<http://www.misa.org.ca/mrms#Vehicle>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Asset> .
+
+<http://www.misa.org.ca/mrms#InternalEnabling>
+  a owl:Class ;
+  dc11:title "Internal Enabling"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ServiceType> .
+
+<http://www.misa.org.ca/mrms#ServiceType>
+  a owl:Class ;
+  dc11:description "A closed classification of Service.  A Service is either a “public” service offered to clients, or an “internal” service offered within the municipality to other public or internal service providers."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Individual>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TargetGroupType> .
+
+<http://www.misa.org.ca/mrms#LegalEntity>
+  a owl:Class ;
+  dc11:title "Legal Entity"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TargetGroupType> .
+
+<http://www.misa.org.ca/mrms#Board>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#Consumable>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ResourceType> .
+
+<http://www.misa.org.ca/mrms#CapacityBuilding>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#Involvement>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Responsible> .
+
+<http://www.misa.org.ca/mrms#Demographic>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> ;
+  rdfs:label "Demographic"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Electricity>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#Public>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProgramType> .
+
+<http://www.misa.org.ca/mrms#ProcessLevel>
+  a owl:Class ;
+  dc11:title "Process"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcesLevelType> .
+
+<http://www.misa.org.ca/mrms#Capital>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ResourceType> .
+
+<http://www.misa.org.ca/mrms#Road>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#Quality>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#PerformanceIndicatorType> .
+
+<http://www.misa.org.ca/mrms#PerformanceIndicatorType>
+  a owl:Class ;
+  dc11:description "A closed classification of Performance Indicators."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#StormWater>
+  a owl:Class ;
+  dc11:title "Storm Water"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#Active>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#StatusType> .
+
+<http://www.misa.org.ca/mrms#Primary>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Responsible> .
+
+<http://www.misa.org.ca/mrms#Collaboration>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ReportingRelationshipType> .
+
+<http://www.misa.org.ca/mrms#Agency>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#Decision>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Responsible> .
+
+<http://www.misa.org.ca/mrms#Office>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#MainOffice>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#LocationType> ;
+  rdfs:label "Main Office"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#LocationType>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#GroupOfIndividuals>
+  a owl:Class ;
+  dc11:title "Group of Individuals"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TargetGroupType> .
+
+<http://www.misa.org.ca/mrms#TaskLevel>
+  a owl:Class ;
+  dc11:title "Task"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcesLevelType> .
+
+<http://www.misa.org.ca/mrms#Delivering>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#Labor>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ResourceType> .
+
+<http://www.misa.org.ca/mrms#ServiceOutputType>
+  a owl:Class ;
+  dc11:description "A closed classification of Service Outputs."^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#BeneficialClient>
+  a owl:Class ;
+  dc11:title "Direct"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ServiceClientType> .
+
+<http://www.misa.org.ca/mrms#ServiceClientType>
+  a owl:Class ;
+  dc11:title "Internal Enabling"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Social>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> ;
+  rdfs:label "Social"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Accountable>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#RoleType> .
+
+<http://www.misa.org.ca/mrms#Division>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#DirectClient>
+  a owl:Class ;
+  dc11:title "Direct"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ServiceClientType> .
+
+<http://www.misa.org.ca/mrms#ServiceOutput>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OutputType> .
+
+<http://www.misa.org.ca/mrms#Contingiency>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ChangeDriverType> ;
+  rdfs:label "Contingiency"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#Effectiveness>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#PerformanceIndicatorType> .
+
+<http://www.misa.org.ca/mrms#Decommissioning>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#Department>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#NeedsCategoryType>
+  a owl:Class ;
+  rdfs:label "Needs Category"^^xsd:string ;
+  dc11:description "A closed classification of Programs and Services according to Recognized Needs.  "^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#TypeClassifier> .
+
+<http://www.misa.org.ca/mrms#Monitoring>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#PotableWater>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#PublicService>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ServiceType> .
+
+<http://www.misa.org.ca/mrms#BusinessProcess>
+  a owl:Class ;
+  dc11:description "Work performed from an external event to the completion of the organization's response to that external event that may involve municipal services and processes"^^xsd:string ;
+  rdfs:label "Business Process"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Process> .
+
+<http://www.misa.org.ca/mrms#Pending>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#StatusType> .
+
+<http://www.misa.org.ca/mrms#Beneficial>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ReportingRelationshipType> .
+
+<http://www.misa.org.ca/mrms#Informal>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProgramClassType> .
+
+<http://www.misa.org.ca/mrms#Section>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#Consulted>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#RoleType> .
+
+<http://www.misa.org.ca/mrms#Corporation>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#OrganizationUnitType> .
+
+<http://www.misa.org.ca/mrms#Waste>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ResourceType> .
+
+<http://www.misa.org.ca/mrms#Controlling>
+  a owl:Class ;
+  dc11:title "Capacty Building"^^xsd:string ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#ProcessType> .
+
+<http://www.misa.org.ca/mrms#Wastewater>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Infrastructure> .
+
+<http://www.misa.org.ca/mrms#Facility>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#Asset> .
+
+<http://www.misa.org.ca/mrms#Efficiency>
+  a owl:Class ;
+  rdfs:subClassOf <http://www.misa.org.ca/mrms#PerformanceIndicatorType> .
+
+<http://www.misa.org.ca/mrms#locatedAt>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Location> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#LocatableElement> .
+
+<http://www.misa.org.ca/mrms#addressedBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#creates>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#createdBy> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ServiceValue> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#createdBy>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Output> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#creates> .
+
+<http://www.misa.org.ca/mrms#sub_Services>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Service> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Service> .
+
+<http://www.misa.org.ca/mrms#administeredBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#assessedBy>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AssessableElement> ;
+  rdfs:range <http://www.misa.org.ca/mrms#PerformanceIndicator> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#assesses> .
+
+<http://www.misa.org.ca/mrms#assesses>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#AssessableElement> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#PerformanceIndicator> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#assessedBy> .
+
+<http://www.misa.org.ca/mrms#sub_Resources>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Resource> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Resource> .
+
+<http://www.misa.org.ca/mrms#producedBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#realizes>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#realizedBy> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Outcome> .
+
+<http://www.misa.org.ca/mrms#realizedBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#administers>
+  a owl:ObjectProperty ;
+  rdfs:label "administers"^^xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Program> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Service> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#administeredBy> .
+
+<http://www.misa.org.ca/mrms#impactedBy>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#impacts> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ChangeDriver> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ImpactAssessment> .
+
+<http://www.misa.org.ca/mrms#impacts>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#impactedBy> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ChangeDriver> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ImpactAssessment> .
+
+<http://www.misa.org.ca/mrms#delivers>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#deliveredBy> ;
+  rdfs:range <http://www.misa.org.ca/mrms#DeliverableElement> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Project> .
+
+<http://www.misa.org.ca/mrms#deliveredBy>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#delivers> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Project> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#DeliverableElement> .
+
+<http://www.misa.org.ca/mrms#sub_OrganizationUnits>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#OrganizationUnit> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> .
+
+<http://www.misa.org.ca/mrms#accountableForProgram>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#accountableToOrganizationUnit> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Program> .
+
+<http://www.misa.org.ca/mrms#accountableToOrganizationUnit> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#usedBy>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Service> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ServiceLevelAgreement> .
+
+<http://www.misa.org.ca/mrms#scope>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Project> ;
+  rdfs:range <http://www.misa.org.ca/mrms#DeliverableElement> .
+
+<http://www.misa.org.ca/mrms#sub_Outcomes>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Outcome> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Outcome> .
+
+<http://www.misa.org.ca/mrms#responsibleFor>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Process> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#responsibleOf> .
+
+<http://www.misa.org.ca/mrms#responsibleOf> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#authorizedBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#sub_Programs>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Program> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Program> .
+
+<http://www.misa.org.ca/mrms#participateIn>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Project> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> .
+
+<http://www.misa.org.ca/mrms#sub_Outputs>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Output> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#sub_Needs>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Need> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Need> .
+
+<http://www.misa.org.ca/mrms#accountableOrganization>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#isAccountableFor> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  rdfs:range <http://www.misa.org.ca/mrms#OrganizationUnit> ;
+  rdfs:label "accountable Organization"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#isAccountableFor>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#accountableOrganization> ;
+  rdfs:range <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  rdfs:label "authorizes"^^xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> .
+
+<http://www.misa.org.ca/mrms#provider>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Service> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#usedBy> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceLevelAgreement> .
+
+<http://www.misa.org.ca/mrms#implementedBy>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#implementes> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Process> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Service> .
+
+<http://www.misa.org.ca/mrms#implementes> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#consumer>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#Service> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#uses> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceLevelAgreement> .
+
+<http://www.misa.org.ca/mrms#uses>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Service> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ServiceLevelAgreement> .
+
+<http://www.misa.org.ca/mrms#experiencedBy>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#experiences> ;
+  rdfs:range <http://www.misa.org.ca/mrms#TargetGroup> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Outcome> .
+
+<http://www.misa.org.ca/mrms#experiences> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#sub_Target_Groups>
+  a owl:ObjectProperty ;
+  rdfs:range <http://www.misa.org.ca/mrms#TargetGroup> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#TargetGroup> .
+
+<http://www.misa.org.ca/mrms#accomodates>
+  a owl:ObjectProperty ;
+  dc11:description "A location accomodates, or provides a place to home locatable elements"^^xsd:string ;
+  rdfs:label "accomodates"^^xsd:string ;
+  rdfs:range <http://www.misa.org.ca/mrms#LocatableElement> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Location> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#locatedAt> .
+
+<http://www.misa.org.ca/mrms#consumedBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#contributedToBy> a owl:ObjectProperty .
+<http://www.misa.org.ca/mrms#addresses>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Outcome> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Need> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#addressedBy> .
+
+<http://www.misa.org.ca/mrms#accountableTo>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AccountableElement> ;
+  rdfs:range <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#accountableFor> .
+
+<http://www.misa.org.ca/mrms#accountableFor>
+  a owl:ObjectProperty ;
+  rdfs:label "accountable For"^^xsd:string ;
+  rdfs:range <http://www.misa.org.ca/mrms#AccountableElement> ;
+  dc11:description "An organization unit is accountable for programs, services, processes and resources"^^xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AccountabilityElement> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#accountableTo> .
+
+<http://www.misa.org.ca/mrms#assessment>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ImpcatableElement> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ImpactAssessment> ;
+  rdfs:label "assessment"^^xsd:string ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#assessmentOf> .
+
+<http://www.misa.org.ca/mrms#assessmentOf>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ImpactAssessment> ;
+  rdfs:range <http://www.misa.org.ca/mrms#ImpcatableElement> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#assessment> .
+
+<http://www.misa.org.ca/mrms#produces>
+  a owl:ObjectProperty ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#producedBy> ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OutputProducer> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#sub_Processes>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Process> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Process> .
+
+<http://www.misa.org.ca/mrms#contributesTo>
+  a owl:ObjectProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Program> ;
+  rdfs:range <http://www.misa.org.ca/mrms#Outcome> ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#contributedToBy> .
+
+<http://www.misa.org.ca/mrms#service-has_Output>
+  a rdf:Property ;
+  rdfs:range <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#client_set_Takeup>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> ;
+  rdfs:range xsd:integer .
+
+<http://www.misa.org.ca/mrms#budget_2>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#BudgetableItem> ;
+  rdfs:range xsd:float .
+
+<http://www.misa.org.ca/mrms#budget_1>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#BudgetableItem> ;
+  rdfs:range xsd:float .
+
+<http://www.misa.org.ca/mrms#consumes>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Process> ;
+  rdfs:range rdfs:Resource ;
+  owl:inverseOf <http://www.misa.org.ca/mrms#consumedBy> .
+
+<http://www.misa.org.ca/mrms#serviceClient>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> ;
+  rdfs:range xsd:string .
+
+<http://www.misa.org.ca/mrms#client_Indicator>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> ;
+  rdfs:range xsd:boolean .
+
+<http://www.misa.org.ca/mrms#is_formal_Program>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Program> ;
+  rdfs:range xsd:boolean .
+
+<http://www.misa.org.ca/mrms#impact_Level>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ImpactAssessment> ;
+  rdfs:range xsd:integer .
+
+<http://www.misa.org.ca/mrms#from_Date>
+  a rdf:Property ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Element> ;
+  rdfs:range xsd:date .
+
+<http://www.misa.org.ca/mrms#hasOutput>
+  a rdf:Property ;
+  rdfs:range <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#plannedVolumeCount>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Output> ;
+  rdfs:range xsd:integer .
+
+<http://www.misa.org.ca/mrms#Organization_Unit_Vision>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> .
+
+<http://www.misa.org.ca/mrms#service_Level_Target>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceLevelAgreement> .
+
+<http://www.misa.org.ca/mrms#to_Date>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:date ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Element> .
+
+<http://www.misa.org.ca/mrms#volume_Period_Start>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:date ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#plannedPerformance>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#PerformanceIndicator> ;
+  rdfs:range xsd:string .
+
+<http://www.misa.org.ca/mrms#algorithm>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#PerformanceIndicator> ;
+  rdfs:label "algorighm"^^xsd:string ;
+  rdfs:range xsd:string .
+
+<http://www.misa.org.ca/mrms#actualVolumeCount>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Output> ;
+  rdfs:range xsd:integer .
+
+<http://www.misa.org.ca/mrms#allocation1>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:float ;
+  dc11:description "The primary budget for a budgetable item"^^xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#BudgetableItem> .
+
+<http://www.misa.org.ca/mrms#beneficiary_Rank>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> .
+
+<http://www.misa.org.ca/mrms#units>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#PerformanceIndicator> .
+
+<http://www.misa.org.ca/mrms#accountableAllocation2>
+  a owl:DatatypeProperty ;
+  dc11:description "The secondary allocation of an organization unit for some element."^^xsd:string ;
+  rdfs:range xsd:integer ;
+  rdfs:label "accountable Allocation 2"^^xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AccountabilityElement> .
+
+<http://www.misa.org.ca/mrms#achievedServiceLevel>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> .
+
+<http://www.misa.org.ca/mrms#staff_1>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:int ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> .
+
+<http://www.misa.org.ca/mrms#planned_Client_Set>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> .
+
+<http://www.misa.org.ca/mrms#population_Size>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#TargetGroup> .
+
+<http://www.misa.org.ca/mrms#Organization_Unit_Mission>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#OrganizationUnit> .
+
+<http://www.misa.org.ca/mrms#volume_Period_end>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:date ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Output> .
+
+<http://www.misa.org.ca/mrms#served_Client_Set>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#ServiceValue> .
+
+<http://www.misa.org.ca/mrms#program_Vision>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Program> .
+
+<http://www.misa.org.ca/mrms#unit>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Resource> .
+
+<http://www.misa.org.ca/mrms#amount>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Resource> ;
+  rdfs:range xsd:int .
+
+<http://www.misa.org.ca/mrms#achievedLevel>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Outcome> ;
+  rdfs:label "achieved Level"^^xsd:string .
+
+<http://www.misa.org.ca/mrms#targetLevel>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#Outcome> ;
+  rdfs:range xsd:integer .
+
+<http://www.misa.org.ca/mrms#accountableAllocation3>
+  a owl:DatatypeProperty ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AccountabilityElement> .
+
+<http://www.misa.org.ca/mrms#actualPerformance>
+  a owl:DatatypeProperty ;
+  dc11:description "The actual performance achieved"^^xsd:string ;
+  rdfs:range xsd:string ;
+  rdfs:label "actual Performance"^^xsd:string ;
+  rdfs:domain <http://www.misa.org.ca/mrms#PerformanceIndicator> .
+
+<http://www.misa.org.ca/mrms#performanceTarget>
+  a owl:DatatypeProperty ;
+  rdfs:domain <http://www.misa.org.ca/mrms#PerformanceIndicator> ;
+  rdfs:range xsd:string .
+
+<http://www.misa.org.ca/mrms#accountableAllocation1>
+  a owl:DatatypeProperty ;
+  rdfs:label "accountable Allocation 1"^^xsd:string ;
+  dc11:description "The primary allocation of an organization unit for some element."^^xsd:string ;
+  rdfs:range xsd:integer ;
+  rdfs:domain <http://www.misa.org.ca/mrms#AccountabilityElement> .
+
+<http://www.misa.org.ca/mrms#Change_Driver_Type-Environmental> rdfs:label "Environmental"^^xsd:string .
+<http://www.misa.org.ca/mrms#Change_Driver_Type-Political> rdfs:label "Political"^^xsd:string .
+<http://www.misa.org.ca/mrms#Change_Driver_Type-Legislative> rdfs:label "Legislative"^^xsd:string .
+<http://www.misa.org.ca/mrms#Change_Driver_Type-Financial> rdfs:label "Financial"^^xsd:string .

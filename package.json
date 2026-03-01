@@ -1,0 +1,15 @@
+{
+  "name": "oslc4js",
+  "private": true,
+  "workspaces": [
+    "storage-service",
+    "ldp-service",
+    "oslc-service",
+    "ldp-service-fs",
+    "ldp-service-mongodb",
+    "ldp-service-jena",
+    "ldp-app",
+    "oslc-server",
+    "mrm-server"
+  ]
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1771716099110" name="file:/C:/Models/eGov/FEA/all.owl" uri="Municipal%20Reference%20Model/FEARMO.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716099110" name="http://www.misa.org.ca/bmm-mrm" uri="Municipal%20Reference%20Model/BMM-MRM.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716099110" name="http://www.misa.org.ca/mrms" uri="MRM2S.rdf"/>
+        <uri id="Automatically generated entry, Timestamp=1771716099110" name="http://www.omg.org/BMM" uri="BMM.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716099110" name="http://www.osera.gov/owl/2004/11/fea/brm" uri="Municipal%20Reference%20Model/FEA_BRM_s.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716099110" name="shadowed:http://www.misa.org.ca/mrms" uri="Municipal%20Reference%20Model/MRM2S.owl"/>
+    </group>
+</catalog>

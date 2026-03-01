@@ -1,0 +1,19 @@
+###############################################################################
+# 01-catalog.http — ServiceProviderCatalog operations
+#
+# Verify the MRM catalog exists and is a valid LDP BasicContainer.
+# Start the mrm-server first: cd mrm-server && npm start
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Read catalog as Turtle
+GET {{baseUrl}}/oslc
+Accept: text/turtle
+
+### 2. Read catalog as JSON-LD
+GET {{baseUrl}}/oslc
+Accept: application/ld+json
+
+### 3. HEAD request to verify LDP type headers
+HEAD {{baseUrl}}/oslc

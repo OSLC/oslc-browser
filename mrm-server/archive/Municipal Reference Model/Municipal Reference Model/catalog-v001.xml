@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="User Entered Import Resolution" name="http://www.misa.org.ca/mrm" uri="mrm-togafs.ttl"/>
+    <uri id="User Entered Import Resolution" name="http://www.omg.org/bmms" uri="mrm-togafs.ttl"/>
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1771716356193" name="file:/C:/Models/eGov/FEA/all.owl" uri="FEARMO.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716356193" name="http://www.misa.org.ca/bmm-mrm" uri="BMM-MRM.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716356193" name="http://www.misa.org.ca/mrms" uri="MRM2S.owl"/>
+        <uri id="Automatically generated entry, Timestamp=1771716356193" name="http://www.osera.gov/owl/2004/11/fea/brm" uri="FEA_BRM_s.owl"/>
+    </group>
+</catalog>

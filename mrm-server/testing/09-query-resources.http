@@ -1,0 +1,66 @@
+###############################################################################
+# 09-query-resources.http — Test OSLC query capability for MRM types
+#
+# Run 01 through 04 first to set up test data.
+# Queries use POST with oslc.prefix on the URL and readable query params
+# in the form-encoded body.
+###############################################################################
+
+@baseUrl = http://localhost:3002
+@queryBase = {{baseUrl}}/oslc/city-of-ottawa/query
+@prefix = oslc.prefix=dcterms%3D%3Chttp%3A%2F%2Fpurl.org%2Fdc%2Fterms%2F%3E%2Cmrm%3D%3Chttp%3A%2F%2Fwww.misa.org.ca%2Fmrm%23%3E
+
+### 1. Query all Services (no filters)
+GET {{queryBase}}/Service
+Accept: text/turtle
+
+### 2. Query Services with oslc.where filter
+POST {{queryBase}}/Service?{{prefix}}
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.where=dcterms:identifier="SVC-001"
+
+### 3. Query with oslc.select for specific properties
+POST {{queryBase}}/Service?{{prefix}}
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.select=dcterms:title,dcterms:description
+
+### 4. Query all Processes
+GET {{queryBase}}/Process
+Accept: text/turtle
+
+### 5. Query all OrganizationUnits
+GET {{queryBase}}/OrganizationUnit
+Accept: text/turtle
+
+### 6. Query all Programs
+GET {{queryBase}}/Program
+Accept: text/turtle
+
+### 7. Query with ordering
+POST {{queryBase}}/Service?{{prefix}}
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.orderBy=+dcterms:title
+
+### 8. Query with paging
+POST {{queryBase}}/Service?{{prefix}}
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.pageSize=2
+
+### 9. Query as JSON-LD
+GET {{queryBase}}/Service
+Accept: application/ld+json
+
+### 10. Query with search terms
+POST {{queryBase}}/Service
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.searchTerms="water"

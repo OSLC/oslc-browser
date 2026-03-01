@@ -1,0 +1,202 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+# --- Catalog properties ---
+
+<urn:oslc:template/catalog>
+  dcterms:title "MRM Service Provider Catalog" ;
+  dcterms:description "ServiceProviderCatalog for the MISA Municipal Reference Model" ;
+  dcterms:publisher [
+    a oslc:Publisher ;
+    dcterms:identifier "mrm" ;
+    dcterms:title "MISA Municipal Reference Model"
+  ] .
+
+# --- Meta ServiceProvider definition ---
+
+<urn:oslc:template/sp>
+  a oslc:ServiceProvider ;
+  oslc:service <urn:oslc:template/sp/service> .
+
+<urn:oslc:template/sp/service>
+  a oslc:Service ;
+  oslc:domain mrm: ;
+
+  # === Creation Factories ===
+
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Programs" ;
+    oslc:resourceType mrm:Program ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ProgramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Services" ;
+    oslc:resourceType mrm:Service ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ServiceShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Processes" ;
+    oslc:resourceType mrm:Process ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ProcessShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Resources" ;
+    oslc:resourceType mrm:Resource ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ResourceShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Outcomes" ;
+    oslc:resourceType mrm:Outcome ;
+    oslc:resourceShape <shapes/MRMS-Shapes#OutcomeShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Organization Units" ;
+    oslc:resourceType mrm:OrganizationUnit ;
+    oslc:resourceShape <shapes/MRMS-Shapes#OrganizationUnitShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Target Groups" ;
+    oslc:resourceType mrm:TargetGroup ;
+    oslc:resourceShape <shapes/MRMS-Shapes#TargetGroupShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Needs" ;
+    oslc:resourceType mrm:Need ;
+    oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+  ] ;
+
+  # === Creation Dialogs ===
+
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Program" ;
+    oslc:label "Program" ;
+    oslc:resourceType mrm:Program ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ProgramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Service" ;
+    oslc:label "Service" ;
+    oslc:resourceType mrm:Service ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ServiceShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Process" ;
+    oslc:label "Process" ;
+    oslc:resourceType mrm:Process ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ProcessShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Resource" ;
+    oslc:label "Resource" ;
+    oslc:resourceType mrm:Resource ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ResourceShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Outcome" ;
+    oslc:label "Outcome" ;
+    oslc:resourceType mrm:Outcome ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#OutcomeShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Organization Unit" ;
+    oslc:label "Organization Unit" ;
+    oslc:resourceType mrm:OrganizationUnit ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#OrganizationUnitShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Target Group" ;
+    oslc:label "Target Group" ;
+    oslc:resourceType mrm:TargetGroup ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#TargetGroupShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "New Need" ;
+    oslc:label "Need" ;
+    oslc:resourceType mrm:Need ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+  ] ;
+
+  # === Query Capabilities ===
+
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Programs" ;
+    oslc:resourceType mrm:Program ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ProgramShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Services" ;
+    oslc:resourceType mrm:Service ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ServiceShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Processes" ;
+    oslc:resourceType mrm:Process ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ProcessShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Resources" ;
+    oslc:resourceType mrm:Resource ;
+    oslc:resourceShape <shapes/MRMS-Shapes#ResourceShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Outcomes" ;
+    oslc:resourceType mrm:Outcome ;
+    oslc:resourceShape <shapes/MRMS-Shapes#OutcomeShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Organization Units" ;
+    oslc:resourceType mrm:OrganizationUnit ;
+    oslc:resourceShape <shapes/MRMS-Shapes#OrganizationUnitShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Target Groups" ;
+    oslc:resourceType mrm:TargetGroup ;
+    oslc:resourceShape <shapes/MRMS-Shapes#TargetGroupShape>
+  ] ;
+  oslc:queryCapability [
+    a oslc:QueryCapability ;
+    dcterms:title "Query Needs" ;
+    oslc:resourceType mrm:Need ;
+    oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+  ] .

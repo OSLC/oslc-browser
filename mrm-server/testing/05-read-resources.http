@@ -1,0 +1,24 @@
+###############################################################################
+# 05-read-resources.http — Read and navigate MRM resources
+#
+# After creating resources in 04, read them back individually and
+# verify the resource containers list their members.
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Read a specific Service
+GET {{baseUrl}}/oslc/city-of-ottawa/resources/water-distribution
+Accept: text/turtle
+
+### 2. Read a specific Process
+GET {{baseUrl}}/oslc/city-of-ottawa/resources/water-quality-testing
+Accept: text/turtle
+
+### 3. Read a resource from City of Toronto
+GET {{baseUrl}}/oslc/city-of-toronto/resources/transit-operations
+Accept: text/turtle
+
+### 4. Read a resource as JSON-LD
+GET {{baseUrl}}/oslc/city-of-ottawa/resources/public-works
+Accept: application/ld+json

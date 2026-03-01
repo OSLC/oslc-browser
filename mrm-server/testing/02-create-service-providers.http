@@ -1,0 +1,37 @@
+###############################################################################
+# 02-create-service-providers.http — Create ServiceProvider instances
+#
+# Each POST creates a ServiceProvider with MRM services.
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Create "City of Ottawa" municipality
+POST {{baseUrl}}/oslc
+Content-Type: text/turtle
+Slug: city-of-ottawa
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+<> dcterms:title "City of Ottawa" ;
+   dcterms:description "Municipal Reference Model for the City of Ottawa." .
+
+### 2. Create "City of Toronto" municipality
+POST {{baseUrl}}/oslc
+Content-Type: text/turtle
+Slug: city-of-toronto
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+<> dcterms:title "City of Toronto" ;
+   dcterms:description "Municipal Reference Model for the City of Toronto." .
+
+### 3. Verify catalog contains the new ServiceProviders
+GET {{baseUrl}}/oslc
+Accept: text/turtle
+
+### 4. Attempt duplicate creation (should return 409 Conflict)
+POST {{baseUrl}}/oslc
+Content-Type: text/turtle
+Slug: city-of-ottawa
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+<> dcterms:title "City of Ottawa" .

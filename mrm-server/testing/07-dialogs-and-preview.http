@@ -1,0 +1,29 @@
+###############################################################################
+# 07-dialogs-and-preview.http — Creation dialogs and resource preview
+#
+# Tests the OSLC-specific endpoints:
+# - GET /dialog/create — returns an HTML creation form
+# - GET /compact — returns resource preview (Compact)
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Creation dialog for Service (HTML form)
+GET {{baseUrl}}/dialog/create?shape={{baseUrl}}/shapes/MRMS-Shapes&creation={{baseUrl}}/oslc/city-of-ottawa/resources
+Accept: text/html
+
+### 2. Creation dialog for Program (HTML form)
+GET {{baseUrl}}/dialog/create?shape={{baseUrl}}/shapes/MRMS-Shapes&creation={{baseUrl}}/oslc/city-of-ottawa/resources
+Accept: text/html
+
+### 3. Resource preview as Turtle (Compact representation)
+GET {{baseUrl}}/compact?uri={{baseUrl}}/oslc/city-of-ottawa/resources/water-distribution
+Accept: text/turtle
+
+### 4. Resource preview as HTML (small preview fragment)
+GET {{baseUrl}}/compact?uri={{baseUrl}}/oslc/city-of-ottawa/resources/water-distribution
+Accept: text/html
+
+### 5. Resource preview for a Program
+GET {{baseUrl}}/compact?uri={{baseUrl}}/oslc/city-of-ottawa/resources/infrastructure-renewal
+Accept: text/turtle

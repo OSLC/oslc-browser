@@ -1,0 +1,42 @@
+###############################################################################
+# 06-update-delete.http — Update and delete MRM resources
+#
+# Tests LDP PUT (update) and DELETE operations on resources.
+# Note: You must first GET the resource to obtain the current ETag,
+# then pass it in the If-Match header for PUT.
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. GET water-distribution to obtain its ETag (check response headers)
+GET {{baseUrl}}/oslc/city-of-ottawa/resources/water-distribution
+Accept: text/turtle
+
+### 2. Update water-distribution (replace ETag value from step 1)
+PUT {{baseUrl}}/oslc/city-of-ottawa/resources/water-distribution
+Content-Type: text/turtle
+If-Match: W/"replace-with-actual-etag"
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+<> a mrm:Service ;
+   dcterms:title "Water Distribution (Updated)" ;
+   dcterms:description "Provision of potable water to residents and businesses through the municipal water distribution network. Updated to include rural areas." ;
+   dcterms:identifier "SVC-001" .
+
+### 3. Verify the update
+GET {{baseUrl}}/oslc/city-of-ottawa/resources/water-distribution
+Accept: text/turtle
+
+### 4. Delete a resource
+DELETE {{baseUrl}}/oslc/city-of-ottawa/resources/water-quality-testing
+
+### 5. Verify deletion (should return 404 or Gone)
+GET {{baseUrl}}/oslc/city-of-ottawa/resources/water-quality-testing
+Accept: text/turtle
+
+### 6. Verify the container no longer lists the deleted resource
+GET {{baseUrl}}/oslc/city-of-ottawa/resources
+Accept: text/turtle

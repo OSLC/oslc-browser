@@ -1,0 +1,17 @@
+###############################################################################
+# 03-read-service-providers.http — Read ServiceProvider details and shapes
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Read "City of Ottawa" ServiceProvider
+GET {{baseUrl}}/oslc/city-of-ottawa
+Accept: text/turtle
+
+### 2. Read "City of Toronto" ServiceProvider
+GET {{baseUrl}}/oslc/city-of-toronto
+Accept: text/turtle
+
+### 3. Read MRMS ResourceShapes document
+GET {{baseUrl}}/shapes/MRMS-Shapes
+Accept: text/turtle

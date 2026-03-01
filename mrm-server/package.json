@@ -1,0 +1,30 @@
+{
+	"name": "mrm-server",
+	"version": "1.0.0",
+	"description": "An OSLC 3.0 server for the MISA Municipal Reference Model",
+	"license": "Apache-2.0",
+	"author": "Jim Amsden",
+	"type": "module",
+	"main": "dist/app.js",
+	"scripts": {
+		"build": "tsc",
+		"clean": "rm -rf dist",
+		"start": "node dist/app.js"
+	},
+	"dependencies": {
+		"cors": "^2.8.6",
+		"express": "^5.0.1",
+		"ldp-service-jena": "*",
+		"oslc-service": "*",
+		"storage-service": "*"
+	},
+	"devDependencies": {
+		"@types/cors": "^2.8.19",
+		"@types/express": "^5.0.0",
+		"@types/node": "^22.0.0",
+		"typescript": "^5.7.0"
+	},
+	"engines": {
+		"node": "^22.11.0"
+	}
+}

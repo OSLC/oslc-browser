@@ -1,0 +1,1806 @@
+@prefix sh:      <http://www.w3.org/ns/shacl#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+# ================================================================
+# SHACL Shapes for the MISA Municipal Reference Model (MRMS)
+#
+# Generated from OSLC ResourceShapes (MRMS-Shapes.ttl).
+# mrm:Element rdfs:subClassOf oslc_am:Resource, so all MRMS
+# resource shapes inherit the standard OSLC Core and AM properties.
+#
+# Property shapes are named nodes so that shared/inherited
+# properties are defined once and referenced by multiple node shapes.
+# ================================================================
+
+
+# ================================================================
+# SHARED PROPERTY SHAPES — Inherited from oslc_am:Resource
+# ================================================================
+
+<#sp-title>
+  a sh:PropertyShape ;
+  sh:path dcterms:title ;
+  sh:name "title" ;
+  sh:description "Title of the resource." ;
+  sh:minCount 1 ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-description>
+  a sh:PropertyShape ;
+  sh:path dcterms:description ;
+  sh:name "description" ;
+  sh:description "Descriptive text about the resource." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-identifier>
+  a sh:PropertyShape ;
+  sh:path dcterms:identifier ;
+  sh:name "identifier" ;
+  sh:description "Unique identifier of the resource." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-creator>
+  a sh:PropertyShape ;
+  sh:path dcterms:creator ;
+  sh:name "creator" ;
+  sh:description "Creator of the resource." ;
+  sh:nodeKind sh:BlankNodeOrIRI .
+
+<#sp-contributor>
+  a sh:PropertyShape ;
+  sh:path dcterms:contributor ;
+  sh:name "contributor" ;
+  sh:description "Contributor to the resource." .
+
+<#sp-created>
+  a sh:PropertyShape ;
+  sh:path dcterms:created ;
+  sh:name "created" ;
+  sh:description "Date the resource was created." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:dateTime .
+
+<#sp-modified>
+  a sh:PropertyShape ;
+  sh:path dcterms:modified ;
+  sh:name "modified" ;
+  sh:description "Date the resource was last modified." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:dateTime .
+
+<#sp-subject>
+  a sh:PropertyShape ;
+  sh:path dcterms:subject ;
+  sh:name "subject" ;
+  sh:description "Tag or keyword for the resource." ;
+  sh:datatype xsd:string .
+
+<#sp-type>
+  a sh:PropertyShape ;
+  sh:path rdf:type ;
+  sh:name "type" ;
+  sh:description "RDF type of the resource." ;
+  sh:nodeKind sh:IRI .
+
+<#sp-instanceShape>
+  a sh:PropertyShape ;
+  sh:path oslc:instanceShape ;
+  sh:name "instanceShape" ;
+  sh:description "Resource shape that describes this resource." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI .
+
+<#sp-serviceProvider>
+  a sh:PropertyShape ;
+  sh:path oslc:serviceProvider ;
+  sh:name "serviceProvider" ;
+  sh:description "OSLC service provider for this resource." ;
+  sh:nodeKind sh:IRI .
+
+<#sp-shortTitle>
+  a sh:PropertyShape ;
+  sh:path oslc:shortTitle ;
+  sh:name "shortTitle" ;
+  sh:description "Shorter form of the title." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+
+# ================================================================
+# SHARED PROPERTY SHAPES — Inherited from mrm:Element
+# ================================================================
+
+<#sp-fromDate>
+  a sh:PropertyShape ;
+  sh:path mrm:fromDate ;
+  sh:name "fromDate" ;
+  sh:description "Start date for the element." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:date .
+
+<#sp-toDate>
+  a sh:PropertyShape ;
+  sh:path mrm:toDate ;
+  sh:name "toDate" ;
+  sh:description "End date for the element." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:date .
+
+<#sp-status>
+  a sh:PropertyShape ;
+  sh:path mrm:status ;
+  sh:name "status" ;
+  sh:description "Current status of the element (Active, Inactive)." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:StatusType .
+
+
+# ================================================================
+# SHARED PROPERTY SHAPES — Inherited from Mixin Classes
+# ================================================================
+
+# --- BudgetableItem (Program, OrganizationUnit) ---
+
+<#sp-budget_1>
+  a sh:PropertyShape ;
+  sh:path mrm:budget_1 ;
+  sh:name "budget_1" ;
+  sh:description "Primary budget amount." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:decimal .
+
+<#sp-budget_2>
+  a sh:PropertyShape ;
+  sh:path mrm:budget_2 ;
+  sh:name "budget_2" ;
+  sh:description "Secondary budget amount." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:decimal .
+
+<#sp-allocation_1>
+  a sh:PropertyShape ;
+  sh:path mrm:allocation_1 ;
+  sh:name "allocation_1" ;
+  sh:description "Budget allocation amount." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:decimal .
+
+# --- LocatableElement (Service, Resource, OrganizationUnit) ---
+
+<#sp-locatedAt>
+  a sh:PropertyShape ;
+  sh:path mrm:locatedAt ;
+  sh:name "locatedAt" ;
+  sh:description "Location where the element is situated." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Location .
+
+# --- DeliverableElement ---
+
+<#sp-deliveredBy>
+  a sh:PropertyShape ;
+  sh:path mrm:deliveredBy ;
+  sh:name "deliveredBy" ;
+  sh:description "Project that delivers this element." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Project .
+
+# --- AssessableElement ---
+
+<#sp-assessedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:assessedBy ;
+  sh:name "assessedBy" ;
+  sh:description "Performance indicator that assesses this element." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:PerformanceIndicator .
+
+# --- AccountableElement ---
+
+<#sp-accountableTo>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableTo ;
+  sh:name "accountableTo" ;
+  sh:description "Organization unit to which this element is accountable." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:AccountabilityElement .
+
+# --- AccountabilityElement (OrganizationUnit) ---
+
+<#sp-accountableFor>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableFor ;
+  sh:name "accountableFor" ;
+  sh:description "Element for which the organization unit is accountable." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:AccountableElement .
+
+<#sp-accountableRoleType>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableRoleType ;
+  sh:name "accountableRoleType" ;
+  sh:description "Role type for the accountability relationship." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:RoleType .
+
+<#sp-accountableOrganization>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableOrganization ;
+  sh:name "accountableOrganization" ;
+  sh:description "Organization unit that holds the accountability." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:OrganizationUnit .
+
+<#sp-accountableAllocation1>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableAllocation1 ;
+  sh:name "accountableAllocation1" ;
+  sh:description "Primary accountability allocation." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-accountableAllocation2>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableAllocation2 ;
+  sh:name "accountableAllocation2" ;
+  sh:description "Secondary accountability allocation." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-accountableAllocation3>
+  a sh:PropertyShape ;
+  sh:path mrm:accountableAllocation3 ;
+  sh:name "accountableAllocation3" ;
+  sh:description "Tertiary accountability allocation." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-governedElement>
+  a sh:PropertyShape ;
+  sh:path mrm:governedElement ;
+  sh:name "governedElement" ;
+  sh:description "Element governed by this accountability relationship." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:AccountableElement .
+
+# --- ImpcatableElement ---
+
+<#sp-assessment>
+  a sh:PropertyShape ;
+  sh:path mrm:assessment ;
+  sh:name "assessment" ;
+  sh:description "Impact assessment for this element." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ImpactAssessment .
+
+# --- OutputProducer (Service, Process) ---
+
+<#sp-produces>
+  a sh:PropertyShape ;
+  sh:path mrm:produces ;
+  sh:name "produces" ;
+  sh:description "Output produced by this element." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Output .
+
+
+# ================================================================
+# DOMAIN-SPECIFIC PROPERTY SHAPES
+# ================================================================
+
+# --- Program ---
+
+<#sp-needsCategory>
+  a sh:PropertyShape ;
+  sh:path mrm:needsCategory ;
+  sh:name "needsCategory" ;
+  sh:description "Classifies the purpose of the program activities in terms of the needs it satisfies." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:NeedsCategory .
+
+<#sp-roleType>
+  a sh:PropertyShape ;
+  sh:path mrm:roleType ;
+  sh:name "roleType" ;
+  sh:description "Role type classification for the program." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:RoleType .
+
+<#sp-programClass>
+  a sh:PropertyShape ;
+  sh:path mrm:programClass ;
+  sh:name "programClass" ;
+  sh:description "Class of the program (Formal, Informal)." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ProgramClassType .
+
+<#sp-programType>
+  a sh:PropertyShape ;
+  sh:path mrm:programType ;
+  sh:name "programType" ;
+  sh:description "Type classification of the program." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ProgramType .
+
+<#sp-isFormalProgram>
+  a sh:PropertyShape ;
+  sh:path mrm:isFormalProgram ;
+  sh:name "isFormalProgram" ;
+  sh:description "Whether the program is a formal program." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:boolean .
+
+<#sp-programVision>
+  a sh:PropertyShape ;
+  sh:path mrm:programVision ;
+  sh:name "programVision" ;
+  sh:description "Vision statement for the program." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-subPrograms>
+  a sh:PropertyShape ;
+  sh:path mrm:subPrograms ;
+  sh:name "subPrograms" ;
+  sh:description "Sub-programs within this program." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Program .
+
+<#sp-administers>
+  a sh:PropertyShape ;
+  sh:path mrm:administers ;
+  sh:name "administers" ;
+  sh:description "Services administered by this program." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Service .
+
+<#sp-contributesTo>
+  a sh:PropertyShape ;
+  sh:path mrm:contributesTo ;
+  sh:name "contributesTo" ;
+  sh:description "Outcomes this program contributes to." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Outcome .
+
+# --- Service ---
+
+<#sp-allocation>
+  a sh:PropertyShape ;
+  sh:path mrm:allocation ;
+  sh:name "allocation" ;
+  sh:description "Allocation value for the service." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:decimal .
+
+<#sp-serviceType>
+  a sh:PropertyShape ;
+  sh:path mrm:serviceType ;
+  sh:name "serviceType" ;
+  sh:description "Type classification of the service (public or internal)." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ServiceType .
+
+<#sp-subServices>
+  a sh:PropertyShape ;
+  sh:path mrm:subServices ;
+  sh:name "subServices" ;
+  sh:description "Sub-services within this service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Service .
+
+<#sp-administeredBy>
+  a sh:PropertyShape ;
+  sh:path mrm:administeredBy ;
+  sh:name "administeredBy" ;
+  sh:description "Program that administers this service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Program .
+
+<#sp-implementedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:implementedBy ;
+  sh:name "implementedBy" ;
+  sh:description "Process that implements this service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Process .
+
+<#sp-uses>
+  a sh:PropertyShape ;
+  sh:path mrm:uses ;
+  sh:name "uses" ;
+  sh:description "Service level agreement used by this service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ServiceLevelAgreements .
+
+<#sp-usedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:usedBy ;
+  sh:name "usedBy" ;
+  sh:description "Service level agreement that uses this service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ServiceLevelAgreements .
+
+<#sp-processes>
+  a sh:PropertyShape ;
+  sh:path mrm:processes ;
+  sh:name "processes" ;
+  sh:description "Processes that implement this service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Process .
+
+<#sp-service-Program_Field_Type>
+  a sh:PropertyShape ;
+  sh:path mrm:service-Program_Field_Type ;
+  sh:name "service-Program_Field_Type" ;
+  sh:description "Needs category classification for the service." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:NeedsCategory .
+
+<#sp-hasOutput>
+  a sh:PropertyShape ;
+  sh:path mrm:hasOutput ;
+  sh:name "hasOutput" ;
+  sh:description "Output of the service or process." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Output .
+
+<#sp-service-has_Output>
+  a sh:PropertyShape ;
+  sh:path mrm:service-has_Output ;
+  sh:name "service-has_Output" ;
+  sh:description "Output produced by the service." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Output .
+
+# --- Process ---
+
+<#sp-implements>
+  a sh:PropertyShape ;
+  sh:path mrm:implements ;
+  sh:name "implements" ;
+  sh:description "Service implemented by this process." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Service .
+
+<#sp-resources>
+  a sh:PropertyShape ;
+  sh:path mrm:resources ;
+  sh:name "resources" ;
+  sh:description "Resources used by this process." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Resource .
+
+<#sp-consumes>
+  a sh:PropertyShape ;
+  sh:path mrm:consumes ;
+  sh:name "consumes" ;
+  sh:description "Resources consumed by this process." ;
+  sh:nodeKind sh:IRI .
+
+<#sp-subProcesses>
+  a sh:PropertyShape ;
+  sh:path mrm:subProcesses ;
+  sh:name "subProcesses" ;
+  sh:description "Sub-processes within this process." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Process .
+
+<#sp-processType>
+  a sh:PropertyShape ;
+  sh:path mrm:processType ;
+  sh:name "processType" ;
+  sh:description "Type classification of the process." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ProcessType .
+
+<#sp-processLevelType>
+  a sh:PropertyShape ;
+  sh:path mrm:processLevelType ;
+  sh:name "processLevelType" ;
+  sh:description "Level classification of the process." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ProcesLevelType .
+
+<#sp-responsibilityOf>
+  a sh:PropertyShape ;
+  sh:path mrm:responsibilityOf ;
+  sh:name "responsibilityOf" ;
+  sh:description "Organization unit responsible for this process." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:OrganizationUnit .
+
+# --- Resource (mrm:Resource) ---
+
+<#sp-subResources>
+  a sh:PropertyShape ;
+  sh:path mrm:subResources ;
+  sh:name "subResources" ;
+  sh:description "Sub-resources within this resource." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Resource .
+
+<#sp-unit>
+  a sh:PropertyShape ;
+  sh:path mrm:unit ;
+  sh:name "unit" ;
+  sh:description "Unit of measure for the resource." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-amount>
+  a sh:PropertyShape ;
+  sh:path mrm:amount ;
+  sh:name "amount" ;
+  sh:description "Quantity of the resource." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-resourceType>
+  a sh:PropertyShape ;
+  sh:path mrm:resourceType ;
+  sh:name "resourceType" ;
+  sh:description "Type classification of the resource." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ResourceType .
+
+<#sp-consumedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:consumedBy ;
+  sh:name "consumedBy" ;
+  sh:description "Process that consumes this resource." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Process .
+
+<#sp-resourceProcesses>
+  a sh:PropertyShape ;
+  sh:path mrm:resourceProcesses ;
+  sh:name "resourceProcesses" ;
+  sh:description "Processes associated with this resource." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Process .
+
+<#sp-authorizedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:authorizedBy ;
+  sh:name "authorizedBy" ;
+  sh:description "Organization unit that authorizes this resource." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:OrganizationUnit .
+
+# --- OrganizationUnit ---
+
+<#sp-subOrganizationUnits>
+  a sh:PropertyShape ;
+  sh:path mrm:subOrganizationUnits ;
+  sh:name "subOrganizationUnits" ;
+  sh:description "Sub-units within this organization unit." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:OrganizationUnit .
+
+<#sp-OrganizationUnitMission>
+  a sh:PropertyShape ;
+  sh:path mrm:OrganizationUnitMission ;
+  sh:name "OrganizationUnitMission" ;
+  sh:description "Mission statement of the organization unit." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-OrganizationUnitVision>
+  a sh:PropertyShape ;
+  sh:path mrm:OrganizationUnitVision ;
+  sh:name "OrganizationUnitVision" ;
+  sh:description "Vision statement of the organization unit." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-participateIn>
+  a sh:PropertyShape ;
+  sh:path mrm:participateIn ;
+  sh:name "participateIn" ;
+  sh:description "Project the organization unit participates in." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Project .
+
+<#sp-staff_1>
+  a sh:PropertyShape ;
+  sh:path mrm:staff_1 ;
+  sh:name "staff_1" ;
+  sh:description "Staff count for the organization unit." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-responsibleFor>
+  a sh:PropertyShape ;
+  sh:path mrm:responsibleFor ;
+  sh:name "responsibleFor" ;
+  sh:description "Process the organization unit is responsible for." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Process .
+
+<#sp-authorizes>
+  a sh:PropertyShape ;
+  sh:path mrm:authorizes ;
+  sh:name "authorizes" ;
+  sh:description "Resource authorized by this organization unit." ;
+  sh:nodeKind sh:IRI .
+
+# --- Output ---
+
+<#sp-creates>
+  a sh:PropertyShape ;
+  sh:path mrm:creates ;
+  sh:name "creates" ;
+  sh:description "Service value created by this output." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ServiceValue .
+
+<#sp-outputType>
+  a sh:PropertyShape ;
+  sh:path mrm:outputType ;
+  sh:name "outputType" ;
+  sh:description "Type classification of the output." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:OutputType .
+
+<#sp-serviceOutputType>
+  a sh:PropertyShape ;
+  sh:path mrm:serviceOutputType ;
+  sh:name "serviceOutputType" ;
+  sh:description "Service output type classification." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ServiceOutputType .
+
+<#sp-subOutputs>
+  a sh:PropertyShape ;
+  sh:path mrm:subOutputs ;
+  sh:name "subOutputs" ;
+  sh:description "Sub-outputs within this output." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Output .
+
+<#sp-volumePeriodStart>
+  a sh:PropertyShape ;
+  sh:path mrm:volumePeriodStart ;
+  sh:name "volumePeriodStart" ;
+  sh:description "Start of the volume measurement period." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:date .
+
+<#sp-volumePeriodEnd>
+  a sh:PropertyShape ;
+  sh:path mrm:volumePeriodEnd ;
+  sh:name "volumePeriodEnd" ;
+  sh:description "End of the volume measurement period." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:date .
+
+<#sp-plannedVolumeCount>
+  a sh:PropertyShape ;
+  sh:path mrm:plannedVolumeCount ;
+  sh:name "plannedVolumeCount" ;
+  sh:description "Planned volume count for the output." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-actualVolumeCount>
+  a sh:PropertyShape ;
+  sh:path mrm:actualVolumeCount ;
+  sh:name "actualVolumeCount" ;
+  sh:description "Actual volume count for the output." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-producer>
+  a sh:PropertyShape ;
+  sh:path mrm:producer ;
+  sh:name "producer" ;
+  sh:description "Service or process that produces this output." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:OutputProducer .
+
+# --- Outcome ---
+
+<#sp-impactReceiver>
+  a sh:PropertyShape ;
+  sh:path mrm:impactReceiver ;
+  sh:name "impactReceiver" ;
+  sh:description "Target group that receives the impact of this outcome." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:TargetGroup .
+
+<#sp-experiencedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:experiencedBy ;
+  sh:name "experiencedBy" ;
+  sh:description "Target group that experiences this outcome." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:TargetGroup .
+
+<#sp-subOutcomes>
+  a sh:PropertyShape ;
+  sh:path mrm:subOutcomes ;
+  sh:name "subOutcomes" ;
+  sh:description "Sub-outcomes within this outcome." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Outcome .
+
+<#sp-realizedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:realizedBy ;
+  sh:name "realizedBy" ;
+  sh:description "Service value that realizes this outcome." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ServiceValue .
+
+<#sp-contributedToBy>
+  a sh:PropertyShape ;
+  sh:path mrm:contributedToBy ;
+  sh:name "contributedToBy" ;
+  sh:description "Program that contributes to this outcome." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Program .
+
+<#sp-addresses>
+  a sh:PropertyShape ;
+  sh:path mrm:addresses ;
+  sh:name "addresses" ;
+  sh:description "Need addressed by this outcome." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Need .
+
+<#sp-targetLevel>
+  a sh:PropertyShape ;
+  sh:path mrm:targetLevel ;
+  sh:name "targetLevel" ;
+  sh:description "Target level for the outcome." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-achievedLevel>
+  a sh:PropertyShape ;
+  sh:path mrm:achievedLevel ;
+  sh:name "achievedLevel" ;
+  sh:description "Achieved level of the outcome." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+# --- Need ---
+
+<#sp-addressedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:addressedBy ;
+  sh:name "addressedBy" ;
+  sh:description "Outcome that addresses this need." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Outcome .
+
+<#sp-subNeeds>
+  a sh:PropertyShape ;
+  sh:path mrm:subNeeds ;
+  sh:name "subNeeds" ;
+  sh:description "Sub-needs within this need." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Need .
+
+# --- TargetGroup ---
+
+<#sp-experiences>
+  a sh:PropertyShape ;
+  sh:path mrm:experiences ;
+  sh:name "experiences" ;
+  sh:description "Outcomes experienced by this target group." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Outcome .
+
+<#sp-subTargetGroups>
+  a sh:PropertyShape ;
+  sh:path mrm:subTargetGroups ;
+  sh:name "subTargetGroups" ;
+  sh:description "Sub-groups within this target group." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:TargetGroup .
+
+<#sp-targetGroupType>
+  a sh:PropertyShape ;
+  sh:path mrm:targetGroupType ;
+  sh:name "targetGroupType" ;
+  sh:description "Type classification (Individual, Group, Legal Entity)." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:TargetGroupType .
+
+<#sp-populationSize>
+  a sh:PropertyShape ;
+  sh:path mrm:populationSize ;
+  sh:name "populationSize" ;
+  sh:description "Population size of the target group." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+# --- Project ---
+
+<#sp-delivers>
+  a sh:PropertyShape ;
+  sh:path mrm:delivers ;
+  sh:name "delivers" ;
+  sh:description "Deliverable element produced by this project." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:DeliverableElement .
+
+<#sp-scope>
+  a sh:PropertyShape ;
+  sh:path mrm:scope ;
+  sh:name "scope" ;
+  sh:description "Scope of the project in terms of deliverable elements." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:DeliverableElement .
+
+<#sp-projectType>
+  a sh:PropertyShape ;
+  sh:path mrm:projectType ;
+  sh:name "projectType" ;
+  sh:description "Type classification of the project." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ProjectType .
+
+# --- Location ---
+
+<#sp-locationType>
+  a sh:PropertyShape ;
+  sh:path mrm:locationType ;
+  sh:name "locationType" ;
+  sh:description "Type classification of the location." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:LocationType .
+
+<#sp-accomodates>
+  a sh:PropertyShape ;
+  sh:path mrm:accomodates ;
+  sh:name "accomodates" ;
+  sh:description "Elements accommodated at this location." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:LocatableElement .
+
+# --- ChangeDriver ---
+
+<#sp-impacts>
+  a sh:PropertyShape ;
+  sh:path mrm:impacts ;
+  sh:name "impacts" ;
+  sh:description "Elements impacted by this change driver." ;
+  sh:nodeKind sh:IRI ;
+.
+
+<#sp-changeDriverType>
+  a sh:PropertyShape ;
+  sh:path mrm:changeDriverType ;
+  sh:name "changeDriverType" ;
+  sh:description "Type of change driver (Demographic, Social, etc.)." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ChangeDriverType .
+
+# --- PerformanceIndicator ---
+
+<#sp-performanceIndicatorType>
+  a sh:PropertyShape ;
+  sh:path mrm:performanceIndicatorType ;
+  sh:name "performanceIndicatorType" ;
+  sh:description "Type classification of the performance indicator." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:PerformanceIndicatorType .
+
+<#sp-assesses>
+  a sh:PropertyShape ;
+  sh:path mrm:assesses ;
+  sh:name "assesses" ;
+  sh:description "Element assessed by this performance indicator." ;
+  sh:nodeKind sh:IRI .
+
+<#sp-actualPerformance>
+  a sh:PropertyShape ;
+  sh:path mrm:actualPerformance ;
+  sh:name "actualPerformance" ;
+  sh:description "Actual measured performance value." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-performanceTarget>
+  a sh:PropertyShape ;
+  sh:path mrm:performanceTarget ;
+  sh:name "performanceTarget" ;
+  sh:description "Target performance value." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-plannedPerformance>
+  a sh:PropertyShape ;
+  sh:path mrm:plannedPerformance ;
+  sh:name "plannedPerformance" ;
+  sh:description "Planned performance value." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-units>
+  a sh:PropertyShape ;
+  sh:path mrm:units ;
+  sh:name "units" ;
+  sh:description "Units of measure for the performance indicator." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-algorithm>
+  a sh:PropertyShape ;
+  sh:path mrm:algorithm ;
+  sh:name "algorithm" ;
+  sh:description "Algorithm used to compute the performance indicator." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+# --- ServiceValue ---
+
+<#sp-createdBy>
+  a sh:PropertyShape ;
+  sh:path mrm:createdBy ;
+  sh:name "createdBy" ;
+  sh:description "Output that creates this service value." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Output .
+
+<#sp-objective>
+  a sh:PropertyShape ;
+  sh:path mrm:objective ;
+  sh:name "objective" ;
+  sh:description "Objective statement for this service value." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-beneficiaryRank>
+  a sh:PropertyShape ;
+  sh:path mrm:beneficiaryRank ;
+  sh:name "beneficiaryRank" ;
+  sh:description "Ranking of the beneficiary." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-achievedServiceLevel>
+  a sh:PropertyShape ;
+  sh:path mrm:achievedServiceLevel ;
+  sh:name "achievedServiceLevel" ;
+  sh:description "Achieved service level." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-plannedClientSet>
+  a sh:PropertyShape ;
+  sh:path mrm:plannedClientSet ;
+  sh:name "plannedClientSet" ;
+  sh:description "Planned number of clients to be served." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-servedClientSet>
+  a sh:PropertyShape ;
+  sh:path mrm:servedClientSet ;
+  sh:name "servedClientSet" ;
+  sh:description "Actual number of clients served." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-clientSetTakeup>
+  a sh:PropertyShape ;
+  sh:path mrm:clientSetTakeup ;
+  sh:name "clientSetTakeup" ;
+  sh:description "Client set takeup rate." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+<#sp-clientIndicator>
+  a sh:PropertyShape ;
+  sh:path mrm:clientIndicator ;
+  sh:name "clientIndicator" ;
+  sh:description "Whether the target group member is a direct client." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:boolean .
+
+<#sp-realizes>
+  a sh:PropertyShape ;
+  sh:path mrm:realizes ;
+  sh:name "realizes" ;
+  sh:description "Outcome realized by this service value." ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Outcome .
+
+# --- ServiceLevelAgreements ---
+
+<#sp-consumer>
+  a sh:PropertyShape ;
+  sh:path mrm:consumer ;
+  sh:name "consumer" ;
+  sh:description "Service that consumes under this agreement." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Service .
+
+<#sp-serviceLevelTarget>
+  a sh:PropertyShape ;
+  sh:path mrm:serviceLevelTarget ;
+  sh:name "serviceLevelTarget" ;
+  sh:description "Target service level for the agreement." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:string .
+
+<#sp-provider>
+  a sh:PropertyShape ;
+  sh:path mrm:provider ;
+  sh:name "provider" ;
+  sh:description "Service that provides under this agreement." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:Service .
+
+# --- ImpactAssessment ---
+
+<#sp-impactedBy>
+  a sh:PropertyShape ;
+  sh:path mrm:impactedBy ;
+  sh:name "impactedBy" ;
+  sh:description "Change driver that causes the impact." ;
+  sh:maxCount 1 ;
+  sh:nodeKind sh:IRI ;
+  sh:class mrm:ChangeDriver .
+
+<#sp-impactLevel>
+  a sh:PropertyShape ;
+  sh:path mrm:impactLevel ;
+  sh:name "impactLevel" ;
+  sh:description "Level or severity of the impact." ;
+  sh:maxCount 1 ;
+  sh:datatype xsd:integer .
+
+
+# ================================================================
+# NODE SHAPE DEFINITIONS
+# ================================================================
+
+# ============================================================
+# Program
+# ============================================================
+
+<#ProgramShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Program ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  # Inherited from mrm:Element
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # Inherited from BudgetableItem
+  sh:property <#sp-budget_1> ;
+  sh:property <#sp-budget_2> ;
+  sh:property <#sp-allocation_1> ;
+  # Inherited from DeliverableElement
+  sh:property <#sp-deliveredBy> ;
+  # Inherited from AssessableElement
+  sh:property <#sp-assessedBy> ;
+  # Inherited from AccountableElement
+  sh:property <#sp-accountableTo> ;
+  # Inherited from ImpcatableElement
+  sh:property <#sp-assessment> ;
+  # Program-specific
+  sh:property <#sp-needsCategory> ;
+  sh:property <#sp-roleType> ;
+  sh:property <#sp-programClass> ;
+  sh:property <#sp-programType> ;
+  sh:property <#sp-isFormalProgram> ;
+  sh:property <#sp-programVision> ;
+  sh:property <#sp-subPrograms> ;
+  sh:property <#sp-administers> ;
+  sh:property <#sp-contributesTo> .
+
+
+# ============================================================
+# Service
+# ============================================================
+
+<#ServiceShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Service ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # Inherited from LocatableElement
+  sh:property <#sp-locatedAt> ;
+  # Inherited from DeliverableElement
+  sh:property <#sp-deliveredBy> ;
+  # Inherited from AssessableElement
+  sh:property <#sp-assessedBy> ;
+  # Inherited from AccountableElement
+  sh:property <#sp-accountableTo> ;
+  # Inherited from ImpcatableElement
+  sh:property <#sp-assessment> ;
+  # Inherited from OutputProducer
+  sh:property <#sp-produces> ;
+  # Service-specific
+  sh:property <#sp-allocation> ;
+  sh:property <#sp-serviceType> ;
+  sh:property <#sp-subServices> ;
+  sh:property <#sp-administeredBy> ;
+  sh:property <#sp-implementedBy> ;
+  sh:property <#sp-uses> ;
+  sh:property <#sp-usedBy> ;
+  sh:property <#sp-processes> ;
+  sh:property <#sp-service-Program_Field_Type> ;
+  sh:property <#sp-hasOutput> ;
+  sh:property <#sp-service-has_Output> .
+
+
+# ============================================================
+# Process
+# ============================================================
+
+<#ProcessShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Process ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  sh:property <#sp-deliveredBy> ;
+  sh:property <#sp-assessedBy> ;
+  sh:property <#sp-accountableTo> ;
+  sh:property <#sp-assessment> ;
+  sh:property <#sp-produces> ;
+  # Process-specific
+  sh:property <#sp-implements> ;
+  sh:property <#sp-resources> ;
+  sh:property <#sp-consumes> ;
+  sh:property <#sp-subProcesses> ;
+  sh:property <#sp-processType> ;
+  sh:property <#sp-processLevelType> ;
+  sh:property <#sp-responsibilityOf> .
+
+
+# ============================================================
+# Resource (mrm:Resource)
+# ============================================================
+
+<#ResourceShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Resource ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  sh:property <#sp-locatedAt> ;
+  sh:property <#sp-deliveredBy> ;
+  sh:property <#sp-assessedBy> ;
+  sh:property <#sp-accountableTo> ;
+  sh:property <#sp-assessment> ;
+  # Resource-specific
+  sh:property <#sp-subResources> ;
+  sh:property <#sp-unit> ;
+  sh:property <#sp-amount> ;
+  sh:property <#sp-resourceType> ;
+  sh:property <#sp-consumedBy> ;
+  sh:property <#sp-resourceProcesses> ;
+  sh:property <#sp-authorizedBy> .
+
+
+# ============================================================
+# OrganizationUnit
+# ============================================================
+
+<#OrganizationUnitShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:OrganizationUnit ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  sh:property <#sp-budget_1> ;
+  sh:property <#sp-budget_2> ;
+  sh:property <#sp-allocation_1> ;
+  sh:property <#sp-locatedAt> ;
+  sh:property <#sp-deliveredBy> ;
+  sh:property <#sp-accountableFor> ;
+  sh:property <#sp-accountableRoleType> ;
+  sh:property <#sp-accountableOrganization> ;
+  sh:property <#sp-accountableAllocation1> ;
+  sh:property <#sp-accountableAllocation2> ;
+  sh:property <#sp-accountableAllocation3> ;
+  sh:property <#sp-governedElement> ;
+  # OrganizationUnit-specific
+  sh:property <#sp-subOrganizationUnits> ;
+  sh:property <#sp-OrganizationUnitMission> ;
+  sh:property <#sp-OrganizationUnitVision> ;
+  sh:property <#sp-participateIn> ;
+  sh:property <#sp-staff_1> ;
+  sh:property <#sp-responsibleFor> ;
+  sh:property <#sp-authorizes> .
+
+
+# ============================================================
+# Output
+# ============================================================
+
+<#OutputShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Output ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # Output-specific
+  sh:property <#sp-creates> ;
+  sh:property <#sp-outputType> ;
+  sh:property <#sp-serviceOutputType> ;
+  sh:property <#sp-subOutputs> ;
+  sh:property <#sp-volumePeriodStart> ;
+  sh:property <#sp-volumePeriodEnd> ;
+  sh:property <#sp-plannedVolumeCount> ;
+  sh:property <#sp-actualVolumeCount> ;
+  sh:property <#sp-producer> .
+
+
+# ============================================================
+# Outcome
+# ============================================================
+
+<#OutcomeShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Outcome ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  sh:property <#sp-assessedBy> ;
+  # Outcome-specific
+  sh:property <#sp-impactReceiver> ;
+  sh:property <#sp-experiencedBy> ;
+  sh:property <#sp-subOutcomes> ;
+  sh:property <#sp-realizedBy> ;
+  sh:property <#sp-contributedToBy> ;
+  sh:property <#sp-addresses> ;
+  sh:property <#sp-targetLevel> ;
+  sh:property <#sp-achievedLevel> .
+
+
+# ============================================================
+# Need
+# ============================================================
+
+<#NeedShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Need ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # Need-specific
+  sh:property <#sp-addressedBy> ;
+  sh:property <#sp-subNeeds> .
+
+
+# ============================================================
+# TargetGroup
+# ============================================================
+
+<#TargetGroupShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:TargetGroup ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # TargetGroup-specific
+  sh:property <#sp-experiences> ;
+  sh:property <#sp-subTargetGroups> ;
+  sh:property <#sp-targetGroupType> ;
+  sh:property <#sp-populationSize> .
+
+
+# ============================================================
+# Project
+# ============================================================
+
+<#ProjectShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Project ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # Project-specific
+  sh:property <#sp-delivers> ;
+  sh:property <#sp-scope> ;
+  sh:property <#sp-projectType> .
+
+
+# ============================================================
+# Location
+# ============================================================
+
+<#LocationShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:Location ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # Location-specific
+  sh:property <#sp-locationType> ;
+  sh:property <#sp-accomodates> .
+
+
+# ============================================================
+# ChangeDriver
+# ============================================================
+
+<#ChangeDriverShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ChangeDriver ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # ChangeDriver-specific
+  sh:property <#sp-impacts> ;
+  sh:property <#sp-changeDriverType> .
+
+
+# ============================================================
+# BusinessProcess
+# ============================================================
+
+<#BusinessProcessShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:BusinessProcess ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# PerformanceIndicator
+# ============================================================
+
+<#PerformanceIndicatorShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:PerformanceIndicator ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # PerformanceIndicator-specific
+  sh:property <#sp-performanceIndicatorType> ;
+  sh:property <#sp-assesses> ;
+  sh:property <#sp-actualPerformance> ;
+  sh:property <#sp-performanceTarget> ;
+  sh:property <#sp-plannedPerformance> ;
+  sh:property <#sp-units> ;
+  sh:property <#sp-algorithm> .
+
+
+# ============================================================
+# ServiceValue
+# ============================================================
+
+<#ServiceValueShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ServiceValue ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # ServiceValue-specific
+  sh:property <#sp-createdBy> ;
+  sh:property <#sp-objective> ;
+  sh:property <#sp-beneficiaryRank> ;
+  sh:property <#sp-achievedServiceLevel> ;
+  sh:property <#sp-plannedClientSet> ;
+  sh:property <#sp-servedClientSet> ;
+  sh:property <#sp-clientSetTakeup> ;
+  sh:property <#sp-clientIndicator> ;
+  sh:property <#sp-realizes> .
+
+
+# ============================================================
+# ServiceLevelAgreements
+# ============================================================
+
+<#ServiceLevelAgreementsShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ServiceLevelAgreements ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-subject> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-shortTitle> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> ;
+  # ServiceLevelAgreements-specific
+  sh:property <#sp-consumer> ;
+  sh:property <#sp-serviceLevelTarget> ;
+  sh:property <#sp-provider> .
+
+
+# ============================================================
+# ImpactAssessment (not a subclass of Element)
+# ============================================================
+
+<#ImpactAssessmentShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ImpactAssessment ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  # ImpactAssessment-specific
+  sh:property <#sp-impactedBy> ;
+  sh:property <#sp-impactLevel> .
+
+
+# ============================================================
+# ProcessImpacts
+# ============================================================
+
+<#ProcessImpactsShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ProcessImpacts ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# ServiceImpacts
+# ============================================================
+
+<#ServiceImpactsShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ServiceImpacts ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# ProgramImpacts
+# ============================================================
+
+<#ProgramImpactsShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ProgramImpacts ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# ResourceImpacts
+# ============================================================
+
+<#ResourceImpactsShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ResourceImpacts ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# ResourceAuthorities
+# ============================================================
+
+<#ResourceAuthoritiesShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ResourceAuthorities ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# ProcessResponsibilities
+# ============================================================
+
+<#ProcessResponsibilitiesShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ProcessResponsibilities ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .
+
+
+# ============================================================
+# ServiceAccountabilities
+# ============================================================
+
+<#ServiceAccountabilitiesShape>
+  a sh:NodeShape ;
+  sh:targetClass mrm:ServiceAccountabilities ;
+  sh:property <#sp-title> ;
+  sh:property <#sp-description> ;
+  sh:property <#sp-identifier> ;
+  sh:property <#sp-creator> ;
+  sh:property <#sp-contributor> ;
+  sh:property <#sp-created> ;
+  sh:property <#sp-modified> ;
+  sh:property <#sp-type> ;
+  sh:property <#sp-instanceShape> ;
+  sh:property <#sp-serviceProvider> ;
+  sh:property <#sp-fromDate> ;
+  sh:property <#sp-toDate> ;
+  sh:property <#sp-status> .

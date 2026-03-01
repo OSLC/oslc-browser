@@ -1,0 +1,77 @@
+###############################################################################
+# 04-create-resources.http — Create MRM resources in ServiceProviders
+#
+# POST resources to the SP's creation factory endpoint.
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Create a Service in "City of Ottawa"
+POST {{baseUrl}}/oslc/city-of-ottawa/resources
+Content-Type: text/turtle
+Slug: water-distribution
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+<> a mrm:Service ;
+   dcterms:title "Water Distribution" ;
+   dcterms:description "Provision of potable water to residents and businesses through the municipal water distribution network." ;
+   dcterms:identifier "SVC-001" .
+
+### 2. Create a Process in "City of Ottawa"
+POST {{baseUrl}}/oslc/city-of-ottawa/resources
+Content-Type: text/turtle
+Slug: water-quality-testing
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+<> a mrm:Process ;
+   dcterms:title "Water Quality Testing" ;
+   dcterms:description "Regular testing of water quality at treatment plants and distribution points." ;
+   dcterms:identifier "PRC-001" .
+
+### 3. Create an OrganizationUnit in "City of Ottawa"
+POST {{baseUrl}}/oslc/city-of-ottawa/resources
+Content-Type: text/turtle
+Slug: public-works
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+<> a mrm:OrganizationUnit ;
+   dcterms:title "Public Works Department" ;
+   dcterms:description "Responsible for infrastructure maintenance and public works services." ;
+   dcterms:identifier "ORG-001" .
+
+### 4. Create a Program in "City of Ottawa"
+POST {{baseUrl}}/oslc/city-of-ottawa/resources
+Content-Type: text/turtle
+Slug: infrastructure-renewal
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+<> a mrm:Program ;
+   dcterms:title "Infrastructure Renewal Program" ;
+   dcterms:description "Multi-year program for renewal of aging municipal infrastructure." ;
+   dcterms:identifier "PGM-001" .
+
+### 5. Create a Service in "City of Toronto"
+POST {{baseUrl}}/oslc/city-of-toronto/resources
+Content-Type: text/turtle
+Slug: transit-operations
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+<> a mrm:Service ;
+   dcterms:title "Transit Operations" ;
+   dcterms:description "Public transit service including buses, streetcars, and subway operations." ;
+   dcterms:identifier "SVC-101" .

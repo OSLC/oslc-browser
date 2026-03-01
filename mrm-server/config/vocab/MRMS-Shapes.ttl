@@ -1,0 +1,2042 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+# ================================================================
+# OSLC Resource Shapes for the MISA Municipal Reference Model (MRMS)
+#
+# mrm:Element rdfs:subClassOf oslc_am:Resource, so all MRMS
+# resource shapes inherit the standard OSLC Core and AM properties.
+#
+# Property definitions are named nodes so that shared/inherited
+# properties are defined once and referenced by multiple shapes.
+# ================================================================
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — Inherited from oslc_am:Resource
+# ================================================================
+
+<#p-title>
+  a oslc:Property ;
+  oslc:name "title" ;
+  oslc:propertyDefinition dcterms:title ;
+  dcterms:description "Title of the resource." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType xsd:string .
+
+<#p-description>
+  a oslc:Property ;
+  oslc:name "description" ;
+  oslc:propertyDefinition dcterms:description ;
+  dcterms:description "Descriptive text about the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-identifier>
+  a oslc:Property ;
+  oslc:name "identifier" ;
+  oslc:propertyDefinition dcterms:identifier ;
+  dcterms:description "Unique identifier of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string ;
+  oslc:readOnly true .
+
+<#p-creator>
+  a oslc:Property ;
+  oslc:name "creator" ;
+  oslc:propertyDefinition dcterms:creator ;
+  dcterms:description "Creator of the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Either .
+
+<#p-contributor>
+  a oslc:Property ;
+  oslc:name "contributor" ;
+  oslc:propertyDefinition dcterms:contributor ;
+  dcterms:description "Contributor to the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Either .
+
+<#p-created>
+  a oslc:Property ;
+  oslc:name "created" ;
+  oslc:propertyDefinition dcterms:created ;
+  dcterms:description "Date the resource was created." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:dateTime ;
+  oslc:readOnly true .
+
+<#p-modified>
+  a oslc:Property ;
+  oslc:name "modified" ;
+  oslc:propertyDefinition dcterms:modified ;
+  dcterms:description "Date the resource was last modified." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:dateTime ;
+  oslc:readOnly true .
+
+<#p-subject>
+  a oslc:Property ;
+  oslc:name "subject" ;
+  oslc:propertyDefinition dcterms:subject ;
+  dcterms:description "Tag or keyword for the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType xsd:string .
+
+<#p-type>
+  a oslc:Property ;
+  oslc:name "type" ;
+  oslc:propertyDefinition rdf:type ;
+  dcterms:description "RDF type of the resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-instanceShape>
+  a oslc:Property ;
+  oslc:name "instanceShape" ;
+  oslc:propertyDefinition oslc:instanceShape ;
+  dcterms:description "Resource shape that describes this resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:readOnly true .
+
+<#p-serviceProvider>
+  a oslc:Property ;
+  oslc:name "serviceProvider" ;
+  oslc:propertyDefinition oslc:serviceProvider ;
+  dcterms:description "OSLC service provider for this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:readOnly true .
+
+<#p-shortTitle>
+  a oslc:Property ;
+  oslc:name "shortTitle" ;
+  oslc:propertyDefinition oslc:shortTitle ;
+  dcterms:description "Shorter form of the title." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — Inherited from mrm:Element
+# ================================================================
+
+<#p-fromDate>
+  a oslc:Property ;
+  oslc:name "fromDate" ;
+  oslc:propertyDefinition mrm:fromDate ;
+  dcterms:description "Start date for the element." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:date .
+
+<#p-toDate>
+  a oslc:Property ;
+  oslc:name "toDate" ;
+  oslc:propertyDefinition mrm:toDate ;
+  dcterms:description "End date for the element." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:date .
+
+<#p-status>
+  a oslc:Property ;
+  oslc:name "status" ;
+  oslc:propertyDefinition mrm:status ;
+  dcterms:description "Current status of the element (Active, Inactive)." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:StatusType .
+
+
+# ================================================================
+# SHARED PROPERTY DEFINITIONS — Inherited from Mixin Classes
+# ================================================================
+
+# --- BudgetableItem (Program, OrganizationUnit) ---
+
+<#p-budget_1>
+  a oslc:Property ;
+  oslc:name "budget_1" ;
+  oslc:propertyDefinition mrm:budget_1 ;
+  dcterms:description "Primary budget amount." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:float .
+
+<#p-budget_2>
+  a oslc:Property ;
+  oslc:name "budget_2" ;
+  oslc:propertyDefinition mrm:budget_2 ;
+  dcterms:description "Secondary budget amount." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:float .
+
+<#p-allocation_1>
+  a oslc:Property ;
+  oslc:name "allocation_1" ;
+  oslc:propertyDefinition mrm:allocation_1 ;
+  dcterms:description "Budget allocation amount." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:float .
+
+# --- LocatableElement (Service, Resource, OrganizationUnit) ---
+
+<#p-locatedAt>
+  a oslc:Property ;
+  oslc:name "locatedAt" ;
+  oslc:propertyDefinition mrm:locatedAt ;
+  dcterms:description "Location where the element is situated." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Location .
+
+# --- DeliverableElement (Program, Service, Process, Resource, OrganizationUnit) ---
+
+<#p-deliveredBy>
+  a oslc:Property ;
+  oslc:name "deliveredBy" ;
+  oslc:propertyDefinition mrm:deliveredBy ;
+  dcterms:description "Project that delivers this element." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Project .
+
+# --- AssessableElement (Service, Process, Program, Resource, Outcome) ---
+
+<#p-assessedBy>
+  a oslc:Property ;
+  oslc:name "assessedBy" ;
+  oslc:propertyDefinition mrm:assessedBy ;
+  dcterms:description "Performance indicator that assesses this element." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:PerformanceIndicator .
+
+# --- AccountableElement (Service, Process, Program, Resource) ---
+
+<#p-accountableTo>
+  a oslc:Property ;
+  oslc:name "accountableTo" ;
+  oslc:propertyDefinition mrm:accountableTo ;
+  dcterms:description "Organization unit to which this element is accountable." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:AccountabilityElement .
+
+# --- AccountabilityElement (OrganizationUnit) ---
+
+<#p-accountableFor>
+  a oslc:Property ;
+  oslc:name "accountableFor" ;
+  oslc:propertyDefinition mrm:accountableFor ;
+  dcterms:description "Element for which the organization unit is accountable." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:AccountableElement .
+
+<#p-accountableRoleType>
+  a oslc:Property ;
+  oslc:name "accountableRoleType" ;
+  oslc:propertyDefinition mrm:accountableRoleType ;
+  dcterms:description "Role type for the accountability relationship." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:RoleType .
+
+<#p-accountableOrganization>
+  a oslc:Property ;
+  oslc:name "accountableOrganization" ;
+  oslc:propertyDefinition mrm:accountableOrganization ;
+  dcterms:description "Organization unit that holds the accountability." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:OrganizationUnit .
+
+<#p-accountableAllocation1>
+  a oslc:Property ;
+  oslc:name "accountableAllocation1" ;
+  oslc:propertyDefinition mrm:accountableAllocation1 ;
+  dcterms:description "Primary accountability allocation." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-accountableAllocation2>
+  a oslc:Property ;
+  oslc:name "accountableAllocation2" ;
+  oslc:propertyDefinition mrm:accountableAllocation2 ;
+  dcterms:description "Secondary accountability allocation." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-accountableAllocation3>
+  a oslc:Property ;
+  oslc:name "accountableAllocation3" ;
+  oslc:propertyDefinition mrm:accountableAllocation3 ;
+  dcterms:description "Tertiary accountability allocation." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-governedElement>
+  a oslc:Property ;
+  oslc:name "governedElement" ;
+  oslc:propertyDefinition mrm:governedElement ;
+  dcterms:description "Element governed by this accountability relationship." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:AccountableElement .
+
+# --- ImpcatableElement (Service, Process, Program, Resource) ---
+
+<#p-assessment>
+  a oslc:Property ;
+  oslc:name "assessment" ;
+  oslc:propertyDefinition mrm:assessment ;
+  dcterms:description "Impact assessment for this element." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ImpactAssessment .
+
+# --- OutputProducer (Service, Process) ---
+
+<#p-produces>
+  a oslc:Property ;
+  oslc:name "produces" ;
+  oslc:propertyDefinition mrm:produces ;
+  dcterms:description "Output produced by this element." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Output .
+
+
+# ================================================================
+# DOMAIN-SPECIFIC PROPERTY DEFINITIONS
+# ================================================================
+
+# --- Program ---
+
+<#p-needsCategory>
+  a oslc:Property ;
+  oslc:name "needsCategory" ;
+  oslc:propertyDefinition mrm:needsCategory ;
+  dcterms:description "Classifies the purpose of the program activities in terms of the needs it satisfies." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:NeedsCategory .
+
+<#p-roleType>
+  a oslc:Property ;
+  oslc:name "roleType" ;
+  oslc:propertyDefinition mrm:roleType ;
+  dcterms:description "Role type classification for the program." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:RoleType .
+
+<#p-programClass>
+  a oslc:Property ;
+  oslc:name "programClass" ;
+  oslc:propertyDefinition mrm:programClass ;
+  dcterms:description "Class of the program (Formal, Informal)." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ProgramClassType .
+
+<#p-programType>
+  a oslc:Property ;
+  oslc:name "programType" ;
+  oslc:propertyDefinition mrm:programType ;
+  dcterms:description "Type classification of the program." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ProgramType .
+
+<#p-isFormalProgram>
+  a oslc:Property ;
+  oslc:name "isFormalProgram" ;
+  oslc:propertyDefinition mrm:isFormalProgram ;
+  dcterms:description "Whether the program is a formal program." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:boolean .
+
+<#p-programVision>
+  a oslc:Property ;
+  oslc:name "programVision" ;
+  oslc:propertyDefinition mrm:programVision ;
+  dcterms:description "Vision statement for the program." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-subPrograms>
+  a oslc:Property ;
+  oslc:name "subPrograms" ;
+  oslc:propertyDefinition mrm:subPrograms ;
+  dcterms:description "Sub-programs within this program." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Program .
+
+<#p-administers>
+  a oslc:Property ;
+  oslc:name "administers" ;
+  oslc:propertyDefinition mrm:administers ;
+  dcterms:description "Services administered by this program." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Service .
+
+<#p-contributesTo>
+  a oslc:Property ;
+  oslc:name "contributesTo" ;
+  oslc:propertyDefinition mrm:contributesTo ;
+  dcterms:description "Outcomes this program contributes to." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Outcome .
+
+# --- Service ---
+
+<#p-allocation>
+  a oslc:Property ;
+  oslc:name "allocation" ;
+  oslc:propertyDefinition mrm:allocation ;
+  dcterms:description "Allocation value for the service." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:float .
+
+<#p-serviceType>
+  a oslc:Property ;
+  oslc:name "serviceType" ;
+  oslc:propertyDefinition mrm:serviceType ;
+  dcterms:description "Type classification of the service (public or internal)." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ServiceType .
+
+<#p-subServices>
+  a oslc:Property ;
+  oslc:name "subServices" ;
+  oslc:propertyDefinition mrm:subServices ;
+  dcterms:description "Sub-services within this service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Service .
+
+<#p-administeredBy>
+  a oslc:Property ;
+  oslc:name "administeredBy" ;
+  oslc:propertyDefinition mrm:administeredBy ;
+  dcterms:description "Program that administers this service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Program .
+
+<#p-implementedBy>
+  a oslc:Property ;
+  oslc:name "implementedBy" ;
+  oslc:propertyDefinition mrm:implementedBy ;
+  dcterms:description "Process that implements this service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Process .
+
+<#p-uses>
+  a oslc:Property ;
+  oslc:name "uses" ;
+  oslc:propertyDefinition mrm:uses ;
+  dcterms:description "Service level agreement used by this service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ServiceLevelAgreements .
+
+<#p-usedBy>
+  a oslc:Property ;
+  oslc:name "usedBy" ;
+  oslc:propertyDefinition mrm:usedBy ;
+  dcterms:description "Service level agreement that uses this service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ServiceLevelAgreements .
+
+<#p-processes>
+  a oslc:Property ;
+  oslc:name "processes" ;
+  oslc:propertyDefinition mrm:processes ;
+  dcterms:description "Processes that implement this service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Process .
+
+<#p-service-Program_Field_Type>
+  a oslc:Property ;
+  oslc:name "service-Program_Field_Type" ;
+  oslc:propertyDefinition mrm:service-Program_Field_Type ;
+  dcterms:description "Needs category classification for the service." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:NeedsCategory .
+
+<#p-hasOutput>
+  a oslc:Property ;
+  oslc:name "hasOutput" ;
+  oslc:propertyDefinition mrm:hasOutput ;
+  dcterms:description "Output of the service or process." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Output .
+
+<#p-service-has_Output>
+  a oslc:Property ;
+  oslc:name "service-has_Output" ;
+  oslc:propertyDefinition mrm:service-has_Output ;
+  dcterms:description "Output produced by the service." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Output .
+
+# --- Process ---
+
+<#p-implements>
+  a oslc:Property ;
+  oslc:name "implements" ;
+  oslc:propertyDefinition mrm:implements ;
+  dcterms:description "Service implemented by this process." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Service .
+
+<#p-resources>
+  a oslc:Property ;
+  oslc:name "resources" ;
+  oslc:propertyDefinition mrm:resources ;
+  dcterms:description "Resources used by this process." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Resource .
+
+<#p-consumes>
+  a oslc:Property ;
+  oslc:name "consumes" ;
+  oslc:propertyDefinition mrm:consumes ;
+  dcterms:description "Resources consumed by this process." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-subProcesses>
+  a oslc:Property ;
+  oslc:name "subProcesses" ;
+  oslc:propertyDefinition mrm:subProcesses ;
+  dcterms:description "Sub-processes within this process." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Process .
+
+<#p-processType>
+  a oslc:Property ;
+  oslc:name "processType" ;
+  oslc:propertyDefinition mrm:processType ;
+  dcterms:description "Type classification of the process." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ProcessType .
+
+<#p-processLevelType>
+  a oslc:Property ;
+  oslc:name "processLevelType" ;
+  oslc:propertyDefinition mrm:processLevelType ;
+  dcterms:description "Level classification of the process." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ProcesLevelType .
+
+<#p-responsibilityOf>
+  a oslc:Property ;
+  oslc:name "responsibilityOf" ;
+  oslc:propertyDefinition mrm:responsibilityOf ;
+  dcterms:description "Organization unit responsible for this process." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:OrganizationUnit .
+
+# --- Resource (mrm:Resource) ---
+
+<#p-subResources>
+  a oslc:Property ;
+  oslc:name "subResources" ;
+  oslc:propertyDefinition mrm:subResources ;
+  dcterms:description "Sub-resources within this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Resource .
+
+<#p-unit>
+  a oslc:Property ;
+  oslc:name "unit" ;
+  oslc:propertyDefinition mrm:unit ;
+  dcterms:description "Unit of measure for the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-amount>
+  a oslc:Property ;
+  oslc:name "amount" ;
+  oslc:propertyDefinition mrm:amount ;
+  dcterms:description "Quantity of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:int .
+
+<#p-resourceType>
+  a oslc:Property ;
+  oslc:name "resourceType" ;
+  oslc:propertyDefinition mrm:resourceType ;
+  dcterms:description "Type classification of the resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ResourceType .
+
+<#p-consumedBy>
+  a oslc:Property ;
+  oslc:name "consumedBy" ;
+  oslc:propertyDefinition mrm:consumedBy ;
+  dcterms:description "Process that consumes this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Process .
+
+<#p-resourceProcesses>
+  a oslc:Property ;
+  oslc:name "resourceProcesses" ;
+  oslc:propertyDefinition mrm:resourceProcesses ;
+  dcterms:description "Processes associated with this resource." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Process .
+
+<#p-authorizedBy>
+  a oslc:Property ;
+  oslc:name "authorizedBy" ;
+  oslc:propertyDefinition mrm:authorizedBy ;
+  dcterms:description "Organization unit that authorizes this resource." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:OrganizationUnit .
+
+# --- OrganizationUnit ---
+
+<#p-subOrganizationUnits>
+  a oslc:Property ;
+  oslc:name "subOrganizationUnits" ;
+  oslc:propertyDefinition mrm:subOrganizationUnits ;
+  dcterms:description "Sub-units within this organization unit." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:OrganizationUnit .
+
+<#p-OrganizationUnitMission>
+  a oslc:Property ;
+  oslc:name "OrganizationUnitMission" ;
+  oslc:propertyDefinition mrm:OrganizationUnitMission ;
+  dcterms:description "Mission statement of the organization unit." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-OrganizationUnitVision>
+  a oslc:Property ;
+  oslc:name "OrganizationUnitVision" ;
+  oslc:propertyDefinition mrm:OrganizationUnitVision ;
+  dcterms:description "Vision statement of the organization unit." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-participateIn>
+  a oslc:Property ;
+  oslc:name "participateIn" ;
+  oslc:propertyDefinition mrm:participateIn ;
+  dcterms:description "Project the organization unit participates in." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Project .
+
+<#p-staff_1>
+  a oslc:Property ;
+  oslc:name "staff_1" ;
+  oslc:propertyDefinition mrm:staff_1 ;
+  dcterms:description "Staff count for the organization unit." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:int .
+
+<#p-responsibleFor>
+  a oslc:Property ;
+  oslc:name "responsibleFor" ;
+  oslc:propertyDefinition mrm:responsibleFor ;
+  dcterms:description "Process the organization unit is responsible for." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Process .
+
+<#p-authorizes>
+  a oslc:Property ;
+  oslc:name "authorizes" ;
+  oslc:propertyDefinition mrm:authorizes ;
+  dcterms:description "Resource authorized by this organization unit." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+# --- Output ---
+
+<#p-creates>
+  a oslc:Property ;
+  oslc:name "creates" ;
+  oslc:propertyDefinition mrm:creates ;
+  dcterms:description "Service value created by this output." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ServiceValue .
+
+<#p-outputType>
+  a oslc:Property ;
+  oslc:name "outputType" ;
+  oslc:propertyDefinition mrm:outputType ;
+  dcterms:description "Type classification of the output." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:OutputType .
+
+<#p-serviceOutputType>
+  a oslc:Property ;
+  oslc:name "serviceOutputType" ;
+  oslc:propertyDefinition mrm:serviceOutputType ;
+  dcterms:description "Service output type classification." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ServiceOutputType .
+
+<#p-subOutputs>
+  a oslc:Property ;
+  oslc:name "subOutputs" ;
+  oslc:propertyDefinition mrm:subOutputs ;
+  dcterms:description "Sub-outputs within this output." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Output .
+
+<#p-volumePeriodStart>
+  a oslc:Property ;
+  oslc:name "volumePeriodStart" ;
+  oslc:propertyDefinition mrm:volumePeriodStart ;
+  dcterms:description "Start of the volume measurement period." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:date .
+
+<#p-volumePeriodEnd>
+  a oslc:Property ;
+  oslc:name "volumePeriodEnd" ;
+  oslc:propertyDefinition mrm:volumePeriodEnd ;
+  dcterms:description "End of the volume measurement period." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:date .
+
+<#p-plannedVolumeCount>
+  a oslc:Property ;
+  oslc:name "plannedVolumeCount" ;
+  oslc:propertyDefinition mrm:plannedVolumeCount ;
+  dcterms:description "Planned volume count for the output." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-actualVolumeCount>
+  a oslc:Property ;
+  oslc:name "actualVolumeCount" ;
+  oslc:propertyDefinition mrm:actualVolumeCount ;
+  dcterms:description "Actual volume count for the output." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-producer>
+  a oslc:Property ;
+  oslc:name "producer" ;
+  oslc:propertyDefinition mrm:producer ;
+  dcterms:description "Service or process that produces this output." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:OutputProducer .
+
+# --- Outcome ---
+
+<#p-impactReceiver>
+  a oslc:Property ;
+  oslc:name "impactReceiver" ;
+  oslc:propertyDefinition mrm:impactReceiver ;
+  dcterms:description "Target group that receives the impact of this outcome." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:TargetGroup .
+
+<#p-experiencedBy>
+  a oslc:Property ;
+  oslc:name "experiencedBy" ;
+  oslc:propertyDefinition mrm:experiencedBy ;
+  dcterms:description "Target group that experiences this outcome." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:TargetGroup .
+
+<#p-subOutcomes>
+  a oslc:Property ;
+  oslc:name "subOutcomes" ;
+  oslc:propertyDefinition mrm:subOutcomes ;
+  dcterms:description "Sub-outcomes within this outcome." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Outcome .
+
+<#p-realizedBy>
+  a oslc:Property ;
+  oslc:name "realizedBy" ;
+  oslc:propertyDefinition mrm:realizedBy ;
+  dcterms:description "Service value that realizes this outcome." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ServiceValue .
+
+<#p-contributedToBy>
+  a oslc:Property ;
+  oslc:name "contributedToBy" ;
+  oslc:propertyDefinition mrm:contributedToBy ;
+  dcterms:description "Program that contributes to this outcome." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Program .
+
+<#p-addresses>
+  a oslc:Property ;
+  oslc:name "addresses" ;
+  oslc:propertyDefinition mrm:addresses ;
+  dcterms:description "Need addressed by this outcome." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Need .
+
+<#p-targetLevel>
+  a oslc:Property ;
+  oslc:name "targetLevel" ;
+  oslc:propertyDefinition mrm:targetLevel ;
+  dcterms:description "Target level for the outcome." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-achievedLevel>
+  a oslc:Property ;
+  oslc:name "achievedLevel" ;
+  oslc:propertyDefinition mrm:achievedLevel ;
+  dcterms:description "Achieved level of the outcome." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+# --- Need ---
+
+<#p-addressedBy>
+  a oslc:Property ;
+  oslc:name "addressedBy" ;
+  oslc:propertyDefinition mrm:addressedBy ;
+  dcterms:description "Outcome that addresses this need." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Outcome .
+
+<#p-subNeeds>
+  a oslc:Property ;
+  oslc:name "subNeeds" ;
+  oslc:propertyDefinition mrm:subNeeds ;
+  dcterms:description "Sub-needs within this need." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Need .
+
+# --- TargetGroup ---
+
+<#p-experiences>
+  a oslc:Property ;
+  oslc:name "experiences" ;
+  oslc:propertyDefinition mrm:experiences ;
+  dcterms:description "Outcomes experienced by this target group." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Outcome .
+
+<#p-subTargetGroups>
+  a oslc:Property ;
+  oslc:name "subTargetGroups" ;
+  oslc:propertyDefinition mrm:subTargetGroups ;
+  dcterms:description "Sub-groups within this target group." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:TargetGroup .
+
+<#p-targetGroupType>
+  a oslc:Property ;
+  oslc:name "targetGroupType" ;
+  oslc:propertyDefinition mrm:targetGroupType ;
+  dcterms:description "Type classification (Individual, Group, Legal Entity)." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:TargetGroupType .
+
+<#p-populationSize>
+  a oslc:Property ;
+  oslc:name "populationSize" ;
+  oslc:propertyDefinition mrm:populationSize ;
+  dcterms:description "Population size of the target group." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+# --- Project ---
+
+<#p-delivers>
+  a oslc:Property ;
+  oslc:name "delivers" ;
+  oslc:propertyDefinition mrm:delivers ;
+  dcterms:description "Deliverable element produced by this project." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:DeliverableElement .
+
+<#p-scope>
+  a oslc:Property ;
+  oslc:name "scope" ;
+  oslc:propertyDefinition mrm:scope ;
+  dcterms:description "Scope of the project in terms of deliverable elements." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:DeliverableElement .
+
+<#p-projectType>
+  a oslc:Property ;
+  oslc:name "projectType" ;
+  oslc:propertyDefinition mrm:projectType ;
+  dcterms:description "Type classification of the project." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ProjectType .
+
+# --- Location ---
+
+<#p-locationType>
+  a oslc:Property ;
+  oslc:name "locationType" ;
+  oslc:propertyDefinition mrm:locationType ;
+  dcterms:description "Type classification of the location." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:LocationType .
+
+<#p-accomodates>
+  a oslc:Property ;
+  oslc:name "accomodates" ;
+  oslc:propertyDefinition mrm:accomodates ;
+  dcterms:description "Elements accommodated at this location." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:LocatableElement .
+
+# --- ChangeDriver ---
+
+<#p-impacts>
+  a oslc:Property ;
+  oslc:name "impacts" ;
+  oslc:propertyDefinition mrm:impacts ;
+  dcterms:description "Elements impacted by this change driver." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ImpcatableElement .
+
+<#p-changeDriverType>
+  a oslc:Property ;
+  oslc:name "changeDriverType" ;
+  oslc:propertyDefinition mrm:changeDriverType ;
+  dcterms:description "Type of change driver (Demographic, Social, etc.)." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ChangeDriverType .
+
+# --- PerformanceIndicator ---
+
+<#p-performanceIndicatorType>
+  a oslc:Property ;
+  oslc:name "performanceIndicatorType" ;
+  oslc:propertyDefinition mrm:performanceIndicatorType ;
+  dcterms:description "Type classification of the performance indicator." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:PerformanceIndicatorType .
+
+<#p-assesses>
+  a oslc:Property ;
+  oslc:name "assesses" ;
+  oslc:propertyDefinition mrm:assesses ;
+  dcterms:description "Element assessed by this performance indicator." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:AssessableElement .
+
+<#p-actualPerformance>
+  a oslc:Property ;
+  oslc:name "actualPerformance" ;
+  oslc:propertyDefinition mrm:actualPerformance ;
+  dcterms:description "Actual measured performance value." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-performanceTarget>
+  a oslc:Property ;
+  oslc:name "performanceTarget" ;
+  oslc:propertyDefinition mrm:performanceTarget ;
+  dcterms:description "Target performance value." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-plannedPerformance>
+  a oslc:Property ;
+  oslc:name "plannedPerformance" ;
+  oslc:propertyDefinition mrm:plannedPerformance ;
+  dcterms:description "Planned performance value." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-units>
+  a oslc:Property ;
+  oslc:name "units" ;
+  oslc:propertyDefinition mrm:units ;
+  dcterms:description "Units of measure for the performance indicator." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-algorithm>
+  a oslc:Property ;
+  oslc:name "algorithm" ;
+  oslc:propertyDefinition mrm:algorithm ;
+  dcterms:description "Algorithm used to compute the performance indicator." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+# --- ServiceValue ---
+
+<#p-createdBy>
+  a oslc:Property ;
+  oslc:name "createdBy" ;
+  oslc:propertyDefinition mrm:createdBy ;
+  dcterms:description "Output that creates this service value." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Output .
+
+<#p-objective>
+  a oslc:Property ;
+  oslc:name "objective" ;
+  oslc:propertyDefinition mrm:objective ;
+  dcterms:description "Objective statement for this service value." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-beneficiaryRank>
+  a oslc:Property ;
+  oslc:name "beneficiaryRank" ;
+  oslc:propertyDefinition mrm:beneficiaryRank ;
+  dcterms:description "Ranking of the beneficiary." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-achievedServiceLevel>
+  a oslc:Property ;
+  oslc:name "achievedServiceLevel" ;
+  oslc:propertyDefinition mrm:achievedServiceLevel ;
+  dcterms:description "Achieved service level." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-plannedClientSet>
+  a oslc:Property ;
+  oslc:name "plannedClientSet" ;
+  oslc:propertyDefinition mrm:plannedClientSet ;
+  dcterms:description "Planned number of clients to be served." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-servedClientSet>
+  a oslc:Property ;
+  oslc:name "servedClientSet" ;
+  oslc:propertyDefinition mrm:servedClientSet ;
+  dcterms:description "Actual number of clients served." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-clientSetTakeup>
+  a oslc:Property ;
+  oslc:name "clientSetTakeup" ;
+  oslc:propertyDefinition mrm:clientSetTakeup ;
+  dcterms:description "Client set takeup rate." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+<#p-clientIndicator>
+  a oslc:Property ;
+  oslc:name "clientIndicator" ;
+  oslc:propertyDefinition mrm:clientIndicator ;
+  dcterms:description "Whether the target group member is a direct client." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:boolean .
+
+<#p-realizes>
+  a oslc:Property ;
+  oslc:name "realizes" ;
+  oslc:propertyDefinition mrm:realizes ;
+  dcterms:description "Outcome realized by this service value." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Outcome .
+
+# --- ServiceLevelAgreements ---
+
+<#p-consumer>
+  a oslc:Property ;
+  oslc:name "consumer" ;
+  oslc:propertyDefinition mrm:consumer ;
+  dcterms:description "Service that consumes under this agreement." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Service .
+
+<#p-serviceLevelTarget>
+  a oslc:Property ;
+  oslc:name "serviceLevelTarget" ;
+  oslc:propertyDefinition mrm:serviceLevelTarget ;
+  dcterms:description "Target service level for the agreement." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-provider>
+  a oslc:Property ;
+  oslc:name "provider" ;
+  oslc:propertyDefinition mrm:provider ;
+  dcterms:description "Service that provides under this agreement." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:Service .
+
+# --- ImpactAssessment ---
+
+<#p-impactedBy>
+  a oslc:Property ;
+  oslc:name "impactedBy" ;
+  oslc:propertyDefinition mrm:impactedBy ;
+  dcterms:description "Change driver that causes the impact." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference ;
+  oslc:range mrm:ChangeDriver .
+
+<#p-impactLevel>
+  a oslc:Property ;
+  oslc:name "impactLevel" ;
+  oslc:propertyDefinition mrm:impactLevel ;
+  dcterms:description "Level or severity of the impact." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:integer .
+
+
+# ================================================================
+# RESOURCE SHAPE DEFINITIONS
+# ================================================================
+
+# ============================================================
+# Program
+# Mixins: ImpcatableElement, BudgetableItem, DeliverableElement,
+#         AssessableElement, Element, AccountableElement
+# ============================================================
+
+<#ProgramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Program" ;
+  oslc:describes mrm:Program ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Inherited from BudgetableItem
+  oslc:property <#p-budget_1> ;
+  oslc:property <#p-budget_2> ;
+  oslc:property <#p-allocation_1> ;
+  # Inherited from DeliverableElement
+  oslc:property <#p-deliveredBy> ;
+  # Inherited from AssessableElement
+  oslc:property <#p-assessedBy> ;
+  # Inherited from AccountableElement
+  oslc:property <#p-accountableTo> ;
+  # Inherited from ImpcatableElement
+  oslc:property <#p-assessment> ;
+  # Program-specific
+  oslc:property <#p-needsCategory> ;
+  oslc:property <#p-roleType> ;
+  oslc:property <#p-programClass> ;
+  oslc:property <#p-programType> ;
+  oslc:property <#p-isFormalProgram> ;
+  oslc:property <#p-programVision> ;
+  oslc:property <#p-subPrograms> ;
+  oslc:property <#p-administers> ;
+  oslc:property <#p-contributesTo> .
+
+
+# ============================================================
+# Service
+# Mixins: ImpcatableElement, OutputProducer, Element,
+#         AssessableElement, LocatableElement,
+#         AccountableElement, DeliverableElement
+# ============================================================
+
+<#ServiceShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service" ;
+  oslc:describes mrm:Service ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Inherited from LocatableElement
+  oslc:property <#p-locatedAt> ;
+  # Inherited from DeliverableElement
+  oslc:property <#p-deliveredBy> ;
+  # Inherited from AssessableElement
+  oslc:property <#p-assessedBy> ;
+  # Inherited from AccountableElement
+  oslc:property <#p-accountableTo> ;
+  # Inherited from ImpcatableElement
+  oslc:property <#p-assessment> ;
+  # Inherited from OutputProducer
+  oslc:property <#p-produces> ;
+  # Service-specific
+  oslc:property <#p-allocation> ;
+  oslc:property <#p-serviceType> ;
+  oslc:property <#p-subServices> ;
+  oslc:property <#p-administeredBy> ;
+  oslc:property <#p-implementedBy> ;
+  oslc:property <#p-uses> ;
+  oslc:property <#p-usedBy> ;
+  oslc:property <#p-processes> ;
+  oslc:property <#p-service-Program_Field_Type> ;
+  oslc:property <#p-hasOutput> ;
+  oslc:property <#p-service-has_Output> .
+
+
+# ============================================================
+# Process
+# Mixins: ImpcatableElement, AccountableElement, Element,
+#         AssessableElement, OutputProducer, DeliverableElement
+# ============================================================
+
+<#ProcessShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Process" ;
+  oslc:describes mrm:Process ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Inherited from DeliverableElement
+  oslc:property <#p-deliveredBy> ;
+  # Inherited from AssessableElement
+  oslc:property <#p-assessedBy> ;
+  # Inherited from AccountableElement
+  oslc:property <#p-accountableTo> ;
+  # Inherited from ImpcatableElement
+  oslc:property <#p-assessment> ;
+  # Inherited from OutputProducer
+  oslc:property <#p-produces> ;
+  # Process-specific
+  oslc:property <#p-implements> ;
+  oslc:property <#p-resources> ;
+  oslc:property <#p-consumes> ;
+  oslc:property <#p-subProcesses> ;
+  oslc:property <#p-processType> ;
+  oslc:property <#p-processLevelType> ;
+  oslc:property <#p-responsibilityOf> .
+
+
+# ============================================================
+# Resource (mrm:Resource)
+# Mixins: ImpcatableElement, DeliverableElement, Element,
+#         LocatableElement, AssessableElement, AccountableElement
+# ============================================================
+
+<#ResourceShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Resource" ;
+  oslc:describes mrm:Resource ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Inherited from LocatableElement
+  oslc:property <#p-locatedAt> ;
+  # Inherited from DeliverableElement
+  oslc:property <#p-deliveredBy> ;
+  # Inherited from AssessableElement
+  oslc:property <#p-assessedBy> ;
+  # Inherited from AccountableElement
+  oslc:property <#p-accountableTo> ;
+  # Inherited from ImpcatableElement
+  oslc:property <#p-assessment> ;
+  # Resource-specific
+  oslc:property <#p-subResources> ;
+  oslc:property <#p-unit> ;
+  oslc:property <#p-amount> ;
+  oslc:property <#p-resourceType> ;
+  oslc:property <#p-consumedBy> ;
+  oslc:property <#p-resourceProcesses> ;
+  oslc:property <#p-authorizedBy> .
+
+
+# ============================================================
+# OrganizationUnit
+# Mixins: AccountabilityElement, BudgetableItem,
+#         LocatableElement, Element, DeliverableElement
+# ============================================================
+
+<#OrganizationUnitShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Organization Unit" ;
+  oslc:describes mrm:OrganizationUnit ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Inherited from BudgetableItem
+  oslc:property <#p-budget_1> ;
+  oslc:property <#p-budget_2> ;
+  oslc:property <#p-allocation_1> ;
+  # Inherited from LocatableElement
+  oslc:property <#p-locatedAt> ;
+  # Inherited from DeliverableElement
+  oslc:property <#p-deliveredBy> ;
+  # Inherited from AccountabilityElement
+  oslc:property <#p-accountableFor> ;
+  oslc:property <#p-accountableRoleType> ;
+  oslc:property <#p-accountableOrganization> ;
+  oslc:property <#p-accountableAllocation1> ;
+  oslc:property <#p-accountableAllocation2> ;
+  oslc:property <#p-accountableAllocation3> ;
+  oslc:property <#p-governedElement> ;
+  # OrganizationUnit-specific
+  oslc:property <#p-subOrganizationUnits> ;
+  oslc:property <#p-OrganizationUnitMission> ;
+  oslc:property <#p-OrganizationUnitVision> ;
+  oslc:property <#p-participateIn> ;
+  oslc:property <#p-staff_1> ;
+  oslc:property <#p-responsibleFor> ;
+  oslc:property <#p-authorizes> .
+
+
+# ============================================================
+# Output
+# Mixins: Element
+# ============================================================
+
+<#OutputShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Output" ;
+  oslc:describes mrm:Output ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Output-specific
+  oslc:property <#p-creates> ;
+  oslc:property <#p-outputType> ;
+  oslc:property <#p-serviceOutputType> ;
+  oslc:property <#p-subOutputs> ;
+  oslc:property <#p-volumePeriodStart> ;
+  oslc:property <#p-volumePeriodEnd> ;
+  oslc:property <#p-plannedVolumeCount> ;
+  oslc:property <#p-actualVolumeCount> ;
+  oslc:property <#p-producer> .
+
+
+# ============================================================
+# Outcome
+# Mixins: Element, AssessableElement
+# ============================================================
+
+<#OutcomeShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Outcome" ;
+  oslc:describes mrm:Outcome ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Inherited from AssessableElement
+  oslc:property <#p-assessedBy> ;
+  # Outcome-specific
+  oslc:property <#p-impactReceiver> ;
+  oslc:property <#p-experiencedBy> ;
+  oslc:property <#p-subOutcomes> ;
+  oslc:property <#p-realizedBy> ;
+  oslc:property <#p-contributedToBy> ;
+  oslc:property <#p-addresses> ;
+  oslc:property <#p-targetLevel> ;
+  oslc:property <#p-achievedLevel> .
+
+
+# ============================================================
+# Need
+# Mixins: Element
+# ============================================================
+
+<#NeedShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Need" ;
+  oslc:describes mrm:Need ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Need-specific
+  oslc:property <#p-addressedBy> ;
+  oslc:property <#p-subNeeds> .
+
+
+# ============================================================
+# TargetGroup
+# Mixins: Element
+# ============================================================
+
+<#TargetGroupShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Target Group" ;
+  oslc:describes mrm:TargetGroup ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # TargetGroup-specific
+  oslc:property <#p-experiences> ;
+  oslc:property <#p-subTargetGroups> ;
+  oslc:property <#p-targetGroupType> ;
+  oslc:property <#p-populationSize> .
+
+
+# ============================================================
+# Project
+# Mixins: Element
+# ============================================================
+
+<#ProjectShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Project" ;
+  oslc:describes mrm:Project ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Project-specific
+  oslc:property <#p-delivers> ;
+  oslc:property <#p-scope> ;
+  oslc:property <#p-projectType> .
+
+
+# ============================================================
+# Location
+# Mixins: Element
+# ============================================================
+
+<#LocationShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Location" ;
+  oslc:describes mrm:Location ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # Location-specific
+  oslc:property <#p-locationType> ;
+  oslc:property <#p-accomodates> .
+
+
+# ============================================================
+# ChangeDriver
+# Mixins: Element
+# ============================================================
+
+<#ChangeDriverShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Change Driver" ;
+  oslc:describes mrm:ChangeDriver ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # ChangeDriver-specific
+  oslc:property <#p-impacts> ;
+  oslc:property <#p-changeDriverType> .
+
+
+# ============================================================
+# BusinessProcess
+# Mixins: Element
+# ============================================================
+
+<#BusinessProcessShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Business Process" ;
+  oslc:describes mrm:BusinessProcess ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# PerformanceIndicator
+# Mixins: Element
+# ============================================================
+
+<#PerformanceIndicatorShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Performance Indicator" ;
+  oslc:describes mrm:PerformanceIndicator ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # PerformanceIndicator-specific
+  oslc:property <#p-performanceIndicatorType> ;
+  oslc:property <#p-assesses> ;
+  oslc:property <#p-actualPerformance> ;
+  oslc:property <#p-performanceTarget> ;
+  oslc:property <#p-plannedPerformance> ;
+  oslc:property <#p-units> ;
+  oslc:property <#p-algorithm> .
+
+
+# ============================================================
+# ServiceValue
+# Mixins: Element
+# ============================================================
+
+<#ServiceValueShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Value" ;
+  oslc:describes mrm:ServiceValue ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # ServiceValue-specific
+  oslc:property <#p-createdBy> ;
+  oslc:property <#p-objective> ;
+  oslc:property <#p-beneficiaryRank> ;
+  oslc:property <#p-achievedServiceLevel> ;
+  oslc:property <#p-plannedClientSet> ;
+  oslc:property <#p-servedClientSet> ;
+  oslc:property <#p-clientSetTakeup> ;
+  oslc:property <#p-clientIndicator> ;
+  oslc:property <#p-realizes> .
+
+
+# ============================================================
+# ServiceLevelAgreements
+# Mixins: Element
+# ============================================================
+
+<#ServiceLevelAgreementsShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Level Agreements" ;
+  oslc:describes mrm:ServiceLevelAgreements ;
+  # Inherited from oslc_am:Resource / OSLC Core
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-subject> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-shortTitle> ;
+  # Inherited from mrm:Element
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> ;
+  # ServiceLevelAgreements-specific
+  oslc:property <#p-consumer> ;
+  oslc:property <#p-serviceLevelTarget> ;
+  oslc:property <#p-provider> .
+
+
+# ============================================================
+# ImpactAssessment (not a subclass of Element)
+# ============================================================
+
+<#ImpactAssessmentShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Impact Assessment" ;
+  oslc:describes mrm:ImpactAssessment ;
+  # OSLC Core (no mrm:Element inheritance)
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  # ImpactAssessment-specific
+  oslc:property <#p-impactedBy> ;
+  oslc:property <#p-impactLevel> .
+
+
+# ============================================================
+# ProcessImpacts
+# Mixins: Element
+# ============================================================
+
+<#ProcessImpactsShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Process Impacts" ;
+  oslc:describes mrm:ProcessImpacts ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# ServiceImpacts
+# Mixins: Element
+# ============================================================
+
+<#ServiceImpactsShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Impacts" ;
+  oslc:describes mrm:ServiceImpacts ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# ProgramImpacts
+# Mixins: Element
+# ============================================================
+
+<#ProgramImpactsShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Program Impacts" ;
+  oslc:describes mrm:ProgramImpacts ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# ResourceImpacts
+# Mixins: Element
+# ============================================================
+
+<#ResourceImpactsShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Resource Impacts" ;
+  oslc:describes mrm:ResourceImpacts ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# ResourceAuthorities
+# Mixins: Element
+# ============================================================
+
+<#ResourceAuthoritiesShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Resource Authorities" ;
+  oslc:describes mrm:ResourceAuthorities ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# ProcessResponsibilities
+# Mixins: Element
+# ============================================================
+
+<#ProcessResponsibilitiesShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Process Responsibilities" ;
+  oslc:describes mrm:ProcessResponsibilities ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
+
+
+# ============================================================
+# ServiceAccountabilities
+# Mixins: Element
+# ============================================================
+
+<#ServiceAccountabilitiesShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Accountabilities" ;
+  oslc:describes mrm:ServiceAccountabilities ;
+  oslc:property <#p-title> ;
+  oslc:property <#p-description> ;
+  oslc:property <#p-identifier> ;
+  oslc:property <#p-creator> ;
+  oslc:property <#p-contributor> ;
+  oslc:property <#p-created> ;
+  oslc:property <#p-modified> ;
+  oslc:property <#p-type> ;
+  oslc:property <#p-instanceShape> ;
+  oslc:property <#p-serviceProvider> ;
+  oslc:property <#p-fromDate> ;
+  oslc:property <#p-toDate> ;
+  oslc:property <#p-status> .
