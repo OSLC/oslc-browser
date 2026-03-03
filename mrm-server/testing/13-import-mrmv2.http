@@ -1,0 +1,50 @@
+###############################################################################
+# 13-import-mrmv2.http — Create MRMv2.1 ServiceProvider and import data
+#
+# Step 1: Create the ServiceProvider (run once)
+# Step 2: Import MRMv2.1.ttl data file into it
+# Step 3: Verify import via SPARQL queries
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. Create "MRMv2.1" ServiceProvider
+POST {{baseUrl}}/oslc
+Content-Type: text/turtle
+Slug: mrmv2-1
+
+@prefix dcterms: <http://purl.org/dc/terms/> .
+<> dcterms:title "MRMv2.1" ;
+   dcterms:description "Municipal Reference Model v2.1 — imported reference data." .
+
+### 2. Import MRMv2.1.ttl data file
+PUT {{baseUrl}}/oslc/mrmv2-1/import
+Content-Type: text/turtle
+
+< ../data/MRMv2.1.ttl
+
+### 3. Verify import — count resources by type
+POST {{baseUrl}}/sparql
+Accept: application/sparql-results+json
+Content-Type: application/sparql-query
+
+SELECT ?type (COUNT(?s) AS ?count) WHERE {
+  ?s a ?type .
+} GROUP BY ?type ORDER BY DESC(?count)
+
+### 4. Verify import — query all Services
+POST {{baseUrl}}/oslc/mrmv2-1/query
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.where=rdf:type=mrm:Service&oslc.prefix=mrm%3D%3Chttp%3A%2F%2Fwww.misa.org.ca%2Fmrm%23%3E
+
+### 5. Verify import — SELECT a few imported resources
+POST {{baseUrl}}/sparql
+Accept: application/sparql-results+json
+Content-Type: application/sparql-query
+
+SELECT ?s ?title WHERE {
+  ?s a <http://www.misa.org.ca/mrm#Service> .
+  ?s <http://purl.org/dc/terms/title> ?title .
+} ORDER BY ?title LIMIT 10

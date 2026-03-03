@@ -1,0 +1,58 @@
+###############################################################################
+# 12-sparql-endpoint.http — Test SPARQL endpoint proxy for MRM server
+#
+# Run 01 through 04 first to set up test data.
+#
+# The /sparql endpoint proxies read-only SPARQL queries to the Fuseki
+# backend. Supports GET (query in ?query= param) and POST (query in body).
+###############################################################################
+
+@baseUrl = http://localhost:3002
+
+### 1. SELECT all distinct resource types (GET with query param)
+GET {{baseUrl}}/sparql?query=SELECT%20DISTINCT%20%3Ftype%20WHERE%20%7B%20%3Fs%20a%20%3Ftype%20%7D%20ORDER%20BY%20%3Ftype
+Accept: application/sparql-results+json
+
+### 2. SELECT all Services with their titles
+POST {{baseUrl}}/sparql
+Accept: application/sparql-results+json
+Content-Type: application/sparql-query
+
+SELECT ?s ?title WHERE {
+  ?s a <http://www.misa.org.ca/mrm#Service> .
+  ?s <http://purl.org/dc/terms/title> ?title .
+}
+
+### 3. CONSTRUCT all triples for Services
+POST {{baseUrl}}/sparql
+Accept: text/turtle
+Content-Type: application/sparql-query
+
+CONSTRUCT { ?s ?p ?o }
+WHERE {
+  ?s a <http://www.misa.org.ca/mrm#Service> .
+  ?s ?p ?o .
+}
+
+### 4. ASK if any Services exist
+POST {{baseUrl}}/sparql
+Accept: application/sparql-results+json
+Content-Type: application/sparql-query
+
+ASK { ?s a <http://www.misa.org.ca/mrm#Service> }
+
+### 5. DESCRIBE a specific resource type
+POST {{baseUrl}}/sparql
+Accept: text/turtle
+Content-Type: application/sparql-query
+
+DESCRIBE ?s WHERE { ?s a <http://www.misa.org.ca/mrm#Service> } LIMIT 1
+
+### 6. Count resources by type
+POST {{baseUrl}}/sparql
+Accept: application/sparql-results+json
+Content-Type: application/sparql-query
+
+SELECT ?type (COUNT(?s) AS ?count) WHERE {
+  ?s a ?type .
+} GROUP BY ?type ORDER BY DESC(?count)

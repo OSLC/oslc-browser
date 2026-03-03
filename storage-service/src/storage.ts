@@ -113,6 +113,13 @@ export interface StorageService {
   constructQuery(sparql: string): Promise<{ status: number; results: IndexedFormula | null }>;
 
   /**
+   * Execute a raw SPARQL query (SELECT, CONSTRUCT, ASK, DESCRIBE)
+   * and return the raw response body and content type.
+   * Optional — only implemented by backends with SPARQL support.
+   */
+  sparqlQuery?(sparql: string, accept: string): Promise<{ status: number; contentType: string; body: string }>;
+
+  /**
    * Export the entire dataset in the specified format.
    * 'trig' preserves named graph structure; 'turtle' merges all into one graph.
    */
