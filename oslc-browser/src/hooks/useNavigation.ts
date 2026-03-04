@@ -12,7 +12,8 @@ type NavigationAction =
   | { type: 'SELECT_ITEM'; columnIndex: number; itemUri: string }
   | { type: 'ADD_COLUMN'; column: NavigationColumn; afterIndex: number; resource: LoadedResource }
   | { type: 'SET_COLUMN_LOADING'; columnIndex: number }
-  | { type: 'SET_COLUMN_ERROR'; columnIndex: number; error: string };
+  | { type: 'SET_COLUMN_ERROR'; columnIndex: number; error: string }
+  | { type: 'UPDATE_ITEM_TITLES'; columnIndex: number; titles: Record<string, string> };
 
 function reducer(state: NavigationState, action: NavigationAction): NavigationState {
   switch (action.type) {
@@ -70,13 +71,45 @@ function reducer(state: NavigationState, action: NavigationAction): NavigationSt
       return { ...state, columns };
     }
 
+    case 'UPDATE_ITEM_TITLES': {
+      const col = state.columns[action.columnIndex];
+      if (!col) return state;
+      const columns = [...state.columns];
+      columns[action.columnIndex] = {
+        ...col,
+        items: col.items.map(item => {
+          const newTitle = action.titles[item.uri];
+          return newTitle ? { ...item, title: newTitle } : item;
+        }),
+      };
+      return { ...state, columns };
+    }
+
     default:
       return state;
   }
 }
 
-/** Create a column showing unique link predicates for a resource. */
+/** Create a column showing unique link predicates for a resource,
+ *  or member resources directly if this is a query result. */
 function resourceToColumn(resource: LoadedResource): NavigationColumn {
+  // Query results: list member resources directly
+  if (resource.isQueryResult && resource.members) {
+    const items: ColumnItem[] = resource.members.map(member => ({
+      uri: member.uri,
+      title: member.title,
+      selected: false,
+      kind: 'resource' as const,
+    }));
+    return {
+      uri: resource.uri,
+      title: resource.title,
+      items,
+      loading: false,
+      resource,
+    };
+  }
+
   const seen = new Set<string>();
   const items: ColumnItem[] = [];
   for (const link of resource.links) {
@@ -160,11 +193,48 @@ export function useNavigation(): UseNavigationReturn {
           afterIndex: columnIndex,
           resource: column.resource,
         });
+
+        // Resolve titles for target resources asynchronously
+        const targetItems = targetsCol.items.filter(
+          ti => ti.kind === 'resource' && !ti.uri.startsWith('_:')
+        );
+        if (targetItems.length > 0) {
+          const targetsColumnIndex = columnIndex + 1;
+          Promise.all(
+            targetItems.map(async ti => {
+              const res = await fetchResource(ti.uri);
+              return res ? { uri: ti.uri, title: res.title } : null;
+            })
+          ).then(results => {
+            const titles: Record<string, string> = {};
+            for (const r of results) {
+              if (r) titles[r.uri] = r.title;
+            }
+            if (Object.keys(titles).length > 0) {
+              dispatch({ type: 'UPDATE_ITEM_TITLES', columnIndex: targetsColumnIndex, titles });
+            }
+          });
+        }
       }
       return;
     }
 
-    // Resource clicked — check for inline blank node or fetch from server
+    // Resource clicked — check query result members first
+    const currentColumn = stateRef.current.columns[columnIndex];
+    if (currentColumn?.resource?.isQueryResult && currentColumn.resource.members) {
+      const member = currentColumn.resource.members.find(m => m.uri === item.uri);
+      if (member) {
+        dispatch({
+          type: 'ADD_COLUMN',
+          column: resourceToColumn(member),
+          afterIndex: columnIndex,
+          resource: member,
+        });
+        return;
+      }
+    }
+
+    // Check for inline blank node or fetch from server
     if (item.uri.startsWith('_:')) {
       // Blank node: find inline resource from a parent column's resource
       const columns = stateRef.current.columns;

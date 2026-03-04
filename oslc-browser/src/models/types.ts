@@ -21,6 +21,10 @@ export interface LoadedResource {
   links: ResourceLink[];
   resourceTypes: string[];
   inlineResources?: Record<string, LoadedResource>;
+  /** True when this represents OSLC query results (multiple subjects). */
+  isQueryResult?: boolean;
+  /** Member resources when isQueryResult is true. */
+  members?: LoadedResource[];
 }
 
 export interface ColumnItem {

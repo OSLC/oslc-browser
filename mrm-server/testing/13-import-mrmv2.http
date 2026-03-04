@@ -48,3 +48,33 @@ SELECT ?s ?title WHERE {
   ?s a <http://www.misa.org.ca/mrm#Service> .
   ?s <http://purl.org/dc/terms/title> ?title .
 } ORDER BY ?title LIMIT 10
+
+### 6. Verify import — query all OrganizationUnits
+POST {{baseUrl}}/oslc/mrmv2-1/query
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.where=rdf:type=mrm:OrganizationUnit&oslc.prefix=mrm%3D%3Chttp%3A%2F%2Fwww.misa.org.ca%2Fmrm%23%3E
+
+### Get the Fire Department
+POST {{baseUrl}}/oslc/mrmv2-1/query
+Accept: text/turtle
+Content-Type: application/x-www-form-urlencoded
+
+oslc.where=dcterms:title="Fire Department"&oslc.prefix=mrm%3D%3Chttp%3A%2F%2Fwww.misa.org.ca%2Fmrm%23%3E
+
+### 7. Read a specific Program administered by the Fire Department
+GET {{baseUrl}}/resource?uri=http%3A%2F%2Fwww.misa.org.ca%2Fmrm%23bd3213639a974ff2Abd7Ce582b9d4ed5SA02
+Accept: text/turtle
+
+### 8. Resource lookup — resolve imported resource by external URI
+GET {{baseUrl}}/resource?uri=http%3A%2F%2Fwww.misa.org.ca%2Fmrm%23FireDepartment
+Accept: text/turtle
+
+### 9. Resource lookup — DESCRIBE via SPARQL
+POST {{baseUrl}}/sparql
+Accept: text/turtle
+Content-Type: application/sparql-query
+
+DESCRIBE <http://www.misa.org.ca/mrm#FireDepartment>
+

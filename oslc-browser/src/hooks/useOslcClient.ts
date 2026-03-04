@@ -24,6 +24,14 @@ interface RdfStatement {
 }
 
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
+const DCTERMS_TITLE = 'http://purl.org/dc/terms/title';
+const LDP_CONTAINS = 'http://www.w3.org/ns/ldp#contains';
+const LDP_CONTAINER_TYPES = new Set([
+  'http://www.w3.org/ns/ldp#Container',
+  'http://www.w3.org/ns/ldp#BasicContainer',
+  'http://www.w3.org/ns/ldp#DirectContainer',
+  'http://www.w3.org/ns/ldp#IndirectContainer',
+]);
 
 /**
  * Extract a blank node's properties and links from the store.
@@ -88,10 +96,106 @@ function extractBlankNode(
   return loaded;
 }
 
+/**
+ * Detect whether the response is an OSLC query result container.
+ *
+ * Per OSLC Query 3.0 [query-11..14], query results are returned in an
+ * LDP container with ldp:contains references to each result member.
+ * We detect this by checking if the fetch URI is typed as any LDP
+ * container type and has ldp:contains links.
+ */
+function tryParseQueryResult(
+  statements: RdfStatement[],
+  uri: string
+): LoadedResource | null {
+  // Strip query string to match the container subject (queryBase URI)
+  const baseUri = uri.split('?')[0];
+
+  // Check if the base URI is typed as ldp:DirectContainer
+  let isContainer = false;
+  const memberURIs: string[] = [];
+
+  for (const st of statements) {
+    if (st.subject.termType !== 'NamedNode') continue;
+    if (st.subject.value !== baseUri) continue;
+
+    if (st.predicate.value === RDF_TYPE && LDP_CONTAINER_TYPES.has(st.object.value)) {
+      isContainer = true;
+    }
+    if (st.predicate.value === LDP_CONTAINS && st.object.termType === 'NamedNode') {
+      memberURIs.push(st.object.value);
+    }
+  }
+
+  if (!isContainer || memberURIs.length === 0) return null;
+
+  // Build a LoadedResource for each member from its triples in the response
+  const members: LoadedResource[] = [];
+  for (const memberURI of memberURIs) {
+    const memberProps: ResourceProperty[] = [];
+    const memberLinks: ResourceLink[] = [];
+    const memberTypes: string[] = [];
+    let title = localName(memberURI);
+
+    for (const st of statements) {
+      if (st.subject.value !== memberURI) continue;
+      const pred = st.predicate.value;
+      const obj = st.object;
+
+      if (pred === RDF_TYPE) {
+        memberTypes.push(obj.value);
+      } else if (pred === DCTERMS_TITLE && obj.termType === 'Literal') {
+        title = obj.value;
+        memberProps.push({
+          predicate: pred, predicateLabel: localName(pred),
+          value: obj.value, isLink: false,
+        });
+      } else if (obj.termType === 'NamedNode') {
+        memberLinks.push({
+          predicate: pred, predicateLabel: localName(pred),
+          targetURI: obj.value, targetTitle: localName(obj.value),
+        });
+      } else if (obj.termType === 'Literal') {
+        memberProps.push({
+          predicate: pred, predicateLabel: localName(pred),
+          value: obj.value, isLink: false,
+        });
+      }
+    }
+
+    members.push({
+      uri: memberURI, title,
+      properties: memberProps, links: memberLinks,
+      resourceTypes: memberTypes,
+    });
+  }
+
+  // Sort members by title for consistent display
+  members.sort((a, b) => a.title.localeCompare(b.title));
+
+  return {
+    uri,
+    title: `Query Results (${members.length} resources)`,
+    properties: [],
+    links: [],
+    resourceTypes: [],
+    isQueryResult: true,
+    members,
+  };
+}
+
 function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource {
   const properties: ResourceProperty[] = [];
   const resourceTypes: string[] = [];
   const inlineResources: Record<string, LoadedResource> = {};
+
+  // Check for OSLC query results (multiple subjects, fetch URI not among them)
+  if (resource.store?.statements?.length > 0) {
+    const queryResult = tryParseQueryResult(
+      resource.store.statements as RdfStatement[], uri
+    );
+    if (queryResult) return queryResult;
+  }
 
   // The resource.uri may not match the store subjects (e.g., trailing slash mismatch).
   // If getOutgoingLinks() is empty but the store has statements, read directly from the store.
@@ -101,6 +205,7 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
     // Build links and properties directly from the store statements
     const statements = resource.store.statements as RdfStatement[];
     const links: ResourceLink[] = [];
+    let extractedTitle: string | undefined;
 
     for (const st of statements) {
       // Skip statements about blank node subjects (handled by extractBlankNode)
@@ -111,6 +216,14 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
 
       if (pred === RDF_TYPE) {
         resourceTypes.push(obj.value);
+      } else if (pred === DCTERMS_TITLE && obj.termType === 'Literal') {
+        extractedTitle = obj.value;
+        properties.push({
+          predicate: pred,
+          predicateLabel: localName(pred),
+          value: obj.value,
+          isLink: false,
+        });
       } else if (obj.termType === 'NamedNode') {
         links.push({
           predicate: pred,
@@ -139,7 +252,7 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
       }
     }
 
-    const title = resource.getTitle() ?? localName(uri);
+    const title = extractedTitle ?? resource.getTitle() ?? localName(uri);
     return { uri, title, properties, links, resourceTypes, inlineResources };
   }
 
@@ -253,13 +366,23 @@ export function useOslcClient(): UseOslcClientReturn {
     if (!client) return null;
 
     try {
-      const resource = await client.getResource(uri);
+      // For URIs outside the server's origin, use the /resource?uri= lookup endpoint
+      let fetchURI = uri;
+      const serverURL = connection.serverURL;
+      if (serverURL) {
+        const serverOrigin = new URL(serverURL).origin;
+        if (!uri.startsWith(serverOrigin)) {
+          fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
+        }
+      }
+
+      const resource = await client.getResource(fetchURI);
       return parseOslcResource(resource, uri);
     } catch (err) {
       console.error('Error fetching resource:', uri, err);
       return null;
     }
-  }, []);
+  }, [connection.serverURL]);
 
   const connect = useCallback(async (): Promise<LoadedResource | null> => {
     setConnection(prev => ({ ...prev, connecting: true, error: undefined }));
