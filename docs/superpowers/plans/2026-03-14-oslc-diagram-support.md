@@ -1323,61 +1323,53 @@ git commit -m "feat: extend MRM catalog template with diagram services"
 
 ## Chunk 4: Phase 4 — oslc-browser Diagram Rendering (Types and Data Parsing)
 
-### Task 6: Add DD Constants and Diagram Types
+### Task 6: Add Diagram Types (Generic, Vocabulary-Driven)
 
 **Files:**
 - Create: `oslc-browser/src/models/diagram-types.ts`
 
 - [ ] **Step 1: Create diagram-types.ts**
 
-Define DD namespace constants and TypeScript interfaces for parsed diagram data:
+This file defines only the DD namespace URI (for detection) and runtime data structures. All property recognition is done generically by extracting the local name from DD-namespaced predicates found in the RDF data — no hardcoded property URI map.
 
 ```typescript
-// DD namespace constants
-export const DD = {
-  NS: 'http://www.omg.org/spec/DD#',
-  Diagram: 'http://www.omg.org/spec/DD#Diagram',
-  Shape: 'http://www.omg.org/spec/DD#Shape',
-  Edge: 'http://www.omg.org/spec/DD#Edge',
-  Bounds: 'http://www.omg.org/spec/DD#Bounds',
-  Point: 'http://www.omg.org/spec/DD#Point',
-  Style: 'http://www.omg.org/spec/DD#Style',
-  SharedStyle: 'http://www.omg.org/spec/DD#SharedStyle',
-  // Properties
-  diagramElement: 'http://www.omg.org/spec/DD#diagramElement',
-  modelElement: 'http://www.omg.org/spec/DD#modelElement',
-  ownedElement: 'http://www.omg.org/spec/DD#ownedElement',
-  localStyle: 'http://www.omg.org/spec/DD#localStyle',
-  sharedStyle: 'http://www.omg.org/spec/DD#sharedStyle',
-  bounds: 'http://www.omg.org/spec/DD#bounds',
-  source: 'http://www.omg.org/spec/DD#source',
-  target: 'http://www.omg.org/spec/DD#target',
-  waypoint: 'http://www.omg.org/spec/DD#waypoint',
-  x: 'http://www.omg.org/spec/DD#x',
-  y: 'http://www.omg.org/spec/DD#y',
-  width: 'http://www.omg.org/spec/DD#width',
-  height: 'http://www.omg.org/spec/DD#height',
-  resolution: 'http://www.omg.org/spec/DD#resolution',
-  fill: 'http://www.omg.org/spec/DD#fill',
-  fillColor: 'http://www.omg.org/spec/DD#fillColor',
-  fillOpacity: 'http://www.omg.org/spec/DD#fillOpacity',
-  stroke: 'http://www.omg.org/spec/DD#stroke',
-  strokeColor: 'http://www.omg.org/spec/DD#strokeColor',
-  strokeWidth: 'http://www.omg.org/spec/DD#strokeWidth',
-  strokeOpacity: 'http://www.omg.org/spec/DD#strokeOpacity',
-  strokeDashLength: 'http://www.omg.org/spec/DD#strokeDashLength',
-  strokeDashGap: 'http://www.omg.org/spec/DD#strokeDashGap',
-  fontSize: 'http://www.omg.org/spec/DD#fontSize',
-  fontName: 'http://www.omg.org/spec/DD#fontName',
-  fontColor: 'http://www.omg.org/spec/DD#fontColor',
-  fontBold: 'http://www.omg.org/spec/DD#fontBold',
-  fontItalic: 'http://www.omg.org/spec/DD#fontItalic',
-  fontUnderline: 'http://www.omg.org/spec/DD#fontUnderline',
-  fontStrikeThrough: 'http://www.omg.org/spec/DD#fontStrikeThrough',
-  shapeType: 'http://www.omg.org/spec/DD#shapeType',
-} as const;
+/** The DD namespace URI — used only for type detection, not property matching */
+export const DD_NS = 'http://www.omg.org/spec/DD#';
 
-// Parsed diagram data structures
+/**
+ * Extract the local name from a URI (the part after # or last /).
+ * Used to map RDF predicate URIs to property keys generically.
+ */
+export function localName(uri: string): string {
+  const hashIdx = uri.lastIndexOf('#');
+  if (hashIdx >= 0) return uri.substring(hashIdx + 1);
+  const slashIdx = uri.lastIndexOf('/');
+  if (slashIdx >= 0) return uri.substring(slashIdx + 1);
+  return uri;
+}
+
+/** Check if a URI belongs to the DD namespace */
+export function isDDProperty(predicateURI: string): boolean {
+  return predicateURI.startsWith(DD_NS);
+}
+
+/** Check if a resource is a dd:Diagram by its rdf:type URIs */
+export function isDiagram(resourceTypes: string[]): boolean {
+  return resourceTypes.some(t => t === DD_NS + 'Diagram');
+}
+
+/** Check if a resource is a dd:Shape */
+export function isShape(resourceTypes: string[]): boolean {
+  return resourceTypes.some(t => t === DD_NS + 'Shape');
+}
+
+/** Check if a resource is a dd:Edge */
+export function isEdge(resourceTypes: string[]): boolean {
+  return resourceTypes.some(t => t === DD_NS + 'Edge');
+}
+
+// ---- Runtime data structures (populated by generic RDF parsing) ----
+
 export interface DiagramBounds {
   x: number;
   y: number;
@@ -1390,25 +1382,13 @@ export interface DiagramPoint {
   y: number;
 }
 
-export interface DiagramStyle {
-  fill?: boolean;
-  fillColor?: string;
-  fillOpacity?: number;
-  stroke?: boolean;
-  strokeColor?: string;
-  strokeWidth?: number;
-  strokeOpacity?: number;
-  strokeDashLength?: number;
-  strokeDashGap?: number;
-  fontSize?: number;
-  fontName?: string;
-  fontColor?: string;
-  fontBold?: boolean;
-  fontItalic?: boolean;
-  fontUnderline?: boolean;
-  fontStrikeThrough?: boolean;
-  shapeType?: string;
-}
+/**
+ * Style properties collected generically from dd:Style blank nodes.
+ * Keys are DD local names (e.g., "fillColor", "shapeType").
+ * Values are strings — the renderer coerces to number/boolean as needed
+ * based on the local name.
+ */
+export type DiagramStyle = Record<string, string>;
 
 export interface DiagramShapeData {
   id: string;                    // blank node ID
@@ -1437,44 +1417,45 @@ export interface ParsedDiagram {
   elements: DiagramElementData[];
   elementMap: Map<string, DiagramElementData>;
 }
-
-export function isDiagram(resourceTypes: string[]): boolean {
-  return resourceTypes.includes(DD.Diagram);
-}
 ```
 
 - [ ] **Step 2: Commit**
 
 ```bash
 git add oslc-browser/src/models/diagram-types.ts
-git commit -m "feat: add DD constants and diagram TypeScript types"
+git commit -m "feat: add generic vocabulary-driven diagram types"
 ```
 
 ---
 
-### Task 7: Create Diagram Data Parser
+### Task 7: Create Diagram Data Parser (Generic)
 
 **Files:**
 - Create: `oslc-browser/src/hooks/useDiagramData.ts`
 
 - [ ] **Step 1: Create useDiagramData.ts**
 
-This hook parses a `LoadedResource` (when it's a diagram) into `ParsedDiagram` by walking the blank node (inline resource) structure. It reads from the existing `LoadedResource.inlineResources` and `LoadedResource.properties`/`links` data.
+This hook parses a `LoadedResource` (when it's a diagram) into `ParsedDiagram` by walking the blank node (inline resource) structure generically. It identifies DD properties by namespace, not by hardcoded URIs. Style properties are collected as a key/value map keyed by local name.
 
 ```typescript
 import { useMemo } from 'react';
 import { LoadedResource } from '../models/types';
 import {
-  DD,
+  DD_NS,
+  isDDProperty,
+  localName,
+  isDiagram,
+  isShape,
+  isEdge,
   DiagramBounds,
   DiagramEdgeData,
   DiagramElementData,
   DiagramPoint,
-  DiagramShapeData,
   DiagramStyle,
   ParsedDiagram,
-  isDiagram,
 } from '../models/diagram-types';
+
+// ---- Generic helpers for reading LoadedResource data ----
 
 function getPropertyValue(
   resource: LoadedResource,
@@ -1482,23 +1463,6 @@ function getPropertyValue(
 ): string | undefined {
   const prop = resource.properties.find(p => p.predicate === predicate);
   return prop?.value;
-}
-
-function getNumericProperty(
-  resource: LoadedResource,
-  predicate: string
-): number | undefined {
-  const val = getPropertyValue(resource, predicate);
-  return val !== undefined ? parseFloat(val) : undefined;
-}
-
-function getBooleanProperty(
-  resource: LoadedResource,
-  predicate: string
-): boolean | undefined {
-  const val = getPropertyValue(resource, predicate);
-  if (val === undefined) return undefined;
-  return val === 'true' || val === '1';
 }
 
 function getLinkURI(
@@ -1533,55 +1497,76 @@ function getInlineResources(
   return results;
 }
 
-function parseStyle(styleResource: LoadedResource): DiagramStyle {
-  return {
-    fill: getBooleanProperty(styleResource, DD.fill),
-    fillColor: getPropertyValue(styleResource, DD.fillColor),
-    fillOpacity: getNumericProperty(styleResource, DD.fillOpacity),
-    stroke: getBooleanProperty(styleResource, DD.stroke),
-    strokeColor: getPropertyValue(styleResource, DD.strokeColor),
-    strokeWidth: getNumericProperty(styleResource, DD.strokeWidth),
-    strokeOpacity: getNumericProperty(styleResource, DD.strokeOpacity),
-    strokeDashLength: getNumericProperty(styleResource, DD.strokeDashLength),
-    strokeDashGap: getNumericProperty(styleResource, DD.strokeDashGap),
-    fontSize: getNumericProperty(styleResource, DD.fontSize),
-    fontName: getPropertyValue(styleResource, DD.fontName),
-    fontColor: getPropertyValue(styleResource, DD.fontColor),
-    fontBold: getBooleanProperty(styleResource, DD.fontBold),
-    fontItalic: getBooleanProperty(styleResource, DD.fontItalic),
-    fontUnderline: getBooleanProperty(styleResource, DD.fontUnderline),
-    fontStrikeThrough: getBooleanProperty(styleResource, DD.fontStrikeThrough),
-    shapeType: getPropertyValue(styleResource, DD.shapeType),
-  };
+/**
+ * Find an inline resource linked via a DD-namespaced predicate
+ * identified by local name (e.g., "bounds", "localStyle").
+ */
+function getDDInlineResource(
+  resource: LoadedResource,
+  ddLocalName: string
+): LoadedResource | undefined {
+  return getInlineResource(resource, DD_NS + ddLocalName);
 }
+
+/**
+ * Find a link URI via a DD-namespaced predicate identified by local name.
+ */
+function getDDLinkURI(
+  resource: LoadedResource,
+  ddLocalName: string
+): string | undefined {
+  return getLinkURI(resource, DD_NS + ddLocalName);
+}
+
+// ---- Generic style parsing ----
+
+/**
+ * Parse all DD-namespaced properties on a style resource into a
+ * key/value map keyed by local name. No hardcoded property list —
+ * any dd: property found on the style is included.
+ */
+function parseStyle(styleResource: LoadedResource): DiagramStyle {
+  const style: DiagramStyle = {};
+  for (const prop of styleResource.properties) {
+    if (isDDProperty(prop.predicate)) {
+      style[localName(prop.predicate)] = prop.value;
+    }
+  }
+  return style;
+}
+
+// ---- Generic bounds parsing ----
 
 function parseBounds(boundsResource: LoadedResource): DiagramBounds {
+  const get = (name: string) => {
+    const val = getPropertyValue(boundsResource, DD_NS + name);
+    return val !== undefined ? parseFloat(val) : 0;
+  };
   return {
-    x: getNumericProperty(boundsResource, DD.x) ?? 0,
-    y: getNumericProperty(boundsResource, DD.y) ?? 0,
-    width: getNumericProperty(boundsResource, DD.width) ?? 100,
-    height: getNumericProperty(boundsResource, DD.height) ?? 60,
+    x: get('x'),
+    y: get('y'),
+    width: get('width') || 100,
+    height: get('height') || 60,
   };
 }
 
-function parseElement(
-  element: LoadedResource,
-  diagramResource: LoadedResource
-): DiagramElementData | null {
-  const types = element.resourceTypes;
-  const modelElementURI = getLinkURI(element, DD.modelElement);
+// ---- Generic element parsing ----
 
-  // Parse style from localStyle (inline) or sharedStyle (reference)
+function parseElement(element: LoadedResource): DiagramElementData | null {
+  const types = element.resourceTypes;
+  const modelElementURI = getDDLinkURI(element, 'modelElement');
+
+  // Parse style generically from localStyle inline blank node
   let style: DiagramStyle = {};
-  const localStyleRes = getInlineResource(element, DD.localStyle);
+  const localStyleRes = getDDInlineResource(element, 'localStyle');
   if (localStyleRes) {
     style = parseStyle(localStyleRes);
   }
   // sharedStyle is a reference URI — would need separate fetch;
   // for now fall back to localStyle or empty style
 
-  if (types.includes(DD.Shape)) {
-    const boundsRes = getInlineResource(element, DD.bounds);
+  if (isShape(types)) {
+    const boundsRes = getDDInlineResource(element, 'bounds');
     const bounds = boundsRes ? parseBounds(boundsRes) : { x: 0, y: 0, width: 100, height: 60 };
     return {
       id: element.uri,
@@ -1592,9 +1577,9 @@ function parseElement(
     };
   }
 
-  if (types.includes(DD.Edge)) {
-    const sourceURI = getLinkURI(element, DD.source);
-    const targetURI = getLinkURI(element, DD.target);
+  if (isEdge(types)) {
+    const sourceURI = getDDLinkURI(element, 'source');
+    const targetURI = getDDLinkURI(element, 'target');
     if (!sourceURI || !targetURI) return null;
     // Waypoints: for now, empty array (straight line between source/target)
     const waypoints: DiagramPoint[] = [];
@@ -1612,15 +1597,18 @@ function parseElement(
   return null;
 }
 
+// ---- Main parser ----
+
 export function parseDiagramResource(resource: LoadedResource): ParsedDiagram | null {
   if (!isDiagram(resource.resourceTypes)) return null;
 
   const elements: DiagramElementData[] = [];
   const elementMap = new Map<string, DiagramElementData>();
 
-  const diagramElements = getInlineResources(resource, DD.diagramElement);
+  // Find top-level diagram elements via dd:diagramElement predicate
+  const diagramElements = getInlineResources(resource, DD_NS + 'diagramElement');
   for (const el of diagramElements) {
-    const parsed = parseElement(el, resource);
+    const parsed = parseElement(el);
     if (parsed) {
       elements.push(parsed);
       elementMap.set(parsed.id, parsed);
@@ -1647,7 +1635,7 @@ export function useDiagramData(resource: LoadedResource | null): ParsedDiagram |
 
 ```bash
 git add oslc-browser/src/hooks/useDiagramData.ts
-git commit -m "feat: add diagram data parser hook (useDiagramData)"
+git commit -m "feat: add generic vocabulary-driven diagram data parser"
 ```
 
 ---
@@ -1665,36 +1653,54 @@ Renders a single shape as SVG elements based on `dd:shapeType` from the style. N
 
 ```tsx
 import React from 'react';
-import { DiagramShapeData } from '../models/diagram-types';
+import { DiagramShapeData, DiagramStyle } from '../models/diagram-types';
 
 interface DiagramShapeProps {
   shape: DiagramShapeData;
   onClick?: (modelElementURI: string) => void;
 }
 
+/** Read a style property as string, with fallback */
+function s(style: DiagramStyle, key: string, fallback: string = ''): string {
+  return style[key] ?? fallback;
+}
+
+/** Read a style property as number, with fallback */
+function n(style: DiagramStyle, key: string, fallback: number = 0): number {
+  const val = style[key];
+  return val !== undefined ? parseFloat(val) : fallback;
+}
+
+/** Read a style property as boolean */
+function b(style: DiagramStyle, key: string): boolean | undefined {
+  const val = style[key];
+  if (val === undefined) return undefined;
+  return val === 'true' || val === '1';
+}
+
 function renderShapeSVG(shape: DiagramShapeData): React.ReactNode {
   const { bounds, style } = shape;
   const { x, y, width, height } = bounds;
-  const fill = style.fillColor ?? '#ffffff';
-  const fillOpacity = style.fillOpacity ?? 1;
-  const strokeColor = style.strokeColor ?? '#333333';
-  const strokeW = style.strokeWidth ?? 1;
-  const strokeOpacity = style.strokeOpacity ?? 1;
+  const fill = s(style, 'fillColor', '#ffffff');
+  const fillOpacity = n(style, 'fillOpacity', 1);
+  const strokeColor = s(style, 'strokeColor', '#333333');
+  const strokeW = n(style, 'strokeWidth', 1);
+  const strokeOpacity = n(style, 'strokeOpacity', 1);
   const dashArray =
-    style.strokeDashLength && style.strokeDashGap
-      ? `${style.strokeDashLength} ${style.strokeDashGap}`
+    style['strokeDashLength'] && style['strokeDashGap']
+      ? `${style['strokeDashLength']} ${style['strokeDashGap']}`
       : undefined;
 
   const commonProps = {
-    fill: style.fill === false ? 'none' : fill,
+    fill: b(style, 'fill') === false ? 'none' : fill,
     fillOpacity,
-    stroke: style.stroke === false ? 'none' : strokeColor,
+    stroke: b(style, 'stroke') === false ? 'none' : strokeColor,
     strokeWidth: strokeW,
     strokeOpacity,
     strokeDasharray: dashArray,
   };
 
-  const shapeType = style.shapeType ?? 'rect';
+  const shapeType = s(style, 'shapeType', 'rect');
 
   switch (shapeType) {
     case 'ellipse':
@@ -1751,14 +1757,14 @@ function renderShapeSVG(shape: DiagramShapeData): React.ReactNode {
 
 export function DiagramShape({ shape, onClick }: DiagramShapeProps) {
   const { bounds, style, modelElementURI, modelElementTitle } = shape;
-  const fontSize = style.fontSize ?? 11;
-  const fontFamily = style.fontName ?? 'Arial, sans-serif';
-  const fontColor = style.fontColor ?? '#333333';
-  const fontWeight = style.fontBold ? 'bold' : 'normal';
-  const fontStyle = style.fontItalic ? 'italic' : 'normal';
+  const fontSize = n(style, 'fontSize', 11);
+  const fontFamily = s(style, 'fontName', 'Arial, sans-serif');
+  const fontColor = s(style, 'fontColor', '#333333');
+  const fontWeight = b(style, 'fontBold') ? 'bold' : 'normal';
+  const fStyle = b(style, 'fontItalic') ? 'italic' : 'normal';
   const textDecoration = [
-    style.fontUnderline ? 'underline' : '',
-    style.fontStrikeThrough ? 'line-through' : '',
+    b(style, 'fontUnderline') ? 'underline' : '',
+    b(style, 'fontStrikeThrough') ? 'line-through' : '',
   ].filter(Boolean).join(' ') || undefined;
 
   const title = modelElementTitle ?? modelElementURI ?? '';
@@ -1774,7 +1780,7 @@ export function DiagramShape({ shape, onClick }: DiagramShapeProps) {
     >
       <title>{title}</title>
       {renderShapeSVG(shape)}
-      {style.shapeType !== 'stickFigure' && (
+      {s(style, 'shapeType', 'rect') !== 'stickFigure' && (
         <text
           x={bounds.x + bounds.width / 2}
           y={bounds.y + bounds.height / 2}
@@ -1784,13 +1790,13 @@ export function DiagramShape({ shape, onClick }: DiagramShapeProps) {
           fontFamily={fontFamily}
           fill={fontColor}
           fontWeight={fontWeight}
-          fontStyle={fontStyle}
+          fontStyle={fStyle}
           textDecoration={textDecoration}
         >
           {title}
         </text>
       )}
-      {style.shapeType === 'stickFigure' && (
+      {s(style, 'shapeType', 'rect') === 'stickFigure' && (
         <text
           x={bounds.x + bounds.width / 2}
           y={bounds.y + bounds.height + 14}
@@ -1827,7 +1833,7 @@ Renders an edge as an SVG path from the center of the source shape bounds, throu
 
 ```tsx
 import React from 'react';
-import { DiagramEdgeData, DiagramShapeData, DiagramElementData } from '../models/diagram-types';
+import { DiagramEdgeData, DiagramShapeData, DiagramElementData, DiagramStyle } from '../models/diagram-types';
 
 interface DiagramEdgeProps {
   edge: DiagramEdgeData;
@@ -1856,12 +1862,13 @@ export function DiagramEdge({ edge, elementMap }: DiagramEdgeProps) {
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`)
     .join(' ');
 
-  const strokeColor = edge.style.strokeColor ?? '#333333';
-  const strokeW = edge.style.strokeWidth ?? 1;
-  const strokeOpacity = edge.style.strokeOpacity ?? 1;
+  const style = edge.style;
+  const strokeColor = style['strokeColor'] ?? '#333333';
+  const strokeW = style['strokeWidth'] ? parseFloat(style['strokeWidth']) : 1;
+  const strokeOpacity = style['strokeOpacity'] ? parseFloat(style['strokeOpacity']) : 1;
   const dashArray =
-    edge.style.strokeDashLength && edge.style.strokeDashGap
-      ? `${edge.style.strokeDashLength} ${edge.style.strokeDashGap}`
+    style['strokeDashLength'] && style['strokeDashGap']
+      ? `${style['strokeDashLength']} ${style['strokeDashGap']}`
       : undefined;
 
   return (
