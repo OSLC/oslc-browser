@@ -104,10 +104,12 @@ All diagram types share `oslc:resourceType dd:Diagram`. Differentiation between 
 
 | Property | Domain | Range | Description |
 |----------|--------|-------|-------------|
-| `dd:name` | `dd:Diagram` | `xsd:string` | Diagram name |
-| `dd:documentation` | `dd:Diagram` | `xsd:string` | Diagram description |
+| `dcterms:title` | (inherited from `oslc_am:Resource`) | `xsd:string` | Diagram name |
+| `dcterms:description` | (inherited from `oslc_am:Resource`) | `xsd:string` | Diagram description |
 | `dd:resolution` | `dd:Diagram` | `xsd:double` | Rendering resolution |
 | `dd:diagramElement` | `dd:Diagram` | `dd:DiagramElement` | Top-level elements in this diagram |
+
+**Note:** `dd:name` and `dd:documentation` from the OMG DD metamodel map directly to `dcterms:title` and `dcterms:description` inherited from `oslc_am:Resource`. No separate DD properties are needed.
 
 **DiagramElement properties:**
 
@@ -183,13 +185,6 @@ All diagram types share `oslc:resourceType dd:Diagram`. Differentiation between 
 
 ```turtle
 # Reusable property definitions
-<#p-name>
-  a oslc:Property ;
-  oslc:name "name" ;
-  oslc:propertyDefinition dd:name ;
-  oslc:occurs oslc:Zero-or-one ;
-  oslc:valueType xsd:string .
-
 <#p-diagramElement>
   a oslc:Property ;
   oslc:name "diagramElement" ;
@@ -213,8 +208,8 @@ All diagram types share `oslc:resourceType dd:Diagram`. Differentiation between 
   a oslc:ResourceShape ;
   dcterms:title "Diagram" ;
   oslc:describes dd:Diagram ;
-  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
-    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+  oslc:property <#p-title>, <#p-identifier>, <#p-description>,
+    <#p-resolution>, <#p-diagramElement> .
 
 <#ShapeShape>
   a oslc:ResourceShape ;
@@ -306,8 +301,8 @@ Example Turtle for `OrgUnitDiagramShape`:
   dcterms:title "Organization Unit Hierarchy Diagram" ;
   dcterms:description "A hierarchy diagram showing OrganizationUnit parent-child relationships. Shapes reference mrm:OrganizationUnit model elements. Edges use mrm:HierarchyEdgeStyle." ;
   oslc:describes dd:Diagram ;
-  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
-    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+  oslc:property <#p-title>, <#p-identifier>, <#p-description>,
+    <#p-resolution>, <#p-diagramElement> .
 ```
 
 - `ProgramDiagramShape`, `ServiceDiagramShape`, `ProcessDiagramShape`, `ResourceDiagramShape`, `NeedDiagramShape`, `OutcomeDiagramShape`, `OutputDiagramShape`, `TargetGroupDiagramShape` — Same pattern with descriptions specifying the relevant MRM type and style conventions.
@@ -320,8 +315,8 @@ Example Turtle for `OrgUnitDiagramShape`:
   dcterms:title "Program Logic Model Diagram" ;
   dcterms:description "Shows contributory relationships: Program → Services → Outputs → Outcomes. Shapes reference mrm:Program, mrm:Service, mrm:Output, and mrm:Outcome model elements. Edges use mrm:ContributoryEdgeStyle." ;
   oslc:describes dd:Diagram ;
-  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
-    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+  oslc:property <#p-title>, <#p-identifier>, <#p-description>,
+    <#p-resolution>, <#p-diagramElement> .
 ```
 
 **SIAM Diagram:**
@@ -332,8 +327,8 @@ Example Turtle for `OrgUnitDiagramShape`:
   dcterms:title "Service Integrated Accountability Model Diagram" ;
   dcterms:description "Traces accountability chains from OrganizationUnit/Program through Services and Processes to Outputs and TargetGroups. Multiple shape styles coexist. Layout is generally top-down." ;
   oslc:describes dd:Diagram ;
-  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
-    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+  oslc:property <#p-title>, <#p-identifier>, <#p-description>,
+    <#p-resolution>, <#p-diagramElement> .
 ```
 
 ---
