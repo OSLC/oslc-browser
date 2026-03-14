@@ -477,6 +477,46 @@ Diagrams are navigated in the column view like any other OSLC resource. Their pr
 - Fit-to-view button
 - Layout direction indicator (informational — diagrams have explicit coordinates)
 
+### Diagram Auto-Generation from Model Elements
+
+The creation factories in Phase 3 create empty diagram resources. To populate diagrams with shapes and edges, the browser provides a **"Create Diagram"** context menu on any resource selected in the column view.
+
+**Discovery — catalog introspection:**
+
+When a resource is selected, the browser inspects the connected server's service provider catalog to find diagram creation factories whose `oslc:resourceShape` description mentions the selected resource's `rdf:type`. For example, selecting an `mrm:OrganizationUnit` would surface menu items for "Organization Unit Hierarchy Diagram" and "SIAM Diagram" (since both reference OrgUnit in their shape descriptions). The matching is done by checking whether any of the resource's `rdf:type` values appear in the diagram shape's `dcterms:description`.
+
+**Menu items:**
+
+The context menu (right-click or action button) on a selected resource shows a "Create Diagram" submenu listing all matching diagram types. For example, on an OrganizationUnit:
+- Create Organization Unit Hierarchy Diagram
+- Create SIAM Diagram
+
+**Auto-generation — generic relationship traversal:**
+
+When the user selects a diagram type, the browser:
+
+1. **Creates the diagram resource** via the creation factory (POST to the factory URL), with `dcterms:title` set to e.g., "Fire Department - SIAM Diagram"
+2. **Traverses outgoing links** from the selected resource, recursively to a default depth of 2:
+   - For each discovered resource, create a `dd:Shape` blank node with `dd:modelElement` pointing to it
+   - For each link traversed, create a `dd:Edge` blank node with `dd:source`/`dd:target` referencing the corresponding shapes
+3. **Assigns shared styles** based on the discovered resource's `rdf:type` — if a `dd:SharedStyle` exists for that type (e.g., `mrm:ServiceStyle` for `mrm:Service`), it is referenced via `dd:sharedStyle`. Resources with no matching style get a default style.
+4. **Applies default layout** — a simple grid or tree layout algorithm assigns `dd:bounds` coordinates to each shape:
+   - The root element is placed at top-center
+   - Children are arranged in rows below their parent, evenly spaced
+   - Edge waypoints are computed as straight lines between shape centers
+   - This produces a basic but readable layout for testing/demonstration
+5. **Updates the diagram resource** (PUT) with all the generated blank node elements
+6. **Navigates to the diagram** in the column view, which triggers the Diagram tab to render it
+
+**Traversal control:**
+
+- Default depth: 2 (root → children → grandchildren)
+- All outgoing link predicates are followed (no filtering in initial implementation)
+- Cycles are detected and broken (a resource already visited is not traversed again, but an edge is still created to it)
+- The traversal depth and predicate filtering are candidates for future UI controls
+
+**Note:** This auto-generation is an initial capability for testing and demonstration. Future iterations will add interactive layout editing, predicate filtering, depth controls, and manual diagram authoring.
+
 ### SVG Property Mapping
 
 | DD Property | SVG Attribute | Notes |
@@ -527,3 +567,4 @@ The following capabilities are planned for future iterations but are **out of sc
 | 4 | `DiagramShape.tsx` | `oslc-browser/src/components/` | Shape SVG rendering |
 | 4 | `DiagramEdge.tsx` | `oslc-browser/src/components/` | Edge SVG rendering |
 | 4 | `DiagramToolbar.tsx` | `oslc-browser/src/components/` | Zoom/fit controls |
+| 4 | `diagramGenerator.ts` | `oslc-browser/src/hooks/` | Auto-generation: traversal, layout, style assignment |
