@@ -1,0 +1,150 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dd:      <http://www.omg.org/spec/DD#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+# ============================================================
+# MRM Shared Styles for Diagram Elements
+# Each style maps an MRM resource type to its visual appearance.
+# ============================================================
+
+mrm:OrgUnitStyle
+  a dd:SharedStyle ;
+  dcterms:title "Organization Unit Style" ;
+  dd:shapeType "rect" ;
+  dd:fill true ;
+  dd:fillColor "#cce5ff" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#004085" ;
+  dd:strokeWidth 1.5 ;
+  dd:fontSize 12.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#004085" .
+
+mrm:ProgramStyle
+  a dd:SharedStyle ;
+  dcterms:title "Program Style" ;
+  dd:shapeType "rect" ;
+  dd:fill true ;
+  dd:fillColor "#d4edda" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#155724" ;
+  dd:strokeWidth 1.5 ;
+  dd:fontSize 12.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#155724" .
+
+mrm:ServiceStyle
+  a dd:SharedStyle ;
+  dcterms:title "Service Style" ;
+  dd:shapeType "roundedRect" ;
+  dd:fill true ;
+  dd:fillColor "#c3e6cb" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#155724" ;
+  dd:strokeWidth 1.0 ;
+  dd:fontSize 11.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#155724" .
+
+mrm:ProcessStyle
+  a dd:SharedStyle ;
+  dcterms:title "Process Style" ;
+  dd:shapeType "ellipse" ;
+  dd:fill true ;
+  dd:fillColor "#e2e3e5" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#383d41" ;
+  dd:strokeWidth 1.0 ;
+  dd:fontSize 10.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#383d41" .
+
+mrm:ResourceStyle
+  a dd:SharedStyle ;
+  dcterms:title "Resource Style" ;
+  dd:shapeType "rect" ;
+  dd:fill true ;
+  dd:fillColor "#fff3cd" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#856404" ;
+  dd:strokeWidth 1.0 ;
+  dd:strokeDashLength 5.0 ;
+  dd:strokeDashGap 3.0 ;
+  dd:fontSize 11.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#856404" .
+
+mrm:OutcomeStyle
+  a dd:SharedStyle ;
+  dcterms:title "Outcome Style" ;
+  dd:shapeType "ellipse" ;
+  dd:fill true ;
+  dd:fillColor "#d1ecf1" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#0c5460" ;
+  dd:strokeWidth 1.0 ;
+  dd:fontSize 10.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#0c5460" .
+
+mrm:OutputStyle
+  a dd:SharedStyle ;
+  dcterms:title "Output Style" ;
+  dd:shapeType "rect" ;
+  dd:fill true ;
+  dd:fillColor "#f8f9fa" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#6c757d" ;
+  dd:strokeWidth 0.5 ;
+  dd:fontSize 10.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#6c757d" .
+
+mrm:NeedStyle
+  a dd:SharedStyle ;
+  dcterms:title "Need Style" ;
+  dd:shapeType "ellipse" ;
+  dd:fill true ;
+  dd:fillColor "#f5c6cb" ;
+  dd:fillOpacity 1.0 ;
+  dd:stroke true ;
+  dd:strokeColor "#721c24" ;
+  dd:strokeWidth 1.0 ;
+  dd:fontSize 10.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#721c24" .
+
+mrm:TargetGroupStyle
+  a dd:SharedStyle ;
+  dcterms:title "Target Group Style" ;
+  dd:shapeType "stickFigure" ;
+  dd:fill false ;
+  dd:stroke true ;
+  dd:strokeColor "#333333" ;
+  dd:strokeWidth 1.5 ;
+  dd:fontSize 10.0 ;
+  dd:fontName "Arial" ;
+  dd:fontColor "#333333" .
+
+mrm:HierarchyEdgeStyle
+  a dd:SharedStyle ;
+  dcterms:title "Hierarchy Edge Style" ;
+  dd:stroke true ;
+  dd:strokeColor "#333333" ;
+  dd:strokeWidth 1.0 .
+
+mrm:ContributoryEdgeStyle
+  a dd:SharedStyle ;
+  dcterms:title "Contributory Edge Style" ;
+  dd:stroke true ;
+  dd:strokeColor "#555555" ;
+  dd:strokeWidth 1.0 .
