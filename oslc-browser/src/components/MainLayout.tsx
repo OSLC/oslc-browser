@@ -1,4 +1,5 @@
 import { Box } from '@mui/material';
+import type { OSLCResource } from 'oslc-client';
 import { ColumnViewComponent } from './ColumnView.js';
 import { FavoritesPanelComponent } from './FavoritesPanel.js';
 import { DetailsPanelComponent } from './DetailsPanel.js';
@@ -16,6 +17,7 @@ interface MainLayoutProps {
   onRemoveFavorite: (id: string) => void;
   onRenameFavorite: (id: string, name: string) => void;
   onToggleFolder: (id: string) => void;
+  fetchRawResource?: (uri: string) => Promise<OSLCResource | null>;
 }
 
 export function MainLayoutComponent({
@@ -30,6 +32,7 @@ export function MainLayoutComponent({
   onRemoveFavorite,
   onRenameFavorite,
   onToggleFolder,
+  fetchRawResource,
 }: MainLayoutProps) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, overflow: 'hidden' }}>
@@ -55,6 +58,7 @@ export function MainLayoutComponent({
         <DetailsPanelComponent
           resource={selectedResource}
           onLinkClick={onLinkClick}
+          fetchRawResource={fetchRawResource}
         />
       </Box>
     </Box>

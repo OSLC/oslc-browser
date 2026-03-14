@@ -2,6 +2,7 @@
 @prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix oslc:    <http://open-services.net/ns/core#> .
 @prefix mrm:     <http://www.misa.org.ca/mrm#> .
+@prefix dd:      <http://www.omg.org/spec/DD#> .
 
 # --- Catalog properties ---
 
@@ -22,7 +23,7 @@
 
 <urn:oslc:template/sp/service>
   a oslc:Service ;
-  oslc:domain mrm: ;
+  oslc:domain mrm:, dd: ;
 
   # === Creation Factories ===
 
@@ -73,6 +74,75 @@
     dcterms:title "Needs" ;
     oslc:resourceType mrm:Need ;
     oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+  ] ;
+
+  # ---- Diagram Creation Factories ----
+
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Organization Unit Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#OrgUnitDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Program Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProgramDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Service Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ServiceDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Process Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProcessDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Resource Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ResourceDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Need Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#NeedDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Outcome Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutcomeDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Output Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutputDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create Target Group Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#TargetGroupDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create PLM Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#PLMDiagramShape>
+  ] ;
+  oslc:creationFactory [
+    a oslc:CreationFactory ;
+    dcterms:title "Create SIAM Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#SIAMDiagramShape>
   ] ;
 
   # === Creation Dialogs ===
@@ -148,6 +218,120 @@
     oslc:hintHeight "505px" ;
     oslc:hintWidth "680px" ;
     oslc:resourceShape <shapes/MRMS-Shapes#NeedShape>
+  ] ;
+
+  # ---- Diagram Creation Dialogs ----
+
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Organization Unit Diagram" ;
+    oslc:label "New OrgUnit Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#OrgUnitDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Program Diagram" ;
+    oslc:label "New Program Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProgramDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Service Diagram" ;
+    oslc:label "New Service Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ServiceDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Process Diagram" ;
+    oslc:label "New Process Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProcessDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Resource Diagram" ;
+    oslc:label "New Resource Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#ResourceDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Need Diagram" ;
+    oslc:label "New Need Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#NeedDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Outcome Diagram" ;
+    oslc:label "New Outcome Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutcomeDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Output Diagram" ;
+    oslc:label "New Output Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutputDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create Target Group Diagram" ;
+    oslc:label "New TargetGroup Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#TargetGroupDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create PLM Diagram" ;
+    oslc:label "New PLM Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#PLMDiagramShape>
+  ] ;
+  oslc:creationDialog [
+    a oslc:Dialog ;
+    dcterms:title "Create SIAM Diagram" ;
+    oslc:label "New SIAM Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:resourceShape <shapes/MRMS-DiagramShapes#SIAMDiagramShape>
+  ] ;
+
+  # ---- Diagram Selection Dialog ----
+
+  oslc:selectionDialog [
+    a oslc:Dialog ;
+    dcterms:title "Select Diagram" ;
+    oslc:label "Select Diagram" ;
+    oslc:resourceType dd:Diagram ;
+    oslc:hintHeight "505px" ;
+    oslc:hintWidth "680px" ;
+    oslc:usage oslc:default
   ] ;
 
   # === Query Capabilities ===

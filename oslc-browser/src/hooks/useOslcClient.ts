@@ -15,6 +15,10 @@ export interface UseOslcClientReturn {
   setPassword: (pass: string) => void;
   connect: () => Promise<LoadedResource | null>;
   fetchResource: (uri: string) => Promise<LoadedResource | null>;
+  /** Fetch the raw OSLCResource (for diagram parsing and other advanced uses) */
+  fetchRawResource: (uri: string) => Promise<OSLCResource | null>;
+  /** Get the underlying OSLCClient instance (for diagram auto-generation) */
+  getClient: () => OSLCClient | null;
 }
 
 interface RdfStatement {
@@ -414,5 +418,30 @@ export function useOslcClient(): UseOslcClientReturn {
     }
   }, [connection.serverURL, connection.username, connection.password]);
 
-  return { connection, setServerURL, setUsername, setPassword, connect, fetchResource };
+  const fetchRawResource = useCallback(async (uri: string): Promise<OSLCResource | null> => {
+    const client = clientRef.current;
+    if (!client) return null;
+
+    try {
+      let fetchURI = uri;
+      const serverURL = connection.serverURL;
+      if (serverURL) {
+        const serverOrigin = new URL(serverURL).origin;
+        if (!uri.startsWith(serverOrigin)) {
+          fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
+        }
+      }
+
+      return await client.getResource(fetchURI);
+    } catch (err) {
+      console.error('Error fetching raw resource:', uri, err);
+      return null;
+    }
+  }, [connection.serverURL]);
+
+  const getClient = useCallback((): OSLCClient | null => {
+    return clientRef.current;
+  }, []);
+
+  return { connection, setServerURL, setUsername, setPassword, connect, fetchResource, fetchRawResource, getClient };
 }
