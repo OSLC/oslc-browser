@@ -32,15 +32,17 @@ Diagrams are **views** of model elements, not replacements for them.
 
 This ensures semantic relationships are never coupled through view elements. Deleting or rearranging a diagram has no effect on model-level links.
 
-### DD Classes Extend oslc_am:Resource
+### Only dd:Diagram Extends oslc_am:Resource
 
-`dd:Diagram` and `dd:DiagramElement` (and subclasses Shape, Edge) inherit from `oslc_am:Resource`. This means:
+Only `dd:Diagram` inherits from `oslc_am:Resource`. This means:
 
-- Existing OSLC AM-aware servers and clients recognize them
-- They inherit standard AM properties (dcterms:title, dcterms:identifier, dcterms:creator, dcterms:created, dcterms:modified, etc.)
-- They participate in OSLC linking relationships naturally
+- Diagrams are recognized by OSLC AM-aware servers and clients
+- Diagrams inherit standard AM properties (dcterms:title, dcterms:identifier, dcterms:creator, dcterms:created, dcterms:modified, etc.)
+- Diagrams participate in OSLC linking relationships naturally
 - Existing query capabilities over `oslc_am:Resource` include diagrams
 - Selection dialogs for AM resources surface diagrams as link targets
+
+`dd:DiagramElement`, `dd:Shape`, and `dd:Edge` are plain `rdfs:Class` instances — they do NOT extend `oslc_am:Resource`, since they are modeled as blank nodes within the Diagram graph and cannot be independently addressed, linked, or queried.
 
 ### Blank Node Structure for Efficiency
 
@@ -50,6 +52,10 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 - Only `dd:modelElement` references are named URIs pointing to external resources
 - Follows the existing pattern used for Publisher, Property definitions in ResourceShapes
 
+### Diagram Type Differentiation
+
+All diagram types share `oslc:resourceType dd:Diagram`. Differentiation between diagram types (OrgUnit diagram vs. SIAM diagram) is through `oslc:resourceShape` on creation factories and query capabilities. This is intentional — OSLC query capabilities use `oslc.where` predicates to filter results, and the shape constrains what properties are valid for each diagram type. No MRM-specific subclasses of `dd:Diagram` are needed.
+
 ---
 
 ## Phase 1: DD RDF Vocabulary and ResourceShapes
@@ -58,6 +64,8 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 
 - `oslc-server/config/vocab/DD.ttl` — DD ontology/vocabulary
 - `oslc-server/config/vocab/DD-Shapes.ttl` — OSLC ResourceShapes for DD classes
+
+**Note:** This introduces a new `vocab/` directory under `oslc-server/config/`, separate from the existing `shapes/` directory. The `shapes/` directory holds server-specific ResourceShapes (ChangeRequest, Requirement). The new `vocab/` directory holds reusable domain vocabularies and their shapes that can be shared across oslc-server-based applications. The mrm-server already follows this convention with `config/vocab/`.
 
 ### Namespace
 
@@ -72,7 +80,7 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 | Class | Superclass | Description |
 |-------|-----------|-------------|
 | `dd:Diagram` | `oslc_am:Resource` | Top-level diagram container |
-| `dd:DiagramElement` | `oslc_am:Resource` | Abstract base for visual elements |
+| `dd:DiagramElement` | `rdfs:Class` | Abstract base for visual elements (blank nodes) |
 | `dd:Shape` | `dd:DiagramElement` | Element with bounds (position and size) |
 | `dd:Edge` | `dd:DiagramElement` | Connection between two elements |
 
@@ -82,7 +90,6 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 |-------|-------------|
 | `dd:Bounds` | Rectangle: x, y, width, height |
 | `dd:Point` | Coordinate: x, y |
-| `dd:Dimension` | Size: width, height |
 
 **Style Classes:**
 
@@ -100,17 +107,19 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 | `dd:name` | `dd:Diagram` | `xsd:string` | Diagram name |
 | `dd:documentation` | `dd:Diagram` | `xsd:string` | Diagram description |
 | `dd:resolution` | `dd:Diagram` | `xsd:double` | Rendering resolution |
-| `dd:ownedElement` | `dd:Diagram` | `dd:DiagramElement` | Elements in this diagram |
+| `dd:diagramElement` | `dd:Diagram` | `dd:DiagramElement` | Top-level elements in this diagram |
 
 **DiagramElement properties:**
 
 | Property | Domain | Range | Description |
 |----------|--------|-------|-------------|
-| `dd:modelElement` | `dd:DiagramElement` | `oslc_am:Resource` | The model element this element represents |
+| `dd:modelElement` | `dd:DiagramElement` | `rdfs:Resource` | The model element this element represents |
 | `dd:owningElement` | `dd:DiagramElement` | `dd:DiagramElement` | Parent element |
-| `dd:ownedElement` | `dd:DiagramElement` | `dd:DiagramElement` | Child elements |
+| `dd:ownedElement` | `dd:DiagramElement` | `dd:DiagramElement` | Nested child elements (element-to-element containment) |
 | `dd:localStyle` | `dd:DiagramElement` | `dd:Style` | Style applied to this element |
 | `dd:sharedStyle` | `dd:DiagramElement` | `dd:SharedStyle` | Reference to a shared style |
+
+**Note:** `dd:diagramElement` (Diagram→DiagramElement) and `dd:ownedElement` (DiagramElement→DiagramElement) are distinct properties to avoid RDF domain union issues. `dd:diagramElement` is used only on Diagrams for top-level elements. `dd:ownedElement` is used on DiagramElements for nesting (e.g., a shape containing sub-shapes).
 
 **Shape properties:**
 
@@ -122,9 +131,11 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 
 | Property | Domain | Range | Description |
 |----------|--------|-------|-------------|
-| `dd:source` | `dd:Edge` | `dd:DiagramElement` | Source element |
-| `dd:target` | `dd:Edge` | `dd:DiagramElement` | Target element |
-| `dd:waypoint` | `dd:Edge` | `dd:Point` | Ordered intermediate points |
+| `dd:source` | `dd:Edge` | `dd:DiagramElement` | Source element (blank node reference) |
+| `dd:target` | `dd:Edge` | `dd:DiagramElement` | Target element (blank node reference) |
+| `dd:waypoint` | `dd:Edge` | `rdf:List` | Ordered list of `dd:Point` instances |
+
+**Note on waypoint ordering:** `dd:waypoint` uses `rdf:List` to preserve point order. In Turtle serialization this appears as `dd:waypoint ( _:p1 _:p2 _:p3 )`. The renderer processes the list in order to construct the edge path.
 
 **Bounds properties:**
 
@@ -164,6 +175,8 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
 | `dd:fontStrikeThrough` | `dd:Style` | `xsd:boolean` | Strikethrough |
 | `dd:shapeType` | `dd:Style` | `xsd:string` | Shape rendering hint: "rect", "ellipse", "roundedRect", "diamond", "stickFigure" |
 
+**Note:** `dd:shapeType` is a property of `dd:Style`, not `dd:Shape`. Renderers must dereference the shape's `dd:localStyle` or `dd:sharedStyle` to determine which SVG element type to use.
+
 ### ResourceShapes
 
 `DD-Shapes.ttl` uses the MRM reusable property pattern:
@@ -177,13 +190,21 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
   oslc:occurs oslc:Zero-or-one ;
   oslc:valueType xsd:string .
 
+<#p-diagramElement>
+  a oslc:Property ;
+  oslc:name "diagramElement" ;
+  oslc:propertyDefinition dd:diagramElement ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Inline .  # blank nodes are inline
+
 <#p-ownedElement>
   a oslc:Property ;
   oslc:name "ownedElement" ;
   oslc:propertyDefinition dd:ownedElement ;
   oslc:occurs oslc:Zero-or-many ;
   oslc:valueType oslc:AnyResource ;
-  oslc:representation oslc:Inline .  # blank nodes are inline
+  oslc:representation oslc:Inline .
 
 # ... more reusable properties ...
 
@@ -193,7 +214,7 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
   dcterms:title "Diagram" ;
   oslc:describes dd:Diagram ;
   oslc:property <#p-title>, <#p-identifier>, <#p-name>,
-    <#p-documentation>, <#p-resolution>, <#p-ownedElement> .
+    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
 
 <#ShapeShape>
   a oslc:ResourceShape ;
@@ -236,7 +257,12 @@ Diagram elements (Shapes, Edges, Bounds, Points, Styles) are modeled as blank no
   a oslc:ResourceShape ;
   dcterms:title "SharedStyle" ;
   oslc:describes dd:SharedStyle ;
-  oslc:property <#p-title>, <#p-fill>, <#p-fillColor>, ... .
+  oslc:property <#p-title>, <#p-fill>, <#p-fillColor>,
+    <#p-fillOpacity>, <#p-stroke>, <#p-strokeColor>,
+    <#p-strokeWidth>, <#p-strokeOpacity>, <#p-strokeDashLength>,
+    <#p-strokeDashGap>, <#p-fontSize>, <#p-fontName>,
+    <#p-fontColor>, <#p-fontBold>, <#p-fontItalic>,
+    <#p-fontUnderline>, <#p-fontStrikeThrough>, <#p-shapeType> .
 ```
 
 ---
@@ -268,24 +294,55 @@ Each MRM resource type gets a SharedStyle defining its visual appearance:
 
 ### Diagram ResourceShapes
 
+**Note on type constraints:** OSLC ResourceShapes cannot express transitive type constraints (e.g., "ownedElement shapes must have modelElement of type mrm:OrganizationUnit"). The constraints described below are **documentation-level conventions**, not shape-enforced. Creation dialogs and application logic enforce these conventions at runtime.
+
 **Hierarchy Diagrams** (one per hierarchical MRM type):
 
-- `OrgUnitDiagramShape` — Constrains `dd:ownedElement` to shapes with `dd:modelElement` of type `mrm:OrganizationUnit` and edges with `dd:sharedStyle` of `mrm:HierarchyEdgeStyle`
-- `ProgramDiagramShape`, `ServiceDiagramShape`, `ProcessDiagramShape`, `ResourceDiagramShape`, `NeedDiagramShape`, `OutcomeDiagramShape`, `OutputDiagramShape`, `TargetGroupDiagramShape` — Same pattern, different MRM types and styles
+Example Turtle for `OrgUnitDiagramShape`:
+
+```turtle
+<#OrgUnitDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Organization Unit Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing OrganizationUnit parent-child relationships. Shapes reference mrm:OrganizationUnit model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
+    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+```
+
+- `ProgramDiagramShape`, `ServiceDiagramShape`, `ProcessDiagramShape`, `ResourceDiagramShape`, `NeedDiagramShape`, `OutcomeDiagramShape`, `OutputDiagramShape`, `TargetGroupDiagramShape` — Same pattern with descriptions specifying the relevant MRM type and style conventions.
 
 **PLM Diagram:**
 
-- `PLMDiagramShape` — Elements include shapes for Program, Service, Output, and Outcome. Edges represent contributory relationships (Program→Service, Service→Output, Output→Outcome). Uses `mrm:ContributoryEdgeStyle`.
+```turtle
+<#PLMDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Program Logic Model Diagram" ;
+  dcterms:description "Shows contributory relationships: Program → Services → Outputs → Outcomes. Shapes reference mrm:Program, mrm:Service, mrm:Output, and mrm:Outcome model elements. Edges use mrm:ContributoryEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
+    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+```
 
 **SIAM Diagram:**
 
-- `SIAMDiagramShape` — Elements include shapes for OrgUnit/Program (top), Service, Process, Output, and TargetGroup. Edges represent accountability chains. Multiple shape styles coexist. Layout is generally top-down with the OrgUnit/Program at the top and TargetGroups at the bottom.
+```turtle
+<#SIAMDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Integrated Accountability Model Diagram" ;
+  dcterms:description "Traces accountability chains from OrganizationUnit/Program through Services and Processes to Outputs and TargetGroups. Multiple shape styles coexist. Layout is generally top-down." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-identifier>, <#p-name>,
+    <#p-documentation>, <#p-resolution>, <#p-diagramElement> .
+```
 
 ---
 
 ## Phase 3: MRM Catalog Template Extensions
 
 ### Changes to `mrm-server/config/catalog-template.ttl`
+
+**Prefix addition:** Add `@prefix dd: <http://www.omg.org/spec/DD#> .` to the prefix declarations at the top of the file.
 
 **Domain addition:**
 
@@ -352,6 +409,8 @@ Same pattern for each diagram type.
   ] ;
 ```
 
+**Note:** This is the first `oslc:selectionDialog` in the MRM catalog template. Selection dialogs are not yet used for other MRM resource types but can be back-filled later. They are added here for diagrams because diagrams are natural link targets from cross-domain resources (requirements, test cases).
+
 **New Query Capabilities:**
 
 ```turtle
@@ -365,6 +424,8 @@ Same pattern for each diagram type.
 
 Same pattern for PLM, SIAM, and each hierarchy diagram type.
 
+**Note:** `oslc:queryBase` is omitted from the template because it is resolved at runtime by the oslc-service template processor, consistent with the existing MRM query capabilities.
+
 ---
 
 ## Phase 4: oslc-browser Diagram Rendering
@@ -375,10 +436,11 @@ Diagrams are navigated in the column view like any other OSLC resource. Their pr
 
 ### Data Flow
 
-1. **Detection:** When a resource is loaded, check if `rdf:type` includes `dd:Diagram`
-2. **Already loaded:** Diagram elements are blank nodes within the diagram resource graph — already fetched with the diagram itself
-3. **Resolve model element titles:** For each shape's `dd:modelElement` URI, request the OSLC Compact representation (same mechanism used for title resolution in the column view). This minimizes network traffic.
-4. **Render SVG:** Map DD properties to SVG elements
+1. **Detection:** When a resource is loaded, check if `LoadedResource.resourceTypes` includes the `dd:Diagram` URI (`http://www.omg.org/spec/DD#Diagram`). The `resourceTypes` array is already populated by the existing RDF parsing logic in `useOslcClient.ts`.
+2. **Already loaded:** Diagram elements are blank nodes within the diagram resource graph — already fetched with the diagram itself. They appear in `LoadedResource.inlineResources`.
+3. **Build element map:** On initial parse, build an in-memory `Map<string, DiagramElement>` keyed by blank node ID. This allows `dd:source` and `dd:target` on edges to be resolved to their corresponding shape objects for computing connection endpoints from bounds.
+4. **Resolve model element titles:** For each shape's `dd:modelElement` URI, request the OSLC Compact representation (same mechanism used for title resolution in the column view). This minimizes network traffic.
+5. **Render SVG:** Map DD properties to SVG elements.
 
 ### New React Components
 
@@ -389,13 +451,14 @@ Diagrams are navigated in the column view like any other OSLC resource. Their pr
 
 **`DiagramCanvas.tsx`**
 - SVG viewport with pan (drag) and zoom (scroll wheel)
-- Iterates over `dd:ownedElement` blank nodes
+- Iterates over `dd:diagramElement` blank nodes
 - Renders `DiagramShape` for each `dd:Shape`
 - Renders `DiagramEdge` for each `dd:Edge`
 - Manages viewBox for fit-to-content
 
 **`DiagramShape.tsx`**
-- Reads `dd:bounds` (x, y, width, height) and `dd:localStyle`/`dd:sharedStyle`
+- Reads `dd:bounds` (x, y, width, height) from the shape's blank node
+- Dereferences `dd:localStyle` or `dd:sharedStyle` to get `dd:shapeType` and visual properties
 - Renders SVG element based on `dd:shapeType`:
   - `"rect"` → `<rect>`
   - `"ellipse"` → `<ellipse>`
@@ -403,12 +466,13 @@ Diagrams are navigated in the column view like any other OSLC resource. Their pr
   - `"diamond"` → `<polygon>`
   - `"stickFigure"` → SVG `<g>` with head circle, body/arm/leg lines
 - Applies style: `fillColor`→`fill`, `strokeColor`→`stroke`, `strokeWidth`→`stroke-width`, etc.
-- Renders model element title as `<text>` centered in bounds
+- Renders model element title (from compact representation) as `<text>` centered in bounds
 - Click handler: navigates to `dd:modelElement` URI in column view
 - Hover handler: shows tooltip with compact representation
 
 **`DiagramEdge.tsx`**
-- Reads `dd:source`, `dd:target` (blank node references to shapes), `dd:waypoint` points
+- Reads `dd:source`, `dd:target` blank node references; resolves them via the element map to get their `dd:bounds` for computing connection points
+- Reads `dd:waypoint` `rdf:List` and iterates the ordered `dd:Point` blank nodes
 - Computes path from source shape bounds → waypoints → target shape bounds
 - Renders `<path>` or `<polyline>` with arrow marker at target end
 - Applies edge style properties
@@ -420,23 +484,23 @@ Diagrams are navigated in the column view like any other OSLC resource. Their pr
 
 ### SVG Property Mapping
 
-| DD Property | SVG Attribute |
-|-------------|--------------|
-| `dd:fillColor` | `fill` |
-| `dd:fillOpacity` | `fill-opacity` |
-| `dd:strokeColor` | `stroke` |
-| `dd:strokeWidth` | `stroke-width` |
-| `dd:strokeOpacity` | `stroke-opacity` |
-| `dd:strokeDashLength` + `dd:strokeDashGap` | `stroke-dasharray` |
-| `dd:fontSize` | `font-size` |
-| `dd:fontName` | `font-family` |
-| `dd:fontColor` | `fill` (on `<text>`) |
-| `dd:fontBold` | `font-weight: bold` |
-| `dd:fontItalic` | `font-style: italic` |
-| `dd:fontUnderline` | `text-decoration: underline` |
-| `dd:fontStrikeThrough` | `text-decoration: line-through` |
-| `dd:x`, `dd:y` | `x`, `y` / `cx`, `cy` |
-| `dd:width`, `dd:height` | `width`, `height` / `rx`, `ry` |
+| DD Property | SVG Attribute | Notes |
+|-------------|--------------|-------|
+| `dd:fillColor` | `fill` | |
+| `dd:fillOpacity` | `fill-opacity` | |
+| `dd:strokeColor` | `stroke` | |
+| `dd:strokeWidth` | `stroke-width` | |
+| `dd:strokeOpacity` | `stroke-opacity` | |
+| `dd:strokeDashLength` + `dd:strokeDashGap` | `stroke-dasharray` | |
+| `dd:fontSize` | `font-size` | |
+| `dd:fontName` | `font-family` | |
+| `dd:fontColor` | `fill` (on `<text>`) | |
+| `dd:fontBold` | `font-weight: bold` | |
+| `dd:fontItalic` | `font-style: italic` | |
+| `dd:fontUnderline` | `text-decoration: underline` | |
+| `dd:fontStrikeThrough` | `text-decoration: line-through` | |
+| `dd:x`, `dd:y` | `x`, `y` / `cx`, `cy` | `cx`, `cy` for `<ellipse>` (center = x + width/2, y + height/2) |
+| `dd:width`, `dd:height` | `width`, `height` / `rx`, `ry` | For `<ellipse>`: `rx` = width/2, `ry` = height/2 |
 
 ---
 
@@ -458,7 +522,7 @@ The following capabilities are planned for future iterations but are **out of sc
 
 | Phase | File | Location | Description |
 |-------|------|----------|-------------|
-| 1 | `DD.ttl` | `oslc-server/config/vocab/` | DD ontology vocabulary |
+| 1 | `DD.ttl` | `oslc-server/config/vocab/` (new directory) | DD ontology vocabulary |
 | 1 | `DD-Shapes.ttl` | `oslc-server/config/vocab/` | DD ResourceShapes |
 | 2 | `MRMS-DiagramStyles.ttl` | `mrm-server/config/vocab/` | Shared styles for MRM types |
 | 2 | `MRMS-DiagramShapes.ttl` | `mrm-server/config/vocab/` | Diagram type ResourceShapes |
