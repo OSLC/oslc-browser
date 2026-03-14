@@ -1,0 +1,160 @@
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix oslc:    <http://open-services.net/ns/core#> .
+@prefix oslc_am: <http://open-services.net/ns/am#> .
+@prefix dd:      <http://www.omg.org/spec/DD#> .
+@prefix mrm:     <http://www.misa.org.ca/mrm#> .
+
+# ============================================================
+# Reusable Property Definitions (duplicated from DD-Shapes.ttl
+# because Turtle files are self-contained; these must match
+# the definitions in oslc-server/config/vocab/DD-Shapes.ttl)
+# ============================================================
+
+<#p-title>
+  a oslc:Property ;
+  oslc:name "title" ;
+  oslc:propertyDefinition dcterms:title ;
+  dcterms:description "Title of the diagram." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType xsd:string .
+
+<#p-description>
+  a oslc:Property ;
+  oslc:name "description" ;
+  oslc:propertyDefinition dcterms:description ;
+  dcterms:description "Description of the diagram." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:string .
+
+<#p-identifier>
+  a oslc:Property ;
+  oslc:name "identifier" ;
+  oslc:propertyDefinition dcterms:identifier ;
+  dcterms:description "Unique identifier." ;
+  oslc:occurs oslc:Exactly-one ;
+  oslc:valueType xsd:string .
+
+<#p-type>
+  a oslc:Property ;
+  oslc:name "type" ;
+  oslc:propertyDefinition rdf:type ;
+  dcterms:description "RDF type(s)." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:Resource ;
+  oslc:representation oslc:Reference .
+
+<#p-resolution>
+  a oslc:Property ;
+  oslc:name "resolution" ;
+  oslc:propertyDefinition dd:resolution ;
+  dcterms:description "Rendering resolution." ;
+  oslc:occurs oslc:Zero-or-one ;
+  oslc:valueType xsd:double .
+
+<#p-diagramElement>
+  a oslc:Property ;
+  oslc:name "diagramElement" ;
+  oslc:propertyDefinition dd:diagramElement ;
+  dcterms:description "Top-level element in this diagram." ;
+  oslc:occurs oslc:Zero-or-many ;
+  oslc:valueType oslc:AnyResource ;
+  oslc:representation oslc:Inline .
+
+# ============================================================
+# Hierarchy Diagram Shapes (one per hierarchical MRM type)
+# ============================================================
+
+<#OrgUnitDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Organization Unit Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing OrganizationUnit parent-child relationships. Shapes reference mrm:OrganizationUnit model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#ProgramDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Program Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Program parent-child relationships. Shapes reference mrm:Program model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#ServiceDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Service parent-child relationships. Shapes reference mrm:Service model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#ProcessDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Process Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Process parent-child relationships. Shapes reference mrm:Process model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#ResourceDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Resource Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Resource parent-child relationships. Shapes reference mrm:Resource model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#NeedDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Need Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Need parent-child relationships. Shapes reference mrm:Need model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#OutcomeDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Outcome Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Outcome parent-child relationships. Shapes reference mrm:Outcome model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#OutputDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Output Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing Output parent-child relationships. Shapes reference mrm:Output model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#TargetGroupDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Target Group Hierarchy Diagram" ;
+  dcterms:description "A hierarchy diagram showing TargetGroup parent-child relationships. Shapes reference mrm:TargetGroup model elements. Edges use mrm:HierarchyEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+# ============================================================
+# Composite Diagram Shapes
+# ============================================================
+
+<#PLMDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Program Logic Model Diagram" ;
+  dcterms:description "Shows contributory relationships: Program to Services to Outputs to Outcomes. Shapes reference mrm:Program, mrm:Service, mrm:Output, and mrm:Outcome model elements. Edges use mrm:ContributoryEdgeStyle." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
+
+<#SIAMDiagramShape>
+  a oslc:ResourceShape ;
+  dcterms:title "Service Integrated Accountability Model Diagram" ;
+  dcterms:description "Traces accountability chains from OrganizationUnit or Program through Services and Processes to Outputs and TargetGroups. Multiple shape styles coexist. Layout is generally top-down." ;
+  oslc:describes dd:Diagram ;
+  oslc:property <#p-title>, <#p-description>, <#p-identifier>,
+    <#p-type>, <#p-resolution>, <#p-diagramElement> .
