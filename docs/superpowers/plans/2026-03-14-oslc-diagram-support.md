@@ -1303,91 +1303,16 @@ After the creation dialogs section, add one selection dialog for diagrams:
   ] ;
 ```
 
-- [ ] **Step 6: Add diagram query capabilities**
+**No diagram-specific query capabilities are needed.** Diagrams are queryable through the existing MRM query capabilities using `oslc.where` clauses (e.g., filtering by `rdf:type=dd:Diagram`).
 
-After the last existing query capability, add 11 query capabilities:
-
-```turtle
-  # ---- Diagram Query Capabilities ----
-
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Organization Unit Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OrgUnitDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Program Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProgramDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Service Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ServiceDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Process Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ProcessDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Resource Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#ResourceDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Need Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#NeedDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Outcome Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutcomeDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Output Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OutputDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Target Group Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#TargetGroupDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query PLM Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#PLMDiagramShape>
-  ] ;
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query SIAM Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#SIAMDiagramShape>
-  ] .
-```
-
-**Note:** The last query capability ends with ` .` (period) instead of ` ;` (semicolon) if it is the final statement in the service. If there are existing statements after, use ` ;`.
-
-- [ ] **Step 7: Validate the complete file**
+- [ ] **Step 6: Validate the complete file**
 
 Verify that:
 - All prefix declarations are consistent
 - All semicolons and periods are correct (semicolons between properties of same subject, period at end)
 - Shape paths match the fragment identifiers in `MRMS-DiagramShapes.ttl` (e.g., `#OrgUnitDiagramShape`)
 
-- [ ] **Step 8: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add mrm-server/config/catalog-template.ttl

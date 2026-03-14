@@ -406,20 +406,7 @@ Same pattern for each diagram type.
 
 **Note:** This is the first `oslc:selectionDialog` in the MRM catalog template. Selection dialogs are not yet used for other MRM resource types but can be back-filled later. They are added here for diagrams because diagrams are natural link targets from cross-domain resources (requirements, test cases).
 
-**New Query Capabilities:**
-
-```turtle
-  oslc:queryCapability [
-    a oslc:QueryCapability ;
-    dcterms:title "Query Organization Unit Diagrams" ;
-    oslc:resourceType dd:Diagram ;
-    oslc:resourceShape <shapes/MRMS-DiagramShapes#OrgUnitDiagramShape>
-  ] ;
-```
-
-Same pattern for PLM, SIAM, and each hierarchy diagram type.
-
-**Note:** `oslc:queryBase` is omitted from the template because it is resolved at runtime by the oslc-service template processor, consistent with the existing MRM query capabilities.
+**No diagram-specific query capabilities are needed.** Diagrams are queryable through the existing MRM query capabilities using `oslc.where` clauses (e.g., filtering by `rdf:type=dd:Diagram`).
 
 ---
 
