@@ -77,9 +77,26 @@ function App() {
         }
         const catalogStore = catalogResource.store;
 
+        // Debug: dump all predicates in the catalog store
+        const allCatalogStmts = catalogStore.statements ?? [];
+        const predicates = new Set(allCatalogStmts.map((st: any) => st.predicate?.value));
+        console.log('[DiagramFactory] Catalog predicates:', [...predicates]);
+        console.log('[DiagramFactory] Catalog statements count:', allCatalogStmts.length);
+
         const spNodes = catalogStore.each(null, ldp('contains'), null);
+        console.log('[DiagramFactory] ldp:contains nodes:', spNodes.length);
         const spURIs = spNodes.map((n: any) => n.value).filter(Boolean);
-        console.log('[DiagramFactory] Found service providers:', spURIs);
+
+        // If no ldp:contains, also try oslc:serviceProvider
+        if (spURIs.length === 0) {
+          const spRefNodes = catalogStore.each(null, oslcNS('serviceProvider'), null);
+          console.log('[DiagramFactory] oslc:serviceProvider nodes:', spRefNodes.length);
+          for (const n of spRefNodes) {
+            if (n.value) spURIs.push(n.value);
+          }
+        }
+
+        console.log('[DiagramFactory] Service provider URIs:', spURIs);
 
         // Step 2: Fetch each service provider and extract diagram factories
         const factories: DiagramFactory[] = [];
@@ -88,17 +105,25 @@ function App() {
           let spResource;
           try {
             spResource = await client.getResource(spURI);
-          } catch {
-            continue; // Skip unreachable service providers
+          } catch (e) {
+            console.warn('[DiagramFactory] Failed to fetch SP:', spURI, e);
+            continue;
           }
-          if (!spResource?.store) continue;
+          if (!spResource?.store) {
+            console.warn('[DiagramFactory] SP has no store:', spURI);
+            continue;
+          }
           const store = spResource.store;
 
           // Walk: ServiceProvider → oslc:service → oslc:creationFactory
           const spSym = store.sym(spURI);
           const services = store.each(spSym, oslcNS('service'), null);
+          console.log('[DiagramFactory] SP', spURI, '→ services:', services.length);
+
           for (const service of services) {
             const creationFactories = store.each(service, oslcNS('creationFactory'), null);
+            console.log('[DiagramFactory]   service →', creationFactories.length, 'creation factories');
+
             for (const factory of creationFactories) {
               // Check if this factory has oslc:resourceType dd:Diagram
               const hasDD = store.statementsMatching(factory, oslcNS('resourceType'), ddDiagramSym);
@@ -112,6 +137,7 @@ function App() {
               const creationURI = creationNode?.value ?? '';
               const shapeURI = shapeNode?.value ?? '';
 
+              console.log('[DiagramFactory]   DD factory:', title, 'creation:', creationURI, 'shape:', shapeURI);
               if (!title || !creationURI) continue;
 
               // Fetch the shape resource to get its description
