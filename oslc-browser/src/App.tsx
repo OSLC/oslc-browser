@@ -83,7 +83,8 @@ function App() {
         console.log('[DiagramFactory] Catalog predicates:', [...predicates]);
         console.log('[DiagramFactory] Catalog statements count:', allCatalogStmts.length);
 
-        const spNodes = catalogStore.each(null, ldp('contains'), null);
+        const catalogSym = catalogStore.sym(catalogURL);
+        const spNodes = catalogStore.each(catalogSym, ldp('contains'), null);
         console.log('[DiagramFactory] ldp:contains nodes:', spNodes.length);
         const spURIs = spNodes.map((n: any) => n.value).filter(Boolean);
 
