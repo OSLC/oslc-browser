@@ -54,20 +54,32 @@ function App() {
     if (!client) return;
 
     // Discover diagram creation factories from all service providers.
-    // The catalog at connection.serverURL contains ldp:contains references
-    // to individual ServiceProviders. We fetch each one and extract its
-    // creation factories that have oslc:resourceType dd:Diagram.
+    // Derive the catalog URL from the connected URL — the catalog is at
+    // the /oslc path segment regardless of what specific resource the user
+    // connected to (e.g., a query URL or a specific service provider).
     (async () => {
       try {
         const ddDiagramSym = sym(DD_DIAGRAM);
 
+        // Derive catalog URL: {origin}/{first-path-segment}
+        // e.g. http://localhost:3002/oslc/mrmv2-1/query?... → http://localhost:3002/oslc
+        const connURL = new URL(connection.serverURL);
+        const pathSegments = connURL.pathname.split('/').filter(Boolean);
+        const catalogPath = pathSegments.length > 0 ? `/${pathSegments[0]}` : '/oslc';
+        const catalogURL = `${connURL.origin}${catalogPath}`;
+
         // Step 1: Fetch catalog and find service provider URIs via ldp:contains
-        const catalogResource = await client.getResource(connection.serverURL);
-        if (!catalogResource?.store) return;
+        console.log('[DiagramFactory] Fetching catalog:', catalogURL);
+        const catalogResource = await client.getResource(catalogURL);
+        if (!catalogResource?.store) {
+          console.warn('[DiagramFactory] Catalog has no store');
+          return;
+        }
         const catalogStore = catalogResource.store;
 
         const spNodes = catalogStore.each(null, ldp('contains'), null);
         const spURIs = spNodes.map((n: any) => n.value).filter(Boolean);
+        console.log('[DiagramFactory] Found service providers:', spURIs);
 
         // Step 2: Fetch each service provider and extract diagram factories
         const factories: DiagramFactory[] = [];
@@ -120,9 +132,10 @@ function App() {
           }
         }
 
+        console.log('[DiagramFactory] Discovered factories:', factories.map(f => f.title));
         setDiagramFactories(factories);
       } catch (err) {
-        console.error('Error discovering diagram factories:', err);
+        console.error('[DiagramFactory] Error discovering diagram factories:', err);
       }
     })();
   }, [connection.connected, connection.serverURL, getClient]);
@@ -146,6 +159,7 @@ function App() {
     setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, item });
 
     if (diagramFactories.length === 0 || item.kind !== 'resource') {
+      console.log('[ContextMenu] No factories or not a resource item. factories:', diagramFactories.length, 'kind:', item.kind);
       setMatchingFactories([]);
       return;
     }
@@ -156,16 +170,19 @@ function App() {
       typeNames = item.resourceTypes.map(t => localName(t));
     } else {
       // Fetch the resource to discover its types
+      console.log('[ContextMenu] No types on item, fetching resource:', item.uri);
       const resource = await fetchResource(item.uri);
       if (resource && resource.resourceTypes.length > 0) {
         typeNames = resource.resourceTypes.map(t => localName(t));
       }
     }
 
+    console.log('[ContextMenu] Resource types:', typeNames, 'Factories:', diagramFactories.length);
     if (typeNames.length > 0) {
       const matching = diagramFactories.filter(f =>
         typeNames.some(name => f.shapeDescription.includes(name))
       );
+      console.log('[ContextMenu] Matching factories:', matching.map(f => f.title));
       setMatchingFactories(matching);
     } else {
       setMatchingFactories([]);
