@@ -77,11 +77,13 @@ export async function traverseLinks(
   const edges: TraversedEdge[] = [];
 
   const rootURI = rootResource.getURI();
+  // Derive the server origin so we only follow links to server-hosted resources
+  const serverOrigin = new URL(rootURI).origin;
   const rootTypes = rootResource.get('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
   visited.add(rootURI);
   nodes.push({
     uri: rootURI,
-    title: rootResource.getTitle() ?? rootURI,
+    title: rootResource.getTitle() ?? localName(rootURI),
     types: Array.isArray(rootTypes) ? rootTypes : rootTypes ? [rootTypes] : [],
     depth: 0,
   });
@@ -94,9 +96,14 @@ export async function traverseLinks(
     const { resource, depth } = queue.shift()!;
     if (depth >= maxDepth) continue;
 
-    // Use OSLCResource.getOutgoingLinks() to discover all relationships
+    // Use OSLCResource.getOutgoingLinks() to discover all relationships.
+    // Only follow links whose target shares the same server origin as the
+    // root resource — vocabulary/ontology URIs (rdf:type values, enum
+    // instances, etc.) are not fetchable resources and must be skipped.
     const links = resource.getOutgoingLinks();
     for (const link of links) {
+      if (!link.targetURL.startsWith(serverOrigin)) continue;
+
       edges.push({
         sourceURI: link.sourceURL,
         targetURI: link.targetURL,
@@ -112,7 +119,7 @@ export async function traverseLinks(
             const types = targetResource.get('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
             nodes.push({
               uri: link.targetURL,
-              title: targetResource.getTitle() ?? link.targetURL,
+              title: targetResource.getTitle() ?? localName(link.targetURL),
               types: Array.isArray(types) ? types : types ? [types] : [],
               depth: depth + 1,
             });
@@ -213,7 +220,8 @@ export function generateDiagramTurtle(
 
   for (let i = 0; i < allElementIds.length; i++) {
     const sep = i < allElementIds.length - 1 ? ',' : '.';
-    lines.push(`  dd:diagramElement ${allElementIds[i]} ${sep}`);
+    const pred = i === 0 ? 'dd:diagramElement' : '   ';
+    lines.push(`  ${pred} ${allElementIds[i]} ${sep}`);
   }
   lines.push('');
 
@@ -223,8 +231,10 @@ export function generateDiagramTurtle(
     const bounds = layout.get(node.uri)!;
     const style = getInlineStyle(node.types);
 
+    const escapedTitle = node.title.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
     lines.push(`_:shape${i}`);
     lines.push('  a dd:Shape ;');
+    lines.push(`  dcterms:title "${escapedTitle}" ;`);
     lines.push(`  dd:modelElement <${node.uri}> ;`);
     if (style) {
       lines.push('  dd:localStyle [');

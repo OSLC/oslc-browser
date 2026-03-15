@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CssBaseline, ThemeProvider, createTheme, Divider, Menu, MenuItem } from '@mui/material';
 import { Namespace, sym } from 'rdflib';
+import type { OSLCResource } from 'oslc-client';
 import { ToolbarComponent } from './components/Toolbar.js';
 import { MainLayoutComponent } from './components/MainLayout.js';
 import { useOslcClient } from './hooks/useOslcClient.js';
@@ -8,11 +9,9 @@ import { useNavigation } from './hooks/useNavigation.js';
 import { useFavorites } from './hooks/useFavorites.js';
 import { traverseLinks, generateDiagramTurtle } from './hooks/diagramGenerator.js';
 import { localName } from './models/diagram-types.js';
-import type { ColumnItem } from './models/types.js';
+import type { LoadedResource } from './models/types.js';
 
 const DD_DIAGRAM = 'http://www.omg.org/spec/DD#Diagram';
-const ldp = Namespace('http://www.w3.org/ns/ldp#');
-const rdfNS = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
 const oslcNS = Namespace('http://open-services.net/ns/core#');
 const dctermsNS = Namespace('http://purl.org/dc/terms/');
 
@@ -30,155 +29,27 @@ const theme = createTheme({
 
 function App() {
   const { connection, setServerURL, setUsername, setPassword, connect, fetchResource, fetchRawResource, getClient } = useOslcClient();
-  const { state: navState, navigateToRoot, navigateToItem } = useNavigation();
+  const { state: navState, navigateToRoot, navigateToItem, selectResource } = useNavigation();
   const {
     favorites, addFolder, addResource, removeItem, rename, toggleFolder,
   } = useFavorites();
 
-  // Context menu state
-  const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number; item: ColumnItem } | null>(null);
+  // Context menu state — tracks a LoadedResource
+  const [contextMenu, setContextMenu] = useState<{ mouseX: number; mouseY: number; resource: LoadedResource } | null>(null);
 
-  // Diagram factories discovered from catalog
-  const [diagramFactories, setDiagramFactories] = useState<DiagramFactory[]>([]);
-  // Matching factories for the current context menu item
+  // Matching factories for the current context menu resource
   const [matchingFactories, setMatchingFactories] = useState<DiagramFactory[]>([]);
 
-  // Discover diagram factories after connecting
-  useEffect(() => {
-    if (!connection.connected) {
-      setDiagramFactories([]);
-      return;
-    }
-
-    const client = getClient();
-    if (!client) return;
-
-    // Discover diagram creation factories from all service providers.
-    // Derive the catalog URL from the connected URL — the catalog is at
-    // the /oslc path segment regardless of what specific resource the user
-    // connected to (e.g., a query URL or a specific service provider).
-    (async () => {
-      try {
-        const ddDiagramSym = sym(DD_DIAGRAM);
-
-        // Derive catalog URL: {origin}/{first-path-segment}
-        // e.g. http://localhost:3002/oslc/mrmv2-1/query?... → http://localhost:3002/oslc
-        const connURL = new URL(connection.serverURL);
-        const pathSegments = connURL.pathname.split('/').filter(Boolean);
-        const catalogPath = pathSegments.length > 0 ? `/${pathSegments[0]}` : '/oslc';
-        const catalogURL = `${connURL.origin}${catalogPath}`;
-
-        // Step 1: Fetch catalog and find service provider URIs via ldp:contains
-        console.log('[DiagramFactory] Fetching catalog:', catalogURL);
-        const catalogResource = await client.getResource(catalogURL);
-        if (!catalogResource?.store) {
-          console.warn('[DiagramFactory] Catalog has no store');
-          return;
-        }
-        const catalogStore = catalogResource.store;
-
-        // Debug: dump all predicates in the catalog store
-        const allCatalogStmts = catalogStore.statements ?? [];
-        const predicates = new Set(allCatalogStmts.map((st: any) => st.predicate?.value));
-        console.log('[DiagramFactory] Catalog predicates:', [...predicates]);
-        console.log('[DiagramFactory] Catalog statements count:', allCatalogStmts.length);
-
-        const catalogSym = catalogStore.sym(catalogURL);
-        const spNodes = catalogStore.each(catalogSym, ldp('contains'), null);
-        console.log('[DiagramFactory] ldp:contains nodes:', spNodes.length);
-        const spURIs = spNodes.map((n: any) => n.value).filter(Boolean);
-
-        // If no ldp:contains, also try oslc:serviceProvider
-        if (spURIs.length === 0) {
-          const spRefNodes = catalogStore.each(null, oslcNS('serviceProvider'), null);
-          console.log('[DiagramFactory] oslc:serviceProvider nodes:', spRefNodes.length);
-          for (const n of spRefNodes) {
-            if (n.value) spURIs.push(n.value);
-          }
-        }
-
-        console.log('[DiagramFactory] Service provider URIs:', spURIs);
-
-        // Step 2: Fetch each service provider and extract diagram factories
-        const factories: DiagramFactory[] = [];
-
-        for (const spURI of spURIs) {
-          let spResource;
-          try {
-            spResource = await client.getResource(spURI);
-          } catch (e) {
-            console.warn('[DiagramFactory] Failed to fetch SP:', spURI, e);
-            continue;
-          }
-          if (!spResource?.store) {
-            console.warn('[DiagramFactory] SP has no store:', spURI);
-            continue;
-          }
-          const store = spResource.store;
-
-          // Walk: ServiceProvider → oslc:service → oslc:creationFactory
-          const spSym = store.sym(spURI);
-          const services = store.each(spSym, oslcNS('service'), null);
-          console.log('[DiagramFactory] SP', spURI, '→ services:', services.length);
-
-          for (const service of services) {
-            console.log('[DiagramFactory]   service node:', service.termType, service.value);
-            // Debug: show all predicates from the service blank node
-            const serviceStmts = store.statementsMatching(service, null, null);
-            const servicePreds = serviceStmts.map((st: any) => st.predicate.value);
-            console.log('[DiagramFactory]   service predicates:', servicePreds);
-            const creationFactories = store.each(service, oslcNS('creationFactory'), null);
-            console.log('[DiagramFactory]   service →', creationFactories.length, 'creation factories');
-
-            for (const factory of creationFactories) {
-              // Check if this factory has oslc:resourceType dd:Diagram
-              const hasDD = store.statementsMatching(factory, oslcNS('resourceType'), ddDiagramSym);
-              if (hasDD.length === 0) continue;
-
-              const titleNode = store.the(factory, dctermsNS('title'), null);
-              const creationNode = store.the(factory, oslcNS('creation'), null);
-              const shapeNode = store.the(factory, oslcNS('resourceShape'), null);
-
-              const title = titleNode?.value ?? '';
-              const creationURI = creationNode?.value ?? '';
-              const shapeURI = shapeNode?.value ?? '';
-
-              console.log('[DiagramFactory]   DD factory:', title, 'creation:', creationURI, 'shape:', shapeURI);
-              if (!title || !creationURI) continue;
-
-              // Fetch the shape resource to get its description
-              let shapeDescription = '';
-              if (shapeURI) {
-                try {
-                  const shapeResource = await client.getResource(shapeURI);
-                  if (shapeResource) {
-                    const desc = shapeResource.get(dctermsNS('description').value);
-                    shapeDescription = Array.isArray(desc) ? desc[0] : desc ?? '';
-                  }
-                } catch {
-                  // Shape may not be fetchable; continue without description
-                }
-              }
-              factories.push({ title, creationURI, shapeDescription });
-            }
-          }
-        }
-
-        console.log('[DiagramFactory] Discovered factories:', factories.map(f => f.title));
-        setDiagramFactories(factories);
-      } catch (err) {
-        console.error('[DiagramFactory] Error discovering diagram factories:', err);
-      }
-    })();
-  }, [connection.connected, connection.serverURL, getClient]);
+  // Diagram resource to show in the Diagram tab (stays separate from column navigation)
+  const [diagramResource, setDiagramResource] = useState<OSLCResource | null>(null);
 
   const handleConnect = useCallback(async () => {
     const resource = await connect();
     if (resource) navigateToRoot(resource);
   }, [connect, navigateToRoot]);
 
-  const handleColumnItemClick = useCallback(async (columnIndex: number, item: ColumnItem) => {
-    await navigateToItem(columnIndex, item, fetchResource);
+  const handlePredicateClick = useCallback(async (columnIndex: number, resource: LoadedResource, predicate: string) => {
+    await navigateToItem(columnIndex, resource, predicate, fetchResource);
   }, [navigateToItem, fetchResource]);
 
   const handleNavigateToResource = useCallback(async (uri: string) => {
@@ -186,40 +57,100 @@ function App() {
     if (resource) navigateToRoot(resource);
   }, [fetchResource, navigateToRoot]);
 
-  const handleItemContextMenu = useCallback(async (event: React.MouseEvent, item: ColumnItem) => {
+  /**
+   * On right-click of a resource accordion, discover diagram creation factories
+   * from the resource's own oslc:serviceProvider.
+   */
+  const handleResourceContextMenu = useCallback(async (event: React.MouseEvent, resource: LoadedResource) => {
     event.preventDefault();
-    setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, item });
+    setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, resource });
+    setMatchingFactories([]);
 
-    if (diagramFactories.length === 0 || item.kind !== 'resource') {
-      console.log('[ContextMenu] No factories or not a resource item. factories:', diagramFactories.length, 'kind:', item.kind);
-      setMatchingFactories([]);
-      return;
-    }
+    const client = getClient();
+    if (!client) return;
 
-    // Get resource types — from the item if available, otherwise fetch the resource
-    let typeNames: string[] = [];
-    if (item.resourceTypes && item.resourceTypes.length > 0) {
-      typeNames = item.resourceTypes.map(t => localName(t));
-    } else {
-      // Fetch the resource to discover its types
-      console.log('[ContextMenu] No types on item, fetching resource:', item.uri);
-      const resource = await fetchResource(item.uri);
-      if (resource && resource.resourceTypes.length > 0) {
-        typeNames = resource.resourceTypes.map(t => localName(t));
+    try {
+      const rawResource = await client.getResource(resource.uri);
+      if (!rawResource?.store) return;
+
+      const store = rawResource.store;
+      const resourceSym = store.sym(resource.uri);
+
+      const spNode = store.the(resourceSym, oslcNS('serviceProvider'), null);
+      let spURI = spNode?.value ?? '';
+
+      if (!spURI && connection.serverURL) {
+        const connURL = new URL(connection.serverURL);
+        const segments = connURL.pathname.split('/').filter(Boolean);
+        if (segments.length >= 2) {
+          spURI = `${connURL.origin}/${segments.slice(0, 2).join('/')}`;
+        }
       }
-    }
+      if (!spURI) return;
 
-    console.log('[ContextMenu] Resource types:', typeNames, 'Factories:', diagramFactories.length);
-    if (typeNames.length > 0) {
-      const matching = diagramFactories.filter(f =>
-        typeNames.some(name => f.shapeDescription.includes(name))
+      const rdfType = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+      const typeNodes = store.each(resourceSym, rdfType('type'), null);
+      const typeNames: string[] = typeNodes.map((n: any) => localName(n.value)).filter(Boolean);
+      if (typeNames.length === 0 && resource.resourceTypes) {
+        for (const t of resource.resourceTypes) {
+          const name = localName(t);
+          if (name) typeNames.push(name);
+        }
+      }
+      if (typeNames.length === 0) return;
+
+      const spResource = await client.getResource(spURI);
+      if (!spResource?.store) return;
+      const spStore = spResource.store;
+
+      const ddDiagramSym = sym(DD_DIAGRAM);
+      const spSym = spStore.sym(spURI);
+      const services = spStore.each(spSym, oslcNS('service'), null);
+
+      const factories: DiagramFactory[] = [];
+
+      for (const service of services) {
+        const creationFactories = spStore.each(service, oslcNS('creationFactory'), null);
+
+        for (const factory of creationFactories) {
+          const hasDD = spStore.statementsMatching(factory, oslcNS('resourceType'), ddDiagramSym);
+          if (hasDD.length === 0) continue;
+
+          const titleNode = spStore.the(factory, dctermsNS('title'), null);
+          const creationNode = spStore.the(factory, oslcNS('creation'), null);
+          const shapeNode = spStore.the(factory, oslcNS('resourceShape'), null);
+
+          const title = titleNode?.value ?? '';
+          const creationURI = creationNode?.value ?? '';
+          const shapeURI = shapeNode?.value ?? '';
+          if (!title || !creationURI) continue;
+
+          let shapeDescription = '';
+          if (shapeURI) {
+            try {
+              const shapeDocURI = shapeURI.split('#')[0];
+              const shapeResource = await client.getResource(shapeDocURI);
+              if (shapeResource?.store) {
+                const shapeSym = shapeResource.store.sym(shapeURI);
+                const descNode = shapeResource.store.the(shapeSym, dctermsNS('description'), null);
+                shapeDescription = descNode?.value ?? '';
+              }
+            } catch {
+              // Shape may not be fetchable; skip this factory
+            }
+          }
+          factories.push({ title, creationURI, shapeDescription });
+        }
+      }
+
+      const matching = factories.filter(f =>
+        typeNames.some((name: string) => f.shapeDescription.includes(name))
       );
-      console.log('[ContextMenu] Matching factories:', matching.map(f => f.title));
       setMatchingFactories(matching);
-    } else {
-      setMatchingFactories([]);
+    } catch (err) {
+      console.error('[ContextMenu] Error discovering diagram factories:', err);
     }
-  }, [diagramFactories, fetchResource]);
+  }, [getClient, connection.serverURL]);
 
   const handleCloseContextMenu = () => {
     setContextMenu(null);
@@ -227,25 +158,21 @@ function App() {
   };
 
   const handleCreateDiagram = useCallback(async (factory: DiagramFactory) => {
-    const item = contextMenu?.item;
+    const resource = contextMenu?.resource;
     handleCloseContextMenu();
-    if (!item) return;
+    if (!resource) return;
 
     const client = getClient();
     if (!client) return;
 
     try {
-      const resource = await fetchRawResource(item.uri);
-      if (!resource) return;
+      const rawRes = await fetchRawResource(resource.uri);
+      if (!rawRes) return;
 
-      // Traverse outgoing links from the resource
-      const traversal = await traverseLinks(client, resource, 2);
-
-      // Generate diagram Turtle (empty URI — server assigns the URI)
-      const diagramTitle = `${item.title} - ${factory.title}`;
+      const traversal = await traverseLinks(client, rawRes, 2);
+      const diagramTitle = `${resource.title} - ${factory.title}`;
       const turtle = generateDiagramTurtle(diagramTitle, traversal, '');
 
-      // POST the Turtle to the creation factory
       const response = await fetch(factory.creationURI, {
         method: 'POST',
         headers: {
@@ -259,8 +186,8 @@ function App() {
       if (response.ok) {
         const newDiagramURI = response.headers.get('Location');
         if (newDiagramURI) {
-          // Navigate to the newly created diagram resource
-          handleNavigateToResource(newDiagramURI);
+          const diagramRes = await fetchRawResource(newDiagramURI);
+          if (diagramRes) setDiagramResource(diagramRes);
         }
       } else {
         console.error('Failed to create diagram, status:', response.status, await response.text());
@@ -268,7 +195,7 @@ function App() {
     } catch (err) {
       console.error('Error creating diagram:', err);
     }
-  }, [contextMenu, getClient, fetchRawResource, handleNavigateToResource]);
+  }, [contextMenu, getClient, fetchRawResource]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -285,8 +212,10 @@ function App() {
           columns={navState.columns}
           selectedResource={navState.selectedResource}
           favorites={favorites}
-          onColumnItemClick={handleColumnItemClick}
-          onColumnItemContextMenu={handleItemContextMenu}
+          diagramResource={diagramResource}
+          onPredicateClick={handlePredicateClick}
+          onResourceSelect={(resource, columnIndex) => selectResource(resource, columnIndex)}
+          onResourceContextMenu={handleResourceContextMenu}
           onLinkClick={handleNavigateToResource}
           onNavigateToFavorite={handleNavigateToResource}
           onAddFolder={addFolder}
@@ -297,7 +226,7 @@ function App() {
         />
       </div>
 
-      {/* Column item context menu */}
+      {/* Resource context menu */}
       <Menu
         open={contextMenu !== null}
         onClose={handleCloseContextMenu}
@@ -305,7 +234,7 @@ function App() {
         anchorPosition={contextMenu ? { top: contextMenu.mouseY, left: contextMenu.mouseX } : undefined}
       >
         <MenuItem onClick={() => {
-          if (contextMenu) addResource(contextMenu.item.title, contextMenu.item.uri);
+          if (contextMenu) addResource(contextMenu.resource.title, contextMenu.resource.uri);
           handleCloseContextMenu();
         }}>
           Add to Favorites

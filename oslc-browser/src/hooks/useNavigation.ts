@@ -2,18 +2,18 @@ import { useReducer, useCallback, useRef } from 'react';
 import type {
   NavigationState,
   NavigationColumn,
-  ColumnItem,
+  ColumnResource,
+  PredicateItem,
   LoadedResource,
 } from '../models/types.js';
 import { localName } from '../models/types.js';
 
 type NavigationAction =
   | { type: 'SET_ROOT'; column: NavigationColumn; resource: LoadedResource }
-  | { type: 'SELECT_ITEM'; columnIndex: number; itemUri: string }
-  | { type: 'ADD_COLUMN'; column: NavigationColumn; afterIndex: number; resource: LoadedResource }
-  | { type: 'SET_COLUMN_LOADING'; columnIndex: number }
+  | { type: 'SELECT_RESOURCE'; resource: LoadedResource; columnIndex?: number }
+  | { type: 'NAVIGATE_PREDICATE'; columnIndex: number; resourceURI: string; predicate: string; title: string }
   | { type: 'SET_COLUMN_ERROR'; columnIndex: number; error: string }
-  | { type: 'UPDATE_ITEM_TITLES'; columnIndex: number; titles: Record<string, string> };
+  | { type: 'SET_COLUMN_RESOURCES'; columnIndex: number; resources: ColumnResource[] };
 
 function reducer(state: NavigationState, action: NavigationAction): NavigationState {
   switch (action.type) {
@@ -23,65 +23,50 @@ function reducer(state: NavigationState, action: NavigationAction): NavigationSt
         selectedResource: action.resource,
       };
 
-    case 'SELECT_ITEM': {
+    case 'SELECT_RESOURCE': {
+      if (action.columnIndex !== undefined) {
+        // Update selectedResourceURI on the specified column
+        const columns = [...state.columns];
+        const col = columns[action.columnIndex];
+        if (col) {
+          columns[action.columnIndex] = { ...col, selectedResourceURI: action.resource.uri };
+        }
+        return { ...state, columns, selectedResource: action.resource };
+      }
+      return { ...state, selectedResource: action.resource };
+    }
+
+    case 'NAVIGATE_PREDICATE': {
+      // Trim columns after this one, mark the resource and predicate as selected,
+      // and add a loading column
       const columns = state.columns.slice(0, action.columnIndex + 1).map((col, i) => {
         if (i !== action.columnIndex) return col;
         return {
           ...col,
-          items: col.items.map(item => ({
-            ...item,
-            selected: item.uri === action.itemUri,
-          })),
+          selectedResourceURI: action.resourceURI,
+          selectedPredicate: action.predicate,
         };
       });
-      return { ...state, columns };
-    }
-
-    case 'ADD_COLUMN': {
-      const columns = state.columns.slice(0, action.afterIndex + 1);
-      // Mark the selected item in the previous column
-      columns[action.afterIndex] = {
-        ...columns[action.afterIndex],
-        items: columns[action.afterIndex].items.map(item => ({
-          ...item,
-          selected: item.uri === action.column.uri,
-        })),
-      };
-      columns.push(action.column);
-      return { columns, selectedResource: action.resource };
-    }
-
-    case 'SET_COLUMN_LOADING': {
-      const columns = [...state.columns];
-      // Remove columns after the loading one
-      const truncated = columns.slice(0, action.columnIndex + 1);
-      truncated.push({
+      columns.push({
         uri: '',
-        title: 'Loading...',
-        items: [],
+        title: action.title,
+        resources: [],
         loading: true,
       });
-      return { ...state, columns: truncated };
+      return { ...state, columns };
     }
 
     case 'SET_COLUMN_ERROR': {
       const columns = [...state.columns];
-      const last = columns[columns.length - 1];
-      columns[columns.length - 1] = { ...last, loading: false, error: action.error };
+      const col = columns[action.columnIndex];
+      if (col) columns[action.columnIndex] = { ...col, loading: false, error: action.error };
       return { ...state, columns };
     }
 
-    case 'UPDATE_ITEM_TITLES': {
-      const col = state.columns[action.columnIndex];
-      if (!col) return state;
+    case 'SET_COLUMN_RESOURCES': {
       const columns = [...state.columns];
-      columns[action.columnIndex] = {
-        ...col,
-        items: col.items.map(item => {
-          const newTitle = action.titles[item.uri];
-          return newTitle ? { ...item, title: newTitle } : item;
-        }),
-      };
+      const col = columns[action.columnIndex];
+      if (col) columns[action.columnIndex] = { ...col, loading: false, resources: action.resources };
       return { ...state, columns };
     }
 
@@ -90,66 +75,46 @@ function reducer(state: NavigationState, action: NavigationAction): NavigationSt
   }
 }
 
-/** Create a column showing unique link predicates for a resource,
- *  or member resources directly if this is a query result. */
-function resourceToColumn(resource: LoadedResource): NavigationColumn {
-  // Query results: list member resources directly
-  if (resource.isQueryResult && resource.members) {
-    const items: ColumnItem[] = resource.members.map(member => ({
-      uri: member.uri,
-      title: member.title,
-      selected: false,
-      kind: 'resource' as const,
-      resourceTypes: member.resourceTypes,
-    }));
-    return {
-      uri: resource.uri,
-      title: resource.title,
-      items,
-      loading: false,
-      resource,
-    };
-  }
-
-  const seen = new Set<string>();
-  const items: ColumnItem[] = [];
+/** Build unique predicate items from a resource's links. */
+function buildPredicates(resource: LoadedResource): PredicateItem[] {
+  const countMap = new Map<string, { label: string; count: number }>();
   for (const link of resource.links) {
-    if (seen.has(link.predicate)) continue;
-    seen.add(link.predicate);
-    items.push({
-      uri: link.predicate,
-      title: link.predicateLabel,
-      predicate: link.predicate,
-      predicateLabel: link.predicateLabel,
-      selected: false,
-      kind: 'predicate',
-    });
+    const existing = countMap.get(link.predicate);
+    if (existing) {
+      existing.count++;
+    } else {
+      countMap.set(link.predicate, { label: link.predicateLabel, count: 1 });
+    }
   }
+  return Array.from(countMap.entries()).map(([predicate, { label, count }]) => ({
+    predicate,
+    predicateLabel: label,
+    targetCount: count,
+  }));
+}
 
+/** Create a ColumnResource from a LoadedResource. */
+function toColumnResource(resource: LoadedResource): ColumnResource {
   return {
-    uri: resource.uri,
-    title: resource.title,
-    items,
-    loading: false,
     resource,
+    predicates: buildPredicates(resource),
   };
 }
 
-/** Create a column listing the targets of a specific predicate from a resource. */
-function predicateTargetsColumn(resource: LoadedResource, predicate: string): NavigationColumn {
-  const items: ColumnItem[] = resource.links
-    .filter(link => link.predicate === predicate)
-    .map(link => ({
-      uri: link.targetURI,
-      title: link.targetTitle ?? localName(link.targetURI),
-      selected: false,
-      kind: 'resource' as const,
-    }));
-
+/** Create the root column for one or more resources. */
+function rootColumn(resource: LoadedResource): NavigationColumn {
+  if (resource.isQueryResult && resource.members) {
+    return {
+      uri: resource.uri,
+      title: resource.title,
+      resources: resource.members.map(toColumnResource),
+      loading: false,
+    };
+  }
   return {
-    uri: predicate,
-    title: localName(predicate),
-    items,
+    uri: resource.uri,
+    title: resource.title,
+    resources: [toColumnResource(resource)],
     loading: false,
   };
 }
@@ -164,9 +129,11 @@ export interface UseNavigationReturn {
   navigateToRoot: (resource: LoadedResource) => void;
   navigateToItem: (
     columnIndex: number,
-    item: ColumnItem,
+    resource: LoadedResource,
+    predicate: string,
     fetchResource: (uri: string) => Promise<LoadedResource | null>
   ) => Promise<void>;
+  selectResource: (resource: LoadedResource, columnIndex?: number) => void;
 }
 
 export function useNavigation(): UseNavigationReturn {
@@ -175,104 +142,62 @@ export function useNavigation(): UseNavigationReturn {
   stateRef.current = state;
 
   const navigateToRoot = useCallback((resource: LoadedResource) => {
-    dispatch({ type: 'SET_ROOT', column: resourceToColumn(resource), resource });
+    dispatch({ type: 'SET_ROOT', column: rootColumn(resource), resource });
   }, []);
 
+  const selectResource = useCallback((resource: LoadedResource, columnIndex?: number) => {
+    dispatch({ type: 'SELECT_RESOURCE', resource, columnIndex });
+  }, []);
+
+  /**
+   * Handle predicate click: fetch all target resources for that predicate
+   * and show them as accordions in the next column.
+   */
   const navigateToItem = useCallback(async (
     columnIndex: number,
-    item: ColumnItem,
+    resource: LoadedResource,
+    predicate: string,
     fetchResource: (uri: string) => Promise<LoadedResource | null>
   ) => {
-    if (item.kind === 'predicate') {
-      // Predicate clicked — show its targets in the next column (no fetch needed)
-      const column = stateRef.current.columns[columnIndex];
-      if (column?.resource) {
-        const targetsCol = predicateTargetsColumn(column.resource, item.uri);
-        dispatch({
-          type: 'ADD_COLUMN',
-          column: targetsCol,
-          afterIndex: columnIndex,
-          resource: column.resource,
-        });
+    const targetLinks = resource.links.filter(l => l.predicate === predicate);
+    if (targetLinks.length === 0) return;
 
-        // Resolve titles for target resources asynchronously
-        const targetItems = targetsCol.items.filter(
-          ti => ti.kind === 'resource' && !ti.uri.startsWith('_:')
-        );
-        if (targetItems.length > 0) {
-          const targetsColumnIndex = columnIndex + 1;
-          Promise.all(
-            targetItems.map(async ti => {
-              const res = await fetchResource(ti.uri);
-              return res ? { uri: ti.uri, title: res.title } : null;
-            })
-          ).then(results => {
-            const titles: Record<string, string> = {};
-            for (const r of results) {
-              if (r) titles[r.uri] = r.title;
-            }
-            if (Object.keys(titles).length > 0) {
-              dispatch({ type: 'UPDATE_ITEM_TITLES', columnIndex: targetsColumnIndex, titles });
-            }
-          });
-        }
-      }
-      return;
-    }
-
-    // Resource clicked — check query result members first
-    const currentColumn = stateRef.current.columns[columnIndex];
-    if (currentColumn?.resource?.isQueryResult && currentColumn.resource.members) {
-      const member = currentColumn.resource.members.find(m => m.uri === item.uri);
-      if (member) {
-        dispatch({
-          type: 'ADD_COLUMN',
-          column: resourceToColumn(member),
-          afterIndex: columnIndex,
-          resource: member,
-        });
-        return;
-      }
-    }
-
-    // Check for inline blank node or fetch from server
-    if (item.uri.startsWith('_:')) {
-      // Blank node: find inline resource from a parent column's resource
-      const columns = stateRef.current.columns;
-      let inlineResource: LoadedResource | undefined;
-      for (let i = columnIndex; i >= 0; i--) {
-        const col = columns[i];
-        if (col.resource?.inlineResources?.[item.uri]) {
-          inlineResource = col.resource.inlineResources[item.uri];
-          break;
-        }
-      }
-      if (inlineResource) {
-        dispatch({
-          type: 'ADD_COLUMN',
-          column: resourceToColumn(inlineResource),
-          afterIndex: columnIndex,
-          resource: inlineResource,
-        });
-        return;
-      }
-    }
-
-    dispatch({ type: 'SET_COLUMN_LOADING', columnIndex });
-
-    const resource = await fetchResource(item.uri);
-    if (!resource) {
-      dispatch({ type: 'SET_COLUMN_ERROR', columnIndex: columnIndex + 1, error: 'Failed to load resource' });
-      return;
-    }
-
+    const predicateLabel = localName(predicate);
     dispatch({
-      type: 'ADD_COLUMN',
-      column: resourceToColumn(resource),
-      afterIndex: columnIndex,
-      resource,
+      type: 'NAVIGATE_PREDICATE',
+      columnIndex,
+      resourceURI: resource.uri,
+      predicate,
+      title: predicateLabel,
     });
+
+    const loadingColumnIndex = columnIndex + 1;
+
+    // Fetch all target resources in parallel
+    const results = await Promise.all(
+      targetLinks.map(async (link) => {
+        if (link.targetURI.startsWith('_:') && resource.inlineResources?.[link.targetURI]) {
+          return resource.inlineResources[link.targetURI];
+        }
+        try {
+          return await fetchResource(link.targetURI);
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    const fetched = results.filter((r): r is LoadedResource => r !== null);
+
+    if (fetched.length === 0) {
+      dispatch({ type: 'SET_COLUMN_ERROR', columnIndex: loadingColumnIndex, error: 'No resources found' });
+      return;
+    }
+
+    const columnResources = fetched.map(toColumnResource);
+    dispatch({ type: 'SET_COLUMN_RESOURCES', columnIndex: loadingColumnIndex, resources: columnResources });
+    dispatch({ type: 'SELECT_RESOURCE', resource: fetched[0] });
   }, []);
 
-  return { state, navigateToRoot, navigateToItem };
+  return { state, navigateToRoot, navigateToItem, selectResource };
 }

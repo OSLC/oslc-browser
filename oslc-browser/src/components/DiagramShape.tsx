@@ -127,32 +127,68 @@ export function DiagramShapeComponent({ shape, onClick }: DiagramShapeProps) {
       <title>{title}</title>
       {renderShapeSVG(shape)}
       {s(style, 'shapeType', 'rect') !== 'stickFigure' && (
-        <text
-          x={bounds.x + bounds.width / 2}
-          y={bounds.y + bounds.height / 2}
-          textAnchor="middle"
-          dominantBaseline="central"
-          fontSize={fontSize}
-          fontFamily={fontFamily}
-          fill={fontColor}
-          fontWeight={fontWeight}
-          fontStyle={fStyle}
-          textDecoration={textDecoration}
+        <foreignObject
+          x={bounds.x + 4}
+          y={bounds.y}
+          width={bounds.width - 8}
+          height={bounds.height}
         >
-          {title}
-        </text>
+          <div
+            title={title}
+            style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              fontSize,
+              fontFamily,
+              color: fontColor,
+              fontWeight,
+              fontStyle: fStyle,
+              textDecoration,
+              lineHeight: 1.2,
+              pointerEvents: 'none',
+            }}
+          >
+            <span style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '100%',
+            }}>
+              {title}
+            </span>
+          </div>
+        </foreignObject>
       )}
       {s(style, 'shapeType', 'rect') === 'stickFigure' && (
-        <text
-          x={bounds.x + bounds.width / 2}
-          y={bounds.y + bounds.height + 14}
-          textAnchor="middle"
-          fontSize={fontSize}
-          fontFamily={fontFamily}
-          fill={fontColor}
+        <foreignObject
+          x={bounds.x}
+          y={bounds.y + bounds.height + 2}
+          width={bounds.width}
+          height={20}
         >
-          {title}
-        </text>
+          <div
+            title={title}
+            style={{
+              width: '100%',
+              textAlign: 'center',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              fontSize,
+              fontFamily,
+              color: fontColor,
+              pointerEvents: 'none',
+            }}
+          >
+            {title}
+          </div>
+        </foreignObject>
       )}
     </g>
   );

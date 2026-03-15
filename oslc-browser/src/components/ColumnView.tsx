@@ -1,15 +1,16 @@
 import { useRef, useEffect } from 'react';
 import { Box } from '@mui/material';
 import { ResourceColumnComponent } from './ResourceColumn.js';
-import type { NavigationColumn, ColumnItem } from '../models/types.js';
+import type { NavigationColumn, LoadedResource } from '../models/types.js';
 
 interface ColumnViewProps {
   columns: NavigationColumn[];
-  onItemClick: (columnIndex: number, item: ColumnItem) => void;
-  onItemContextMenu: (event: React.MouseEvent, item: ColumnItem) => void;
+  onPredicateClick: (columnIndex: number, resource: LoadedResource, predicate: string) => void;
+  onResourceSelect: (resource: LoadedResource, columnIndex: number) => void;
+  onResourceContextMenu: (event: React.MouseEvent, resource: LoadedResource) => void;
 }
 
-export function ColumnViewComponent({ columns, onItemClick, onItemContextMenu }: ColumnViewProps) {
+export function ColumnViewComponent({ columns, onPredicateClick, onResourceSelect, onResourceContextMenu }: ColumnViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to the right when new columns are added
@@ -33,8 +34,10 @@ export function ColumnViewComponent({ columns, onItemClick, onItemContextMenu }:
         <ResourceColumnComponent
           key={col.uri + i}
           column={col}
-          onItemClick={item => onItemClick(i, item)}
-          onItemContextMenu={onItemContextMenu}
+          columnIndex={i}
+          onPredicateClick={(resource, predicate) => onPredicateClick(i, resource, predicate)}
+          onResourceSelect={onResourceSelect}
+          onResourceContextMenu={onResourceContextMenu}
         />
       ))}
     </Box>

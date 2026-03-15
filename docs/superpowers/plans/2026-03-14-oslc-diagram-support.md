@@ -1323,6 +1323,21 @@ git commit -m "feat: extend MRM catalog template with diagram services"
 
 ## Chunk 4: Phase 4 — oslc-browser Diagram Rendering (Types and Data Parsing)
 
+### Design Note: Using oslc-client
+
+All diagram data access uses **oslc-client** (`OSLCResource` and `OSLCClient`), not custom RDF parsing. `OSLCResource` wraps an rdflib `IndexedFormula` and provides:
+- `get(property)` — generic property access by URI
+- `getOutgoingLinks(linkTypes)` — link traversal with predicate info
+- `getProperties()` — all properties as key-value object
+- `store` — direct access to the rdflib knowledge base for SPARQL-like queries
+
+`OSLCClient` provides:
+- `getResource(url)` — fetch any OSLC resource as OSLCResource
+- `createResource(resourceType, resource)` — POST to creation factory
+- `putResource(resource, etag)` — PUT update
+- `getCreationFactory(resourceType)` — discover factory URL from service provider
+- Service provider catalog access via `use()`
+
 ### Task 6: Add Diagram Types (Generic, Vocabulary-Driven)
 
 **Files:**
@@ -1330,7 +1345,7 @@ git commit -m "feat: extend MRM catalog template with diagram services"
 
 - [ ] **Step 1: Create diagram-types.ts**
 
-This file defines only the DD namespace URI (for detection) and runtime data structures. All property recognition is done generically by extracting the local name from DD-namespaced predicates found in the RDF data — no hardcoded property URI map.
+This file defines only the DD namespace URI (for detection) and runtime data structures. All property recognition is done generically by extracting the local name from DD-namespaced predicates found in the RDF data via OSLCResource — no hardcoded property URI map.
 
 ```typescript
 /** The DD namespace URI — used only for type detection, not property matching */
@@ -1353,22 +1368,13 @@ export function isDDProperty(predicateURI: string): boolean {
   return predicateURI.startsWith(DD_NS);
 }
 
-/** Check if a resource is a dd:Diagram by its rdf:type URIs */
-export function isDiagram(resourceTypes: string[]): boolean {
-  return resourceTypes.some(t => t === DD_NS + 'Diagram');
+/** Check if a resource has dd:Diagram in its rdf:type values */
+export function isDiagramType(types: string | string[]): boolean {
+  const arr = Array.isArray(types) ? types : [types];
+  return arr.some(t => t === DD_NS + 'Diagram');
 }
 
-/** Check if a resource is a dd:Shape */
-export function isShape(resourceTypes: string[]): boolean {
-  return resourceTypes.some(t => t === DD_NS + 'Shape');
-}
-
-/** Check if a resource is a dd:Edge */
-export function isEdge(resourceTypes: string[]): boolean {
-  return resourceTypes.some(t => t === DD_NS + 'Edge');
-}
-
-// ---- Runtime data structures (populated by generic RDF parsing) ----
+// ---- Runtime data structures (populated by generic RDF/OSLCResource parsing) ----
 
 export interface DiagramBounds {
   x: number;
@@ -1385,8 +1391,7 @@ export interface DiagramPoint {
 /**
  * Style properties collected generically from dd:Style blank nodes.
  * Keys are DD local names (e.g., "fillColor", "shapeType").
- * Values are strings — the renderer coerces to number/boolean as needed
- * based on the local name.
+ * Values are strings — the renderer coerces to number/boolean as needed.
  */
 export type DiagramStyle = Record<string, string>;
 
@@ -1403,6 +1408,8 @@ export interface DiagramEdgeData {
   id: string;                    // blank node ID
   type: 'edge';
   modelElementURI?: string;
+  predicateURI?: string;         // the link predicate this edge represents
+  predicateLabel?: string;       // human-readable label for the predicate
   sourceId: string;              // blank node ID of source shape
   targetId: string;              // blank node ID of target shape
   waypoints: DiagramPoint[];
@@ -1428,25 +1435,23 @@ git commit -m "feat: add generic vocabulary-driven diagram types"
 
 ---
 
-### Task 7: Create Diagram Data Parser (Generic)
+### Task 7: Create Diagram Data Parser Using OSLCResource
 
 **Files:**
 - Create: `oslc-browser/src/hooks/useDiagramData.ts`
 
 - [ ] **Step 1: Create useDiagramData.ts**
 
-This hook parses a `LoadedResource` (when it's a diagram) into `ParsedDiagram` by walking the blank node (inline resource) structure generically. It identifies DD properties by namespace, not by hardcoded URIs. Style properties are collected as a key/value map keyed by local name.
+This hook takes an `OSLCResource` (the diagram) and parses it into `ParsedDiagram` by querying the rdflib store directly. It uses `OSLCResource.get()` and `OSLCResource.store` for generic RDF property access. DD properties are identified by namespace, not hardcoded URIs. Style properties are collected generically.
 
 ```typescript
 import { useMemo } from 'react';
-import { LoadedResource } from '../models/types';
+import { OSLCResource } from 'oslc-client';
 import {
   DD_NS,
   isDDProperty,
+  isDiagramType,
   localName,
-  isDiagram,
-  isShape,
-  isEdge,
   DiagramBounds,
   DiagramEdgeData,
   DiagramElementData,
@@ -1455,91 +1460,77 @@ import {
   ParsedDiagram,
 } from '../models/diagram-types';
 
-// ---- Generic helpers for reading LoadedResource data ----
+const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 
-function getPropertyValue(
-  resource: LoadedResource,
-  predicate: string
-): string | undefined {
-  const prop = resource.properties.find(p => p.predicate === predicate);
-  return prop?.value;
-}
-
-function getLinkURI(
-  resource: LoadedResource,
-  predicate: string
-): string | undefined {
-  const link = resource.links.find(l => l.predicate === predicate);
-  return link?.targetURI;
-}
-
-function getInlineResource(
-  resource: LoadedResource,
-  predicate: string
-): LoadedResource | undefined {
-  const linkURI = getLinkURI(resource, predicate);
-  if (!linkURI || !resource.inlineResources) return undefined;
-  return resource.inlineResources[linkURI];
-}
-
-function getInlineResources(
-  resource: LoadedResource,
-  predicate: string
-): LoadedResource[] {
-  const results: LoadedResource[] = [];
-  if (!resource.inlineResources) return results;
-  for (const link of resource.links) {
-    if (link.predicate === predicate) {
-      const inline = resource.inlineResources[link.targetURI];
-      if (inline) results.push(inline);
-    }
-  }
-  return results;
+/**
+ * Get a single DD property value from an OSLCResource by local name.
+ * Uses the generic get() which queries the rdflib store.
+ */
+function ddGet(resource: OSLCResource, ddLocalName: string): string | undefined {
+  const val = resource.get(DD_NS + ddLocalName);
+  if (val === undefined) return undefined;
+  return Array.isArray(val) ? val[0] : val;
 }
 
 /**
- * Find an inline resource linked via a DD-namespaced predicate
- * identified by local name (e.g., "bounds", "localStyle").
+ * Get the rdf:type values of a blank node from the store.
  */
-function getDDInlineResource(
-  resource: LoadedResource,
+function getTypes(resource: OSLCResource): string[] {
+  const types = resource.get(RDF_TYPE);
+  if (types === undefined) return [];
+  if (Array.isArray(types)) return types;
+  return [types];
+}
+
+/**
+ * Get a linked blank node as a new OSLCResource wrapping the same store.
+ * The blank node URI is retrieved via a DD property local name.
+ */
+function ddGetLinkedResource(
+  resource: OSLCResource,
+  store: any,
   ddLocalName: string
-): LoadedResource | undefined {
-  return getInlineResource(resource, DD_NS + ddLocalName);
+): OSLCResource | undefined {
+  const val = resource.get(DD_NS + ddLocalName);
+  if (!val) return undefined;
+  const uri = Array.isArray(val) ? val[0] : val;
+  // Wrap the blank node in an OSLCResource sharing the same store
+  return new OSLCResource(uri, store);
 }
 
 /**
- * Find a link URI via a DD-namespaced predicate identified by local name.
+ * Get all linked blank nodes for a multi-valued DD property.
  */
-function getDDLinkURI(
-  resource: LoadedResource,
+function ddGetLinkedResources(
+  resource: OSLCResource,
+  store: any,
   ddLocalName: string
-): string | undefined {
-  return getLinkURI(resource, DD_NS + ddLocalName);
+): OSLCResource[] {
+  const val = resource.get(DD_NS + ddLocalName);
+  if (!val) return [];
+  const uris = Array.isArray(val) ? val : [val];
+  return uris.map(uri => new OSLCResource(uri, store));
 }
 
-// ---- Generic style parsing ----
-
 /**
- * Parse all DD-namespaced properties on a style resource into a
- * key/value map keyed by local name. No hardcoded property list —
- * any dd: property found on the style is included.
+ * Parse all DD-namespaced properties on a resource into a
+ * generic key/value map. Uses getProperties() to enumerate
+ * all predicates, filters to DD namespace.
  */
-function parseStyle(styleResource: LoadedResource): DiagramStyle {
+function parseStyle(resource: OSLCResource): DiagramStyle {
   const style: DiagramStyle = {};
-  for (const prop of styleResource.properties) {
-    if (isDDProperty(prop.predicate)) {
-      style[localName(prop.predicate)] = prop.value;
+  const allProps = resource.getProperties();
+  for (const [predicate, value] of Object.entries(allProps)) {
+    if (isDDProperty(predicate)) {
+      style[localName(predicate)] = Array.isArray(value) ? value[0] : value;
     }
   }
   return style;
 }
 
-// ---- Generic bounds parsing ----
-
-function parseBounds(boundsResource: LoadedResource): DiagramBounds {
+function parseBounds(resource: OSLCResource): DiagramBounds {
   const get = (name: string) => {
-    const val = getPropertyValue(boundsResource, DD_NS + name);
+    const val = ddGet(resource, name);
     return val !== undefined ? parseFloat(val) : 0;
   };
   return {
@@ -1550,26 +1541,28 @@ function parseBounds(boundsResource: LoadedResource): DiagramBounds {
   };
 }
 
-// ---- Generic element parsing ----
+function parseElement(
+  elementRes: OSLCResource,
+  store: any
+): DiagramElementData | null {
+  const types = getTypes(elementRes);
+  const modelElementURI = ddGet(elementRes, 'modelElement');
 
-function parseElement(element: LoadedResource): DiagramElementData | null {
-  const types = element.resourceTypes;
-  const modelElementURI = getDDLinkURI(element, 'modelElement');
-
-  // Parse style generically from localStyle inline blank node
+  // Parse style from localStyle blank node
   let style: DiagramStyle = {};
-  const localStyleRes = getDDInlineResource(element, 'localStyle');
+  const localStyleRes = ddGetLinkedResource(elementRes, store, 'localStyle');
   if (localStyleRes) {
     style = parseStyle(localStyleRes);
   }
-  // sharedStyle is a reference URI — would need separate fetch;
-  // for now fall back to localStyle or empty style
 
-  if (isShape(types)) {
-    const boundsRes = getDDInlineResource(element, 'bounds');
+  const isShape = types.some(t => t === DD_NS + 'Shape');
+  const isEdge = types.some(t => t === DD_NS + 'Edge');
+
+  if (isShape) {
+    const boundsRes = ddGetLinkedResource(elementRes, store, 'bounds');
     const bounds = boundsRes ? parseBounds(boundsRes) : { x: 0, y: 0, width: 100, height: 60 };
     return {
-      id: element.uri,
+      id: elementRes.getURI(),
       type: 'shape',
       modelElementURI,
       bounds,
@@ -1577,16 +1570,22 @@ function parseElement(element: LoadedResource): DiagramElementData | null {
     };
   }
 
-  if (isEdge(types)) {
-    const sourceURI = getDDLinkURI(element, 'source');
-    const targetURI = getDDLinkURI(element, 'target');
+  if (isEdge) {
+    const sourceURI = ddGet(elementRes, 'source');
+    const targetURI = ddGet(elementRes, 'target');
     if (!sourceURI || !targetURI) return null;
-    // Waypoints: for now, empty array (straight line between source/target)
+    // predicateURI and predicateLabel are set during auto-generation;
+    // when reading from stored diagrams, they may be stored as
+    // additional properties on the edge blank node
+    const predicateURI = ddGet(elementRes, 'predicateURI');
+    const predicateLabel = ddGet(elementRes, 'predicateLabel');
     const waypoints: DiagramPoint[] = [];
     return {
-      id: element.uri,
+      id: elementRes.getURI(),
       type: 'edge',
       modelElementURI,
+      predicateURI,
+      predicateLabel,
       sourceId: sourceURI,
       targetId: targetURI,
       waypoints,
@@ -1597,18 +1596,21 @@ function parseElement(element: LoadedResource): DiagramElementData | null {
   return null;
 }
 
-// ---- Main parser ----
+/**
+ * Parse an OSLCResource (diagram) into a ParsedDiagram.
+ * Walks blank node structure via the rdflib store.
+ */
+export function parseDiagramResource(resource: OSLCResource): ParsedDiagram | null {
+  const types = getTypes(resource);
+  if (!isDiagramType(types)) return null;
 
-export function parseDiagramResource(resource: LoadedResource): ParsedDiagram | null {
-  if (!isDiagram(resource.resourceTypes)) return null;
-
+  const store = resource.store;
   const elements: DiagramElementData[] = [];
   const elementMap = new Map<string, DiagramElementData>();
 
-  // Find top-level diagram elements via dd:diagramElement predicate
-  const diagramElements = getInlineResources(resource, DD_NS + 'diagramElement');
-  for (const el of diagramElements) {
-    const parsed = parseElement(el);
+  const elementResources = ddGetLinkedResources(resource, store, 'diagramElement');
+  for (const elRes of elementResources) {
+    const parsed = parseElement(elRes, store);
     if (parsed) {
       elements.push(parsed);
       elementMap.set(parsed.id, parsed);
@@ -1616,14 +1618,17 @@ export function parseDiagramResource(resource: LoadedResource): ParsedDiagram | 
   }
 
   return {
-    uri: resource.uri,
-    title: resource.title,
+    uri: resource.getURI(),
+    title: resource.getTitle() ?? resource.getURI(),
     elements,
     elementMap,
   };
 }
 
-export function useDiagramData(resource: LoadedResource | null): ParsedDiagram | null {
+/**
+ * React hook: parse diagram data from an OSLCResource.
+ */
+export function useDiagramData(resource: OSLCResource | null): ParsedDiagram | null {
   return useMemo(() => {
     if (!resource) return null;
     return parseDiagramResource(resource);
@@ -1635,7 +1640,7 @@ export function useDiagramData(resource: LoadedResource | null): ParsedDiagram |
 
 ```bash
 git add oslc-browser/src/hooks/useDiagramData.ts
-git commit -m "feat: add generic vocabulary-driven diagram data parser"
+git commit -m "feat: add OSLCResource-based diagram data parser"
 ```
 
 ---
@@ -1871,16 +1876,34 @@ export function DiagramEdge({ edge, elementMap }: DiagramEdgeProps) {
       ? `${style['strokeDashLength']} ${style['strokeDashGap']}`
       : undefined;
 
+  // Compute midpoint for edge label
+  const mid = points[Math.floor(points.length / 2)];
+  const label = edge.predicateLabel ?? '';
+
   return (
-    <path
-      d={d}
-      fill="none"
-      stroke={strokeColor}
-      strokeWidth={strokeW}
-      strokeOpacity={strokeOpacity}
-      strokeDasharray={dashArray}
-      markerEnd="url(#arrowhead)"
-    />
+    <g>
+      <path
+        d={d}
+        fill="none"
+        stroke={strokeColor}
+        strokeWidth={strokeW}
+        strokeOpacity={strokeOpacity}
+        strokeDasharray={dashArray}
+        markerEnd="url(#arrowhead)"
+      />
+      {label && (
+        <text
+          x={mid.x}
+          y={mid.y - 6}
+          textAnchor="middle"
+          fontSize={9}
+          fill="#666"
+          fontFamily="Arial, sans-serif"
+        >
+          {label}
+        </text>
+      )}
+    </g>
   );
 }
 
@@ -2109,15 +2132,17 @@ git commit -m "feat: add DiagramCanvas SVG viewport component"
 
 - [ ] **Step 1: Write DiagramTab.tsx**
 
+The DiagramTab receives an `OSLCResource` and uses `useDiagramData` to parse it:
+
 ```tsx
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { LoadedResource } from '../models/types';
+import { OSLCResource } from 'oslc-client';
 import { useDiagramData } from '../hooks/useDiagramData';
 import { DiagramCanvas } from './DiagramCanvas';
 
 interface DiagramTabProps {
-  resource: LoadedResource;
+  resource: OSLCResource;
   onNavigate: (uri: string) => void;
 }
 
@@ -2148,22 +2173,12 @@ export function DiagramTab({ resource, onNavigate }: DiagramTabProps) {
 
 - [ ] **Step 2: Add Diagram tab to DetailsPanel.tsx**
 
-Modify `oslc-browser/src/components/DetailsPanel.tsx` to add a conditional third tab when the resource is a `dd:Diagram`.
+Modify `oslc-browser/src/components/DetailsPanel.tsx` (currently 36 lines, 2 tabs: Properties index 0, Explorer index 1) to add a conditional third tab:
 
-The existing file (36 lines) has two tabs: Properties (index 0) and Explorer (index 1). Add the Diagram tab import and conditional rendering:
-
-Add import at top:
-```typescript
-import { DiagramTab } from './DiagramTab';
-import { isDiagram } from '../models/diagram-types';
-```
-
-Add state for tab tracking and the conditional third tab. The key change: when the resource is a diagram, show a "Diagram" tab as the first tab (index 0), shifting Properties to index 1 and Explorer to index 2.
-
-Alternatively (simpler): append "Diagram" as tab index 2, only visible when resource is a diagram. The implementation should:
-1. Check `isDiagram(resource.resourceTypes)` to determine if the tab should appear
-2. Render the `DiagramTab` component when selected
-3. Pass `onLinkClick` as the `onNavigate` prop
+1. Import `DiagramTab` and `isDiagramType` from diagram-types
+2. The component needs access to the `OSLCResource` for the current resource (not just `LoadedResource`). This may require threading the `OSLCResource` from `useOslcClient` through to the DetailsPanel. The implementer should check how `useOslcClient.fetchResource` returns data and ensure the raw `OSLCResource` is available alongside the parsed `LoadedResource`.
+3. When the current resource's `rdf:type` includes `dd:Diagram`, show a "Diagram" tab (index 2)
+4. Render `DiagramTab` when selected, passing `onLinkClick` as `onNavigate`
 
 - [ ] **Step 3: Commit**
 
@@ -2174,66 +2189,64 @@ git commit -m "feat: add Diagram tab to details panel"
 
 ---
 
-### Task 13: Create Diagram Auto-Generator
+### Task 13: Create Diagram Auto-Generator Using OSLCClient
 
 **Files:**
 - Create: `oslc-browser/src/hooks/diagramGenerator.ts`
 
 - [ ] **Step 1: Write diagramGenerator.ts**
 
-This module handles:
-1. Traversing outgoing links from a root resource (depth 2)
-2. Creating DD blank-node shapes/edges with default layout
-3. Inlining styles as dd:localStyle based on resource type
-4. Serializing the diagram as Turtle for POST/PUT to the server
+This module uses `OSLCClient` and `OSLCResource` for all OSLC operations:
+1. `OSLCResource.getOutgoingLinks()` for relationship traversal
+2. `OSLCClient.getResource()` to fetch linked resources
+3. `OSLCClient.createResource()` to POST new diagram to creation factory
+4. `OSLCClient.putResource()` to update diagram with generated content
+5. Edge data includes the predicate URI and its local name as the label
 
 ```typescript
-import { LoadedResource } from '../models/types';
-import { DD, DiagramBounds } from '../models/diagram-types';
-
-import { DiagramStyle } from '../models/diagram-types';
+import { OSLCClient, OSLCResource } from 'oslc-client';
+import { DD_NS, DiagramStyle, localName } from '../models/diagram-types';
 
 // Map MRM resource type URIs to inline style properties.
-// These are inlined (dd:localStyle) rather than referenced as dd:sharedStyle
-// because the diagram parser does not yet resolve sharedStyle references.
+// Inlined as dd:localStyle because the parser doesn't yet resolve sharedStyle URIs.
 // Values match MRMS-DiagramStyles.ttl.
-const TYPE_STYLE_MAP: Record<string, DiagramStyle> = {
+const TYPE_STYLE_MAP: Record<string, Record<string, string>> = {
   'http://www.misa.org.ca/mrm#OrganizationUnit': {
-    shapeType: 'rect', fill: true, fillColor: '#cce5ff', strokeColor: '#004085',
-    strokeWidth: 1.5, fontSize: 12, fontName: 'Arial', fontColor: '#004085',
+    shapeType: 'rect', fill: 'true', fillColor: '#cce5ff', strokeColor: '#004085',
+    strokeWidth: '1.5', fontSize: '12', fontName: 'Arial', fontColor: '#004085',
   },
   'http://www.misa.org.ca/mrm#Program': {
-    shapeType: 'rect', fill: true, fillColor: '#d4edda', strokeColor: '#155724',
-    strokeWidth: 1.5, fontSize: 12, fontName: 'Arial', fontColor: '#155724',
+    shapeType: 'rect', fill: 'true', fillColor: '#d4edda', strokeColor: '#155724',
+    strokeWidth: '1.5', fontSize: '12', fontName: 'Arial', fontColor: '#155724',
   },
   'http://www.misa.org.ca/mrm#Service': {
-    shapeType: 'roundedRect', fill: true, fillColor: '#c3e6cb', strokeColor: '#155724',
-    strokeWidth: 1.0, fontSize: 11, fontName: 'Arial', fontColor: '#155724',
+    shapeType: 'roundedRect', fill: 'true', fillColor: '#c3e6cb', strokeColor: '#155724',
+    strokeWidth: '1.0', fontSize: '11', fontName: 'Arial', fontColor: '#155724',
   },
   'http://www.misa.org.ca/mrm#Process': {
-    shapeType: 'ellipse', fill: true, fillColor: '#e2e3e5', strokeColor: '#383d41',
-    strokeWidth: 1.0, fontSize: 10, fontName: 'Arial', fontColor: '#383d41',
+    shapeType: 'ellipse', fill: 'true', fillColor: '#e2e3e5', strokeColor: '#383d41',
+    strokeWidth: '1.0', fontSize: '10', fontName: 'Arial', fontColor: '#383d41',
   },
   'http://www.misa.org.ca/mrm#Resource': {
-    shapeType: 'rect', fill: true, fillColor: '#fff3cd', strokeColor: '#856404',
-    strokeWidth: 1.0, strokeDashLength: 5, strokeDashGap: 3, fontSize: 11,
+    shapeType: 'rect', fill: 'true', fillColor: '#fff3cd', strokeColor: '#856404',
+    strokeWidth: '1.0', strokeDashLength: '5', strokeDashGap: '3', fontSize: '11',
     fontName: 'Arial', fontColor: '#856404',
   },
   'http://www.misa.org.ca/mrm#Outcome': {
-    shapeType: 'ellipse', fill: true, fillColor: '#d1ecf1', strokeColor: '#0c5460',
-    strokeWidth: 1.0, fontSize: 10, fontName: 'Arial', fontColor: '#0c5460',
+    shapeType: 'ellipse', fill: 'true', fillColor: '#d1ecf1', strokeColor: '#0c5460',
+    strokeWidth: '1.0', fontSize: '10', fontName: 'Arial', fontColor: '#0c5460',
   },
   'http://www.misa.org.ca/mrm#Output': {
-    shapeType: 'rect', fill: true, fillColor: '#f8f9fa', strokeColor: '#6c757d',
-    strokeWidth: 0.5, fontSize: 10, fontName: 'Arial', fontColor: '#6c757d',
+    shapeType: 'rect', fill: 'true', fillColor: '#f8f9fa', strokeColor: '#6c757d',
+    strokeWidth: '0.5', fontSize: '10', fontName: 'Arial', fontColor: '#6c757d',
   },
   'http://www.misa.org.ca/mrm#Need': {
-    shapeType: 'ellipse', fill: true, fillColor: '#f5c6cb', strokeColor: '#721c24',
-    strokeWidth: 1.0, fontSize: 10, fontName: 'Arial', fontColor: '#721c24',
+    shapeType: 'ellipse', fill: 'true', fillColor: '#f5c6cb', strokeColor: '#721c24',
+    strokeWidth: '1.0', fontSize: '10', fontName: 'Arial', fontColor: '#721c24',
   },
   'http://www.misa.org.ca/mrm#TargetGroup': {
-    shapeType: 'stickFigure', fill: false, strokeColor: '#333333',
-    strokeWidth: 1.5, fontSize: 10, fontName: 'Arial', fontColor: '#333333',
+    shapeType: 'stickFigure', fill: 'false', strokeColor: '#333333',
+    strokeWidth: '1.5', fontSize: '10', fontName: 'Arial', fontColor: '#333333',
   },
 };
 
@@ -2247,7 +2260,8 @@ interface TraversedNode {
 interface TraversedEdge {
   sourceURI: string;
   targetURI: string;
-  predicate: string;
+  predicateURI: string;
+  predicateLabel: string;   // local name of the predicate, displayed on the edge
 }
 
 interface TraversalResult {
@@ -2255,49 +2269,63 @@ interface TraversalResult {
   edges: TraversedEdge[];
 }
 
+/**
+ * Traverse outgoing links from a root resource using OSLCResource.getOutgoingLinks().
+ * Fetches linked resources via OSLCClient.getResource().
+ */
 export async function traverseLinks(
-  rootResource: LoadedResource,
-  fetchResource: (uri: string) => Promise<LoadedResource | null>,
+  client: OSLCClient,
+  rootResource: OSLCResource,
   maxDepth: number = 2
 ): Promise<TraversalResult> {
   const visited = new Set<string>();
   const nodes: TraversedNode[] = [];
   const edges: TraversedEdge[] = [];
-  const queue: Array<{ resource: LoadedResource; depth: number }> = [
-    { resource: rootResource, depth: 0 },
-  ];
 
-  visited.add(rootResource.uri);
+  const rootURI = rootResource.getURI();
+  const rootTypes = rootResource.get('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+  visited.add(rootURI);
   nodes.push({
-    uri: rootResource.uri,
-    title: rootResource.title,
-    types: rootResource.resourceTypes,
+    uri: rootURI,
+    title: rootResource.getTitle() ?? rootURI,
+    types: Array.isArray(rootTypes) ? rootTypes : rootTypes ? [rootTypes] : [],
     depth: 0,
   });
+
+  const queue: Array<{ resource: OSLCResource; depth: number }> = [
+    { resource: rootResource, depth: 0 },
+  ];
 
   while (queue.length > 0) {
     const { resource, depth } = queue.shift()!;
     if (depth >= maxDepth) continue;
 
-    for (const link of resource.links) {
-      const targetURI = link.targetURI;
+    // Use OSLCResource.getOutgoingLinks() to discover all relationships
+    const links = resource.getOutgoingLinks();
+    for (const link of links) {
       edges.push({
-        sourceURI: resource.uri,
-        targetURI,
-        predicate: link.predicate,
+        sourceURI: link.sourceURL,
+        targetURI: link.targetURL,
+        predicateURI: link.linkType,
+        predicateLabel: localName(link.linkType),
       });
 
-      if (!visited.has(targetURI)) {
-        visited.add(targetURI);
-        const targetResource = await fetchResource(targetURI);
-        if (targetResource) {
-          nodes.push({
-            uri: targetURI,
-            title: targetResource.title,
-            types: targetResource.resourceTypes,
-            depth: depth + 1,
-          });
-          queue.push({ resource: targetResource, depth: depth + 1 });
+      if (!visited.has(link.targetURL)) {
+        visited.add(link.targetURL);
+        try {
+          const targetResource = await client.getResource(link.targetURL);
+          if (targetResource) {
+            const types = targetResource.get('http://www.w3.org/1999/02/22-rdf-syntax-ns#type');
+            nodes.push({
+              uri: link.targetURL,
+              title: targetResource.getTitle() ?? link.targetURL,
+              types: Array.isArray(types) ? types : types ? [types] : [],
+              depth: depth + 1,
+            });
+            queue.push({ resource: targetResource, depth: depth + 1 });
+          }
+        } catch {
+          // Skip unreachable resources
         }
       }
     }
@@ -2307,16 +2335,12 @@ export async function traverseLinks(
 }
 
 // Simple tree layout: root at top center, children in rows
-function computeLayout(
-  nodes: TraversedNode[],
-  edges: TraversedEdge[]
-): Map<string, DiagramBounds> {
+function computeLayout(nodes: TraversedNode[]): Map<string, { x: number; y: number; width: number; height: number }> {
   const SHAPE_W = 140;
   const SHAPE_H = 50;
   const H_GAP = 30;
   const V_GAP = 60;
 
-  // Group nodes by depth
   const byDepth = new Map<number, TraversedNode[]>();
   for (const node of nodes) {
     const list = byDepth.get(node.depth) ?? [];
@@ -2324,7 +2348,7 @@ function computeLayout(
     byDepth.set(node.depth, list);
   }
 
-  const layout = new Map<string, DiagramBounds>();
+  const layout = new Map<string, { x: number; y: number; width: number; height: number }>();
   const maxDepth = Math.max(...Array.from(byDepth.keys()));
 
   for (let d = 0; d <= maxDepth; d++) {
@@ -2332,55 +2356,53 @@ function computeLayout(
     const totalWidth = row.length * SHAPE_W + (row.length - 1) * H_GAP;
     const startX = -totalWidth / 2;
     const y = d * (SHAPE_H + V_GAP);
-
     for (let i = 0; i < row.length; i++) {
-      layout.set(row[i].uri, {
-        x: startX + i * (SHAPE_W + H_GAP),
-        y,
-        width: SHAPE_W,
-        height: SHAPE_H,
-      });
+      layout.set(row[i].uri, { x: startX + i * (SHAPE_W + H_GAP), y, width: SHAPE_W, height: SHAPE_H });
     }
   }
-
   return layout;
 }
 
-function getInlineStyle(types: string[]): DiagramStyle | undefined {
+function getInlineStyle(types: string[]): Record<string, string> | undefined {
   for (const t of types) {
     if (TYPE_STYLE_MAP[t]) return TYPE_STYLE_MAP[t];
   }
   return undefined;
 }
 
-function serializeStyleTurtle(style: DiagramStyle): string {
-  const lines: string[] = [];
-  lines.push('    a dd:Style ;');
-  if (style.shapeType) lines.push(`    dd:shapeType "${style.shapeType}" ;`);
-  if (style.fill !== undefined) lines.push(`    dd:fill ${style.fill} ;`);
-  if (style.fillColor) lines.push(`    dd:fillColor "${style.fillColor}" ;`);
-  if (style.fillOpacity !== undefined) lines.push(`    dd:fillOpacity "${style.fillOpacity}"^^xsd:double ;`);
-  if (style.stroke !== undefined) lines.push(`    dd:stroke ${style.stroke} ;`);
-  if (style.strokeColor) lines.push(`    dd:strokeColor "${style.strokeColor}" ;`);
-  if (style.strokeWidth !== undefined) lines.push(`    dd:strokeWidth "${style.strokeWidth}"^^xsd:double ;`);
-  if (style.strokeDashLength !== undefined) lines.push(`    dd:strokeDashLength "${style.strokeDashLength}"^^xsd:double ;`);
-  if (style.strokeDashGap !== undefined) lines.push(`    dd:strokeDashGap "${style.strokeDashGap}"^^xsd:double ;`);
-  if (style.fontSize !== undefined) lines.push(`    dd:fontSize "${style.fontSize}"^^xsd:double ;`);
-  if (style.fontName) lines.push(`    dd:fontName "${style.fontName}" ;`);
-  if (style.fontColor) lines.push(`    dd:fontColor "${style.fontColor}" ;`);
-  // Replace trailing ; on last line with empty (will be closed by caller)
-  if (lines.length > 0) {
+function serializeStyleTurtle(style: Record<string, string>): string {
+  const lines: string[] = ['    a dd:Style ;'];
+  for (const [key, val] of Object.entries(style)) {
+    const isNumeric = ['strokeWidth', 'strokeDashLength', 'strokeDashGap',
+      'fontSize', 'fillOpacity', 'strokeOpacity'].includes(key);
+    if (isNumeric) {
+      lines.push(`    dd:${key} "${val}"^^xsd:double ;`);
+    } else if (val === 'true' || val === 'false') {
+      lines.push(`    dd:${key} ${val} ;`);
+    } else {
+      lines.push(`    dd:${key} "${val}" ;`);
+    }
+  }
+  if (lines.length > 1) {
     lines[lines.length - 1] = lines[lines.length - 1].replace(/ ;$/, '');
   }
   return lines.join('\n');
 }
 
+/**
+ * Build an OSLCResource representing the diagram with all blank-node
+ * shapes and edges, then use OSLCClient.createResource() to POST it.
+ *
+ * Alternatively, generates Turtle and POSTs directly if createResource
+ * doesn't support blank node graphs well. The implementer should
+ * test both approaches.
+ */
 export function generateDiagramTurtle(
   title: string,
   traversal: TraversalResult,
   diagramURI: string
 ): string {
-  const layout = computeLayout(traversal.nodes, traversal.edges);
+  const layout = computeLayout(traversal.nodes);
   const lines: string[] = [];
 
   lines.push('@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .');
@@ -2392,13 +2414,9 @@ export function generateDiagramTurtle(
   lines.push('  a dd:Diagram ;');
   lines.push(`  dcterms:title "${title}" ;`);
 
-  // Generate blank node IDs for shapes
   const shapeIds = new Map<string, string>();
-  traversal.nodes.forEach((node, i) => {
-    shapeIds.set(node.uri, `_:shape${i}`);
-  });
+  traversal.nodes.forEach((node, i) => shapeIds.set(node.uri, `_:shape${i}`));
 
-  // diagramElement references
   const allElementIds: string[] = [];
   traversal.nodes.forEach((_, i) => allElementIds.push(`_:shape${i}`));
   traversal.edges.forEach((_, i) => allElementIds.push(`_:edge${i}`));
@@ -2407,11 +2425,9 @@ export function generateDiagramTurtle(
     const sep = i < allElementIds.length - 1 ? ',' : '.';
     lines.push(`  dd:diagramElement ${allElementIds[i]} ${sep}`);
   }
-
   lines.push('');
 
-  // Shape definitions — styles are inlined as dd:localStyle blank nodes
-  // so the diagram parser can render them without resolving sharedStyle URIs
+  // Shape definitions with inlined styles
   for (let i = 0; i < traversal.nodes.length; i++) {
     const node = traversal.nodes[i];
     const bounds = layout.get(node.uri)!;
@@ -2425,8 +2441,8 @@ export function generateDiagramTurtle(
       lines.push(serializeStyleTurtle(style));
       lines.push('  ] ;');
     }
-    lines.push(`  dd:bounds [`);
-    lines.push(`    a dd:Bounds ;`);
+    lines.push('  dd:bounds [');
+    lines.push('    a dd:Bounds ;');
     lines.push(`    dd:x "${bounds.x}"^^xsd:double ;`);
     lines.push(`    dd:y "${bounds.y}"^^xsd:double ;`);
     lines.push(`    dd:width "${bounds.width}"^^xsd:double ;`);
@@ -2435,7 +2451,7 @@ export function generateDiagramTurtle(
     lines.push('');
   }
 
-  // Edge definitions
+  // Edge definitions with predicate labels
   for (let i = 0; i < traversal.edges.length; i++) {
     const edge = traversal.edges[i];
     const sourceId = shapeIds.get(edge.sourceURI);
@@ -2445,7 +2461,9 @@ export function generateDiagramTurtle(
     lines.push(`_:edge${i}`);
     lines.push('  a dd:Edge ;');
     lines.push(`  dd:source ${sourceId} ;`);
-    lines.push(`  dd:target ${targetId} .`);
+    lines.push(`  dd:target ${targetId} ;`);
+    lines.push(`  dd:predicateURI "${edge.predicateURI}" ;`);
+    lines.push(`  dd:predicateLabel "${edge.predicateLabel}" .`);
     lines.push('');
   }
 
@@ -2457,7 +2475,7 @@ export function generateDiagramTurtle(
 
 ```bash
 git add oslc-browser/src/hooks/diagramGenerator.ts
-git commit -m "feat: add diagram auto-generator (traversal, layout, Turtle serialization)"
+git commit -m "feat: add OSLCClient-based diagram auto-generator"
 ```
 
 ---
@@ -2469,42 +2487,52 @@ git commit -m "feat: add diagram auto-generator (traversal, layout, Turtle seria
 
 - [ ] **Step 1: Add diagram creation menu items to App.tsx context menu**
 
-The existing context menu (`App.tsx` lines 73-86) has a single "Add to Favorites" `MenuItem`. Extend it to include a "Create Diagram" submenu.
+The existing context menu (`App.tsx` lines 73-86) has a single "Add to Favorites" `MenuItem`. Extend it with a "Create Diagram" submenu that is dynamically populated based on the selected resource's type.
 
-This requires:
-1. Importing the diagram generator functions
-2. Adding state for available diagram types (discovered from catalog introspection)
-3. Adding a "Create Diagram" `MenuItem` with a nested submenu
-4. Implementing the handler that:
-   - Fetches the selected resource
-   - Calls `traverseLinks()` to discover related resources
-   - Calls `generateDiagramTurtle()` to create the diagram content
-   - POSTs to the creation factory URL
-   - Navigates to the new diagram
+**Catalog introspection logic:**
 
-**Note:** The full context menu integration depends on how the catalog data is currently stored in the browser. The implementer should check `useOslcClient.ts` for how the catalog/service provider data is available, and use it to find creation factories with `oslc:resourceType dd:Diagram`.
+The browser already connects to a server via `OSLCClient`. The service provider catalog contains creation factories with `oslc:resourceType dd:Diagram` and `oslc:resourceShape` pointing to diagram shapes whose `dcterms:description` mentions specific MRM resource types.
 
-The key function signature for the handler:
+When the context menu opens on any resource in the column view:
+1. Get the selected resource's `rdf:type` values
+2. Query the service provider catalog for creation factories where `oslc:resourceType` is `dd:Diagram`
+3. For each diagram factory, fetch its `oslc:resourceShape` and read the `dcterms:description`
+4. Check if any of the resource's type local names appear in the shape description
+5. Show matching factories as menu items under "Create Diagram"
+
+**Handler using OSLCClient:**
 
 ```typescript
-async function handleCreateDiagram(factoryTitle: string, factoryURL: string) {
-  const resource = await fetchResource(contextMenu.item.uri);
+async function handleCreateDiagram(factoryURL: string, factoryTitle: string) {
+  // 1. Fetch the selected resource as OSLCResource
+  const resource = await client.getResource(contextMenu.item.uri);
   if (!resource) return;
-  const traversal = await traverseLinks(resource, fetchResource, 2);
-  const diagramTitle = `${resource.title} - ${factoryTitle}`;
+
+  // 2. Traverse outgoing links using OSLCResource.getOutgoingLinks()
+  const traversal = await traverseLinks(client, resource, 2);
+
+  // 3. Generate diagram Turtle with predicate labels on edges
+  const diagramTitle = `${resource.getTitle()} - ${factoryTitle}`;
   const turtle = generateDiagramTurtle(diagramTitle, traversal, '');
-  // POST turtle to factoryURL
-  // Navigate to the returned diagram URI
+
+  // 4. POST to creation factory via OSLCClient
+  //    Either use client.createResource() with an OSLCResource built
+  //    from the turtle, or POST the turtle directly via the underlying
+  //    HTTP client. The implementer should test which approach works
+  //    best with blank node graphs.
+
+  // 5. Navigate to the returned diagram URI
+  handleNavigate(newDiagramURI);
 }
 ```
 
-The exact implementation details depend on how the oslc-client library exposes POST/PUT operations. The implementer should review `oslc-client/OSLCClient.js` for the available methods.
+**Note:** The implementer should review how `useOslcClient.ts` exposes the `OSLCClient` instance and ensure it is accessible from the context menu handler. The catalog introspection may be cached at connect time to avoid repeated fetches.
 
 - [ ] **Step 2: Commit**
 
 ```bash
 git add oslc-browser/src/App.tsx
-git commit -m "feat: add Create Diagram context menu with auto-generation"
+git commit -m "feat: add Create Diagram context menu with catalog introspection"
 ```
 
 ---
@@ -2525,16 +2553,18 @@ Verify no TypeScript compilation errors.
 cd mrm-server && npm start
 ```
 
-Navigate to the catalog endpoint and verify the diagram creation factories, dialogs, and query capabilities appear.
+Navigate to the catalog endpoint and verify the diagram creation factories and dialogs appear.
 
 - [ ] **Step 3: Manual test — create and view a diagram**
 
 1. Open oslc-browser, connect to mrm-server
-2. Navigate to an OrganizationUnit resource
-3. Right-click → Create Diagram → select a diagram type
-4. Verify the diagram is created and the Diagram tab appears
-5. Verify shapes render with correct styles and titles
-6. Verify clicking a shape navigates to the model element
+2. Navigate to any MRM resource (e.g., an OrganizationUnit)
+3. Right-click → "Create Diagram" submenu should show matching diagram types
+4. Select a diagram type
+5. Verify the diagram is created and the Diagram tab appears
+6. Verify shapes render with correct styles and titles
+7. Verify edges show predicate labels
+8. Verify clicking a shape navigates to the model element in column view
 
 - [ ] **Step 4: Final commit**
 

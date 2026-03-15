@@ -27,6 +27,36 @@ export interface LoadedResource {
   members?: LoadedResource[];
 }
 
+export interface PredicateItem {
+  predicate: string;
+  predicateLabel: string;
+  targetCount: number;
+}
+
+export interface ColumnResource {
+  resource: LoadedResource;
+  /** Unique link predicates for accordion body */
+  predicates: PredicateItem[];
+}
+
+export interface NavigationColumn {
+  uri: string;
+  title: string;
+  resources: ColumnResource[];
+  loading: boolean;
+  error?: string;
+  /** URI of the selected (expanded) resource in this column */
+  selectedResourceURI?: string;
+  /** URI of the selected predicate in this column */
+  selectedPredicate?: string;
+}
+
+export interface NavigationState {
+  columns: NavigationColumn[];
+  selectedResource: LoadedResource | null;
+}
+
+// Kept for compatibility with context menu and other uses
 export interface ColumnItem {
   uri: string;
   title: string;
@@ -36,20 +66,6 @@ export interface ColumnItem {
   kind: 'predicate' | 'resource';
   /** RDF types of the resource (only for kind === 'resource'). */
   resourceTypes?: string[];
-}
-
-export interface NavigationColumn {
-  uri: string;
-  title: string;
-  items: ColumnItem[];
-  loading: boolean;
-  error?: string;
-  resource?: LoadedResource;
-}
-
-export interface NavigationState {
-  columns: NavigationColumn[];
-  selectedResource: LoadedResource | null;
 }
 
 // --- Favorites types ---
