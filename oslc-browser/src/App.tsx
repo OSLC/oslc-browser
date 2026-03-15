@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CssBaseline, ThemeProvider, createTheme, Divider, Menu, MenuItem } from '@mui/material';
+import { Namespace, sym } from 'rdflib';
 import { ToolbarComponent } from './components/Toolbar.js';
 import { MainLayoutComponent } from './components/MainLayout.js';
 import { useOslcClient } from './hooks/useOslcClient.js';
@@ -10,10 +11,14 @@ import { localName } from './models/diagram-types.js';
 import type { ColumnItem } from './models/types.js';
 
 const DD_DIAGRAM = 'http://www.omg.org/spec/DD#Diagram';
+const ldp = Namespace('http://www.w3.org/ns/ldp#');
+const rdfNS = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
+const oslcNS = Namespace('http://open-services.net/ns/core#');
+const dctermsNS = Namespace('http://purl.org/dc/terms/');
 
 interface DiagramFactory {
   title: string;
-  factoryURI: string;
+  creationURI: string;
   shapeDescription: string;
 }
 
@@ -48,56 +53,70 @@ function App() {
     const client = getClient();
     if (!client) return;
 
-    // Introspect catalog for diagram creation factories
-    // This relies on the catalog being loaded via OSLCClient.use()
-    // For now, we scan the service provider catalog endpoint
+    // Discover diagram creation factories from all service providers.
+    // The catalog at connection.serverURL contains ldp:contains references
+    // to individual ServiceProviders. We fetch each one and extract its
+    // creation factories that have oslc:resourceType dd:Diagram.
     (async () => {
       try {
+        const ddDiagramSym = sym(DD_DIAGRAM);
+
+        // Step 1: Fetch catalog and find service provider URIs via ldp:contains
         const catalogResource = await client.getResource(connection.serverURL);
-        if (!catalogResource?.store?.statements) return;
+        if (!catalogResource?.store) return;
+        const catalogStore = catalogResource.store;
 
-        const statements = catalogResource.store.statements as Array<{
-          subject: { value: string; termType: string };
-          predicate: { value: string };
-          object: { value: string; termType: string };
-        }>;
+        const spNodes = catalogStore.each(null, ldp('contains'), null);
+        const spURIs = spNodes.map((n: any) => n.value).filter(Boolean);
 
-        // Find creation factory blank nodes that have oslc:resourceType dd:Diagram
-        const OSLC_RESOURCE_TYPE = 'http://open-services.net/ns/core#resourceType';
-        const OSLC_RESOURCE_SHAPE = 'http://open-services.net/ns/core#resourceShape';
-        const DCTERMS_TITLE = 'http://purl.org/dc/terms/title';
-
-        // Collect factory blank nodes with dd:Diagram type
-        const factoryNodes = new Set<string>();
-        for (const st of statements) {
-          if (st.predicate.value === OSLC_RESOURCE_TYPE && st.object.value === DD_DIAGRAM) {
-            factoryNodes.add(st.subject.value);
-          }
-        }
-
-        // For each factory node, get title and shape reference
+        // Step 2: Fetch each service provider and extract diagram factories
         const factories: DiagramFactory[] = [];
-        for (const nodeId of factoryNodes) {
-          let title = '';
-          let shapeURI = '';
-          for (const st of statements) {
-            if (st.subject.value !== nodeId) continue;
-            if (st.predicate.value === DCTERMS_TITLE) title = st.object.value;
-            if (st.predicate.value === OSLC_RESOURCE_SHAPE) shapeURI = st.object.value;
+
+        for (const spURI of spURIs) {
+          let spResource;
+          try {
+            spResource = await client.getResource(spURI);
+          } catch {
+            continue; // Skip unreachable service providers
           }
-          if (title) {
-            // Fetch shape to get description (contains type constraints)
-            let shapeDescription = '';
-            try {
-              const shapeResource = await client.getResource(shapeURI);
-              if (shapeResource) {
-                const desc = shapeResource.get('http://purl.org/dc/terms/description');
-                shapeDescription = Array.isArray(desc) ? desc[0] : desc ?? '';
+          if (!spResource?.store) continue;
+          const store = spResource.store;
+
+          // Walk: ServiceProvider → oslc:service → oslc:creationFactory
+          const spSym = store.sym(spURI);
+          const services = store.each(spSym, oslcNS('service'), null);
+          for (const service of services) {
+            const creationFactories = store.each(service, oslcNS('creationFactory'), null);
+            for (const factory of creationFactories) {
+              // Check if this factory has oslc:resourceType dd:Diagram
+              const hasDD = store.statementsMatching(factory, oslcNS('resourceType'), ddDiagramSym);
+              if (hasDD.length === 0) continue;
+
+              const titleNode = store.the(factory, dctermsNS('title'), null);
+              const creationNode = store.the(factory, oslcNS('creation'), null);
+              const shapeNode = store.the(factory, oslcNS('resourceShape'), null);
+
+              const title = titleNode?.value ?? '';
+              const creationURI = creationNode?.value ?? '';
+              const shapeURI = shapeNode?.value ?? '';
+
+              if (!title || !creationURI) continue;
+
+              // Fetch the shape resource to get its description
+              let shapeDescription = '';
+              if (shapeURI) {
+                try {
+                  const shapeResource = await client.getResource(shapeURI);
+                  if (shapeResource) {
+                    const desc = shapeResource.get(dctermsNS('description').value);
+                    shapeDescription = Array.isArray(desc) ? desc[0] : desc ?? '';
+                  }
+                } catch {
+                  // Shape may not be fetchable; continue without description
+                }
               }
-            } catch {
-              // Shape may not be fetchable; use title as fallback
+              factories.push({ title, creationURI, shapeDescription });
             }
-            factories.push({ title, factoryURI: shapeURI, shapeDescription });
           }
         }
 
@@ -122,24 +141,36 @@ function App() {
     if (resource) navigateToRoot(resource);
   }, [fetchResource, navigateToRoot]);
 
-  const handleItemContextMenu = useCallback((event: React.MouseEvent, item: ColumnItem) => {
+  const handleItemContextMenu = useCallback(async (event: React.MouseEvent, item: ColumnItem) => {
     event.preventDefault();
     setContextMenu({ mouseX: event.clientX, mouseY: event.clientY, item });
 
-    // Find matching diagram factories for this item's resource type
-    // We check if the selected resource's types appear in the shape description
-    const selectedResource = navState.selectedResource;
-    if (selectedResource && diagramFactories.length > 0) {
-      const typeNames = selectedResource.resourceTypes.map(t => localName(t));
-      const matching = diagramFactories.filter(f => {
-        // Check if any of the resource's type local names appear in the shape description
-        return typeNames.some(name => f.shapeDescription.includes(name));
-      });
+    if (diagramFactories.length === 0 || item.kind !== 'resource') {
+      setMatchingFactories([]);
+      return;
+    }
+
+    // Get resource types — from the item if available, otherwise fetch the resource
+    let typeNames: string[] = [];
+    if (item.resourceTypes && item.resourceTypes.length > 0) {
+      typeNames = item.resourceTypes.map(t => localName(t));
+    } else {
+      // Fetch the resource to discover its types
+      const resource = await fetchResource(item.uri);
+      if (resource && resource.resourceTypes.length > 0) {
+        typeNames = resource.resourceTypes.map(t => localName(t));
+      }
+    }
+
+    if (typeNames.length > 0) {
+      const matching = diagramFactories.filter(f =>
+        typeNames.some(name => f.shapeDescription.includes(name))
+      );
       setMatchingFactories(matching);
     } else {
       setMatchingFactories([]);
     }
-  }, [navState.selectedResource, diagramFactories]);
+  }, [diagramFactories, fetchResource]);
 
   const handleCloseContextMenu = () => {
     setContextMenu(null);
@@ -147,33 +178,48 @@ function App() {
   };
 
   const handleCreateDiagram = useCallback(async (factory: DiagramFactory) => {
+    const item = contextMenu?.item;
     handleCloseContextMenu();
-    if (!contextMenu) return;
+    if (!item) return;
 
     const client = getClient();
     if (!client) return;
 
     try {
-      const resource = await fetchRawResource(contextMenu.item.uri);
+      const resource = await fetchRawResource(item.uri);
       if (!resource) return;
 
-      // Traverse outgoing links
+      // Traverse outgoing links from the resource
       const traversal = await traverseLinks(client, resource, 2);
 
-      // Generate diagram Turtle
-      const diagramTitle = `${contextMenu.item.title} - ${factory.title}`;
+      // Generate diagram Turtle (empty URI — server assigns the URI)
+      const diagramTitle = `${item.title} - ${factory.title}`;
       const turtle = generateDiagramTurtle(diagramTitle, traversal, '');
 
-      // For now, log the generated turtle (actual creation requires POST to factory)
-      console.log('Generated diagram Turtle:', turtle);
+      // POST the Turtle to the creation factory
+      const response = await fetch(factory.creationURI, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/turtle',
+          'Accept': 'text/turtle',
+          'OSLC-Core-Version': '3.0',
+        },
+        body: turtle,
+      });
 
-      // TODO: POST turtle to creation factory and navigate to new diagram
-      // const newDiagramURI = await client.createResource(DD_DIAGRAM, turtle);
-      // handleNavigateToResource(newDiagramURI);
+      if (response.ok) {
+        const newDiagramURI = response.headers.get('Location');
+        if (newDiagramURI) {
+          // Navigate to the newly created diagram resource
+          handleNavigateToResource(newDiagramURI);
+        }
+      } else {
+        console.error('Failed to create diagram, status:', response.status, await response.text());
+      }
     } catch (err) {
       console.error('Error creating diagram:', err);
     }
-  }, [contextMenu, getClient, fetchRawResource]);
+  }, [contextMenu, getClient, fetchRawResource, handleNavigateToResource]);
 
   return (
     <ThemeProvider theme={theme}>

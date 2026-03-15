@@ -67,6 +67,7 @@ export function ResourceColumnComponent({
       title: column.title,
       selected: false,
       kind: 'resource',
+      resourceTypes: column.resource?.resourceTypes,
     };
     return (
       <Box sx={{ width: 280, minWidth: 280, overflow: 'auto', borderRight: 1, borderColor: 'divider' }}>

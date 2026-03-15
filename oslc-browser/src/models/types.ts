@@ -34,6 +34,8 @@ export interface ColumnItem {
   predicateLabel?: string;
   selected: boolean;
   kind: 'predicate' | 'resource';
+  /** RDF types of the resource (only for kind === 'resource'). */
+  resourceTypes?: string[];
 }
 
 export interface NavigationColumn {

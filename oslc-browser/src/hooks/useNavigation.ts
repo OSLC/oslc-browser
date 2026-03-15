@@ -100,6 +100,7 @@ function resourceToColumn(resource: LoadedResource): NavigationColumn {
       title: member.title,
       selected: false,
       kind: 'resource' as const,
+      resourceTypes: member.resourceTypes,
     }));
     return {
       uri: resource.uri,
