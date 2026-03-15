@@ -62,12 +62,20 @@ export function ResourceColumnComponent({
 
   // Resource column: accordion (collapsed) with predicate items inside
   if (column.resource) {
+    const resourceItem: ColumnItem = {
+      uri: column.uri,
+      title: column.title,
+      selected: false,
+      kind: 'resource',
+    };
     return (
       <Box sx={{ width: 280, minWidth: 280, overflow: 'auto', borderRight: 1, borderColor: 'divider' }}>
         <Accordion disableGutters square elevation={0} sx={{ '&::before': { display: 'none' } }}>
           <AccordionSummary
             expandIcon={<ExpandMore />}
-            sx={{ minHeight: 36, px: 1.5, bgcolor: 'grey.50', borderBottom: 1, borderColor: 'divider', '& .MuiAccordionSummary-content': { my: 0.5 } }}
+            onClick={() => onItemClick(resourceItem)}
+            onContextMenu={e => onItemContextMenu(e, resourceItem)}
+            sx={{ minHeight: 36, px: 1.5, bgcolor: 'grey.50', borderBottom: 1, borderColor: 'divider', cursor: 'pointer', '& .MuiAccordionSummary-content': { my: 0.5 } }}
           >
             <Typography
               variant="subtitle2"
