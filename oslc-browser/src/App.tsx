@@ -122,6 +122,11 @@ function App() {
           console.log('[DiagramFactory] SP', spURI, '→ services:', services.length);
 
           for (const service of services) {
+            console.log('[DiagramFactory]   service node:', service.termType, service.value);
+            // Debug: show all predicates from the service blank node
+            const serviceStmts = store.statementsMatching(service, null, null);
+            const servicePreds = serviceStmts.map((st: any) => st.predicate.value);
+            console.log('[DiagramFactory]   service predicates:', servicePreds);
             const creationFactories = store.each(service, oslcNS('creationFactory'), null);
             console.log('[DiagramFactory]   service →', creationFactories.length, 'creation factories');
 
