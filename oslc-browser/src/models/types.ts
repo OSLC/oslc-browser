@@ -1,3 +1,5 @@
+import type { Theme } from '@mui/material';
+
 // --- Navigation types ---
 
 export interface ResourceProperty {
@@ -98,4 +100,27 @@ export function localName(uri: string): string {
   const slash = uri.lastIndexOf('/');
   if (slash >= 0) return uri.substring(slash + 1);
   return uri;
+}
+
+/** Additional tab for DetailsPanel, rendered after built-in tabs. */
+export interface ExtraTab {
+  label: string;
+  render: (resource: LoadedResource) => React.ReactNode;
+}
+
+/** Additional context menu item, appended after built-in items. */
+export interface ExtraMenuItem {
+  label: string;
+  onClick: (resource: LoadedResource) => void;
+  visible?: (resource: LoadedResource) => boolean;
+}
+
+/** Props for the OslcBrowserApp convenience component. */
+export interface OslcBrowserAppProps {
+  /** Optional MUI theme. If omitted, uses a default dark theme. */
+  theme?: Theme;
+  /** Additional tabs shown in DetailsPanel after built-in tabs. */
+  extraTabs?: ExtraTab[];
+  /** Additional context menu items appended after built-in items. */
+  extraMenuItems?: ExtraMenuItem[];
 }
