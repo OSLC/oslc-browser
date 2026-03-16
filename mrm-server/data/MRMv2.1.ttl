@@ -15,7 +15,6 @@
       rdf:type owl:Ontology ;
       owl:imports <http://purl.org/dc/elements/1.1> , <http://spinrdf.org/spin> .
 
-
 mrm:AAAOutputChanged
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
@@ -32,7 +31,6 @@ mrm:AccessToInformation
       dcterms:contributor "KPMG" ;
       dcterms:description "A public service provided to information requesters offering access to public information under the Municipal Freedom of Information and Protection of Privacy Act, and Personal Health Information Protection Act, and the Municipal Act." ;
       dcterms:title "Access to Information" ;
-      mrm:accountableTo mrm:NewTestOwner , mrm:newTestOwner ;
       mrm:administeredBy
               mrm:IntegratedServiceDelivery ;
       mrm:fromDate "2010-02-22"^^xsd:date .
@@ -278,7 +276,7 @@ mrm:AffordableAssistedHousing
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:contributor "Region of Peel" ;
       dcterms:title "Affordable/Assisted Housing" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ServiceSystemManagement ;
       mrm:administers mrm:AffordableHousingConstructionAndMaintenance , mrm:AssistedHousingProviderManagementAmpSupport , mrm:CommunityDevelopmentAndCapacityBuilding , mrm:CrisisAndOutreachIntervention , mrm:HomelessShelterAccommodation , mrm:HomelessnessPrevention , mrm:RentSupplementPayment , mrm:SocialHousingAccommodationPeelLiving , mrm:TransitionalHousingAccommodation .
 
@@ -333,8 +331,7 @@ mrm:AirQualityEnforcements
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Air Quality Enforcements" ;
-      mrm:creates mrm:SV06 ;
-      mrm:producedBy mrm:AirQualityEnforcementService .
+      mrm:creates mrm:SV06 .
 
 mrm:AirQualityProtection
       rdf:type mrm:Program ;
@@ -581,7 +578,7 @@ mrm:AssetAndEnergyManagement
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:InternalProvider ;
       dcterms:title "Asset and Energy Management" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:RealPropertyAssetManagement ;
       mrm:administers mrm:AssetPlanningAndMonitoringServices , mrm:EnergyManagment , mrm:FacilityManagement , mrm:FleetManagement , mrm:InventoryManagement , mrm:Purchasing , mrm:RealEstateManagement .
 
@@ -681,8 +678,7 @@ mrm:BioSolidsDisposal
 mrm:BirthCertificateIssued
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Birth Certificate Issued" ;
-      mrm:producedBy mrm:BirthCertification .
+      dcterms:title "Birth Certificate Issued" .
 
 mrm:BirthCertification
       rdf:type mrm:Service ;
@@ -975,7 +971,7 @@ mrm:ByLawAndRegulatoryServices
       rdfs:subClassOf mrm:Active ;
       dcterms:description "this organization unit is accountable for programs involving by-law and regulatory services." ;
       dcterms:title "By-law and Regulatory Services" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:LicensesAndPermits ;
       mrm:budget_1 "150000"^^xsd:decimal ;
       mrm:fromDate "2003-01-01"^^xsd:date ;
@@ -1151,7 +1147,7 @@ mrm:ChildrenSServicesOperations
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Children's Services Operations" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:EarlyLearningAndChildCare ;
       mrm:subOrganizationUnits
               mrm:ChildrenSerivcesInitiative , mrm:LearnPlayCareCentres .
@@ -1277,7 +1273,7 @@ mrm:ClientAndCommunityAccess
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Client and Community Access" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:InterpretationAndTranslation ;
       mrm:subOrganizationUnits
               mrm:ClientContact , mrm:ClientServicesCCA , mrm:CommunityPrograms .
@@ -1291,7 +1287,7 @@ mrm:ClientRelationshipsOW
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Client Relationships (OW)" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:OntarioWorks ;
       mrm:subOrganizationUnits
               mrm:ClientServices , mrm:OperationalSupport .
@@ -1327,8 +1323,7 @@ mrm:CollectedWaste
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Collected Waste" ;
-      mrm:creates mrm:SV05 ;
-      mrm:producedBy mrm:WasteCollectionAndDisposal .
+      mrm:creates mrm:SV05 .
 
 mrm:CommitteeOfAdjustmentApproval
       rdf:type mrm:Service ;
@@ -1368,7 +1363,7 @@ mrm:CommunicationServicesAndCustomerContactCentre
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Communication Services and Customer Contact Centre" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:IntegratedServiceDelivery ;
       mrm:subOrganizationUnits
               mrm:CreativeServices , mrm:CustomerContactCentre , mrm:CustomerContactCentre211 , mrm:PublicAffairs .
@@ -1405,7 +1400,7 @@ mrm:CommunityHealth
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Community Health" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:programVision "Mandate: Improve the health of Peel's community" ;
       mrm:subPrograms mrm:EmergencyMedical , mrm:LongTermCare , mrm:PublicHealth .
@@ -1599,8 +1594,7 @@ mrm:ConstructionPermits
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Construction Permits" ;
-      mrm:creates mrm:Output_contributesTo_Outcome_2 ;
-      mrm:producedBy mrm:ConstructionPermission .
+      mrm:creates mrm:Output_contributesTo_Outcome_2 .
 
 mrm:ConstructionSafety
       rdf:type mrm:Program ;
@@ -1681,7 +1675,7 @@ mrm:CorporateGovernanceAmpLeadership
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:InternalProvider ;
       dcterms:title "Corporate Governance amp Leadership" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:administers mrm:AccessibilityPlanning , mrm:CorporateCommunications , mrm:CorporateLeadership , mrm:CouncilSupport , mrm:ExternalCommunications , mrm:ExternalRelations , mrm:InternalAuditing , mrm:InternalCommunications , mrm:LegalCounsel , mrm:PublicPolicyDevelopment , mrm:PublicPolicyDevelopmentAndCoordination , mrm:RiskManagement .
 
@@ -1719,7 +1713,7 @@ mrm:CorporateServicesAndCFO
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Corporate Services (and CFO)" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:FinancialManagement ;
       mrm:subOrganizationUnits
               mrm:BusinessPlanningAndFinancialSupport , mrm:ClerkS , mrm:CorporateFinanceAndDeputyTreasurer , mrm:InternalAudit , mrm:LegislativeServices , mrm:PlanningPolicyAndResearch .
@@ -1909,7 +1903,7 @@ mrm:CulturalDevelopment
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Cultural Development" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:subPrograms mrm:Heritage .
 
@@ -1970,8 +1964,7 @@ mrm:DangerousAnimalInvestigationAndAssessment
 mrm:DeathCertificateIssued
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Death Certificate Issued" ;
-      mrm:producedBy mrm:DeathRegistration .
+      dcterms:title "Death Certificate Issued" .
 
 mrm:DeathRegistration
       rdf:type mrm:Service ;
@@ -2175,8 +2168,7 @@ mrm:DevelopmentPromotions
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Development Promotions" ;
-      mrm:creates mrm:Output_contributesTo_Outcome_1 ;
-      mrm:producedBy mrm:DevelopmentPromotion .
+      mrm:creates mrm:Output_contributesTo_Outcome_1 .
 
 mrm:DevelopmentServices
       rdf:type mrm:OrganizationUnit ;
@@ -2233,7 +2225,7 @@ mrm:EarlyLearningAndChildCare
       dcterms:contributor "KPMG" , "Region of Peel" ;
       dcterms:description "A public service provided to children and their parents or guardians offering early learning opportunities to meet familiesï¾’ child care needs through fee subsidies to eligible families." ;
       dcterms:title "Early Learning and Child Care" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ChildrenSServicesOperations ;
       mrm:administers mrm:EarlyLearningAndChildCareCommunityIntegration , mrm:EarlyLearningAndChildCareFamilySupport , mrm:EarlyLearningAndChildCareProviderSupport , mrm:EarlyLearningAndChildCareProvision , mrm:EarlyLearningAndChildCareWageSubsidyImprovement ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
@@ -2323,8 +2315,7 @@ mrm:Education
 mrm:ElectionCandidateRegistered
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Election Candidate Registered" ;
-      mrm:producedBy mrm:ElectionCandidateRegistration .
+      dcterms:title "Election Candidate Registered" .
 
 mrm:ElectionCandidateRegistration
       rdf:type mrm:Service ;
@@ -2352,8 +2343,7 @@ mrm:ElectionManagement
 mrm:ElectionOfficerTrained
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:EducationalAmpTrainingEncounter , mrm:Service ;
-      dcterms:title "Election Officer Trained" ;
-      mrm:producedBy mrm:ElectionOfficerTraining .
+      dcterms:title "Election Officer Trained" .
 
 mrm:ElectionOfficerTraining
       rdf:type mrm:Service ;
@@ -2367,8 +2357,7 @@ mrm:ElectionOfficerTraining
 mrm:ElectionResultPosted
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:AdvisoryEncounters , mrm:Service ;
-      dcterms:title "Election Result Posted" ;
-      mrm:producedBy mrm:ElectionResultPosting .
+      dcterms:title "Election Result Posted" .
 
 mrm:ElectionResultPosting
       rdf:type mrm:Service ;
@@ -2517,7 +2506,7 @@ mrm:EmergencyManagement
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:description "A public service offering the public with advice and educational campaigns aimed at increasing awareness of emergency management considerations and techniques for preparing for disaster / emergency incidents." ;
       dcterms:title "Emergency Management" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:InternalClientServices ;
       mrm:administers mrm:EmergencyDisasterRecoveryPlanning , mrm:EmergencyManagement , mrm:PublicHealthEmergencyManagement ;
       mrm:administeredBy
@@ -2527,7 +2516,7 @@ mrm:EmergencyMedical
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Emergency Medical" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ParamedicServices ;
       mrm:administers mrm:InterFacilityPatientTransportService , mrm:PreHospitalEmergencyCare ;
       mrm:contributesTo mrm:IncreasedCommunityHealth .
@@ -2548,7 +2537,7 @@ mrm:EmployeeAndBusinessServices
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Employee and Business Services" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:EnvironmentalProtection ;
       mrm:subOrganizationUnits
               mrm:CommunicationServicesAndCustomerContactCentre , mrm:Heritage , mrm:HumanResources , mrm:InformationSystemsAmpTechnologyServices , mrm:Purchasing , mrm:RealPropertyAssetManagement .
@@ -2698,7 +2687,7 @@ mrm:EnivronmentalHealth
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Enivronmental Health" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:PublicHealth ;
       mrm:subOrganizationUnits
               mrm:EmergencyAndProtectiveServices .
@@ -2713,7 +2702,7 @@ mrm:Environmental
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Environmental" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:subPrograms mrm:EnvironmentalProtection , mrm:PotableWater , mrm:RegionalPlanning , mrm:WasteManagement , mrm:Wastewater .
 
@@ -2748,7 +2737,7 @@ mrm:EnvironmentalProtection
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Environmental Protection" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:EmployeeAndBusinessServices ;
       mrm:administers mrm:EnergyConservationPromotion , mrm:EnvironmentalProtectionPromotion , mrm:EnvironmentalResourceProtectionService , mrm:EnvironmentalResourceRestorationService , mrm:GreenlandsSecurement .
 
@@ -2796,7 +2785,8 @@ mrm:EstimateFireSafetyEducationActivityResourceRequirements
       dcterms:description " (develop budget for Fire Safety Education)" ;
       dcterms:title "Estimate Fire Safety Education activity resource requirements" ;
       mrm:accountableTo mrm:FireDepartmentResponsibleForFireSafety ;
-      mrm:fromDate "2010-02-22"^^xsd:date .
+      mrm:fromDate "2010-02-22"^^xsd:date ;
+      mrm:accountableFor mrm:FireDepartmentResponsibleForFireSafety .
 
 mrm:EvaluateEffectivenessOfFireSafetyEducation
       rdf:type mrm:Process ;
@@ -2895,8 +2885,7 @@ mrm:FenceByLawEnforcement
 mrm:FenceByLawViolationBroughtIntoCompliance
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PenaltiesAmpPeriodsOfSanction , mrm:Service ;
-      dcterms:title "Fence By-law violation brought into compliance" ;
-      mrm:producedBy mrm:FenceByLawEnforcement .
+      dcterms:title "Fence By-law violation brought into compliance" .
 
 mrm:FenceExemptionPermit
       rdf:type mrm:Output ;
@@ -2995,7 +2984,7 @@ mrm:FinancialManagement
       dcterms:contributor "KPMG" ;
       dcterms:description "An internal service provided to the corporation offering budget preparation and monitoring, accounting, investment / debt management, and grant / subsidy management." ;
       dcterms:title "Financial Management" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:CorporateServicesAndCFO ;
       mrm:administers mrm:Accounting , mrm:FinancialConsulting , mrm:FinancialMonitoringAndReporting , mrm:FinancialPlanningAndBudgeting , mrm:InvestmentDebtPorfolio ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
@@ -3049,26 +3038,22 @@ mrm:FireDepartment
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Fire Department" ;
-      mrm:accountableForProgram
-              mrm:FireSafety ;
-      mrm:isAccountableFor
-              mrm:FireDepartmentAuthorizesFireTrucks , mrm:FireDepartmentResponsibleForFireSafety , mrm:a1f3557aa3891441bB047313ae73db472Accountable , mrm:a4fc9c3e1F30d41b58801362b69c288cbNotified , mrm:a70568a0565247baB1b740b741cc8c52Accountable , mrm:a843147c97fe74e8099c5Ebd1b6538933FireDepartmentAuthorizesFireTrucks , mrm:bd3213639a974ff2Abd7Ce582b9d4ed5SA02 , mrm:dd9496a388e94593BecdB21f7ef962c3SA01 , mrm:e28339a6F3b74c32A6ef7c2816a5592fPA01 .
+      mrm:accountableFor
+              mrm:FireSafety .
 
 mrm:FireDepartmentAuthorizesFireTrucks
       rdf:type mrm:AccountabilityElement ;
       dcterms:title "Fire department authorizes Fire Trucks" ;
       mrm:accountableOrganization
               mrm:FireDepartment ;
-      mrm:isAccountableFor
-              mrm:FireTruck .
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:FireDepartmentResponsibleForFireSafety
       rdf:type mrm:AccountabilityElement ;
       dcterms:title "Fire department responsible for fire safety" ;
       mrm:accountableOrganization
               mrm:FireDepartment ;
-      mrm:isAccountableFor
-              mrm:EstimateFireSafetyEducationActivityResourceRequirements .
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:FireLoss
       rdf:type mrm:ChangeDriver ;
@@ -3088,7 +3073,8 @@ mrm:FireRescue
       mrm:fromDate "2010-02-22"^^xsd:date ;
       mrm:produces mrm:RescuedPersonOrProperty ;
       mrm:subServices mrm:ElectricalFireResponse , mrm:EnvironmentalFireResponse , mrm:FuelsFlammablesFireResponse , mrm:MedicalAssistanceResponse , mrm:PotentialIncidentInvestigation , mrm:PublicAssistanceResponse , mrm:RescueResponse , mrm:StructureFireResponse , mrm:VehicleAccidentResponse , mrm:VehicleFireResponse ;
-      mrm:uses mrm:acf776e30e334103B5812bc55e0724bcSLA101 .
+      mrm:uses mrm:acf776e30e334103B5812bc55e0724bcSLA101 ;
+      mrm:accountableFor mrm:SA01 .
 
 mrm:FireRescueCallTakingAndDispatching
       rdf:type mrm:Service ;
@@ -3100,13 +3086,14 @@ mrm:FireRescueCallTakingAndDispatching
       mrm:administeredBy
               mrm:FireSafety ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
-      mrm:usedBy mrm:acf776e30e334103B5812bc55e0724bcSLA101 .
+      mrm:usedBy mrm:acf776e30e334103B5812bc55e0724bcSLA101 ;
+      mrm:accountableFor mrm:SA02 .
 
 mrm:FireSafety
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public , mrm:PublicSafety ;
       dcterms:title "Fire Safety" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:FireDepartment ;
       mrm:administers mrm:ElectricalFireResponse , mrm:EnvironmentalFireResponse , mrm:FireRescue , mrm:FireRescueCallTakingAndDispatching , mrm:FireSafetyEducation , mrm:FireSafetyInspection , mrm:FireSafetyPromotion , mrm:FireSetterCounselling , mrm:FuelsFlammablesFireResponse , mrm:MedicalAssistanceResponse , mrm:PotentialIncidentInvestigation , mrm:PublicAssistanceResponse , mrm:RescueResponse , mrm:StructureFireResponse , mrm:VehicleAccidentResponse , mrm:VehicleFireResponse ;
       mrm:assessment mrm:FireSafetyImpactsFireLoss .
@@ -3124,8 +3111,7 @@ mrm:FireSafetyEducation
 
 mrm:FireSafetyImpactsFireLoss
       rdf:type mrm:ImpactAssessment ;
-      dcterms:title "Fire safety impacts fire loss" ;
-      mrm:assessmentOf mrm:FireSafety .
+      dcterms:title "Fire safety impacts fire loss" .
 
 mrm:FireSafetyInspection
       rdf:type mrm:Service ;
@@ -3150,7 +3136,8 @@ mrm:FireSafetyPromotion
       mrm:accountableTo mrm:a70568a0565247baB1b740b741cc8c52Accountable ;
       mrm:administeredBy
               mrm:FireSafety ;
-      mrm:fromDate "2010-02-22"^^xsd:date .
+      mrm:fromDate "2010-02-22"^^xsd:date ;
+      mrm:accountableFor mrm:accountable .
 
 mrm:FireSafetyViolationRectified
       rdf:type mrm:Output ;
@@ -3165,13 +3152,15 @@ mrm:FireSetterCounselling
       mrm:accountableTo mrm:a1f3557aa3891441bB047313ae73db472Accountable ;
       mrm:administeredBy
               mrm:FireSafety ;
-      mrm:fromDate "2010-02-22"^^xsd:date .
+      mrm:fromDate "2010-02-22"^^xsd:date ;
+      mrm:accountableFor mrm:accountable .
 
 mrm:FireTruck
       rdf:type mrm:Resource ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Fire Truck" ;
-      mrm:consumedBy mrm:AcknowledgeReceiptOfFireRescueProfile .
+      mrm:consumedBy mrm:AcknowledgeReceiptOfFireRescueProfile ;
+      mrm:accountableFor mrm:FireDepartmentAuthorizesFireTrucks .
 
 mrm:FireworksByLawEnforcement
       rdf:type mrm:Service ;
@@ -3181,13 +3170,13 @@ mrm:FireworksByLawEnforcement
       dcterms:title "Fireworks By-Law Enforcement" ;
       mrm:accountableTo mrm:a4fc9c3e1F30d41b58801362b69c288cbNotified ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
-      mrm:produces mrm:FireworksByLawViolationBroughtIntoCompliance .
+      mrm:produces mrm:FireworksByLawViolationBroughtIntoCompliance ;
+      mrm:accountableFor mrm:notified .
 
 mrm:FireworksByLawViolationBroughtIntoCompliance
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PenaltiesAmpPeriodsOfSanction , mrm:Service ;
-      dcterms:title "Fireworks By-law violation brought into compliance" ;
-      mrm:producedBy mrm:FireworksByLawEnforcement .
+      dcterms:title "Fireworks By-law violation brought into compliance" .
 
 mrm:FireworksPermit
       rdf:type mrm:Output ;
@@ -3353,7 +3342,7 @@ mrm:GothamCityMain
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Gotham City Main" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:CommunityHealth , mrm:CorporateGovernanceAmpLeadership , mrm:CulturalDevelopment , mrm:Environmental , mrm:InternalService , mrm:PublicSafety , mrm:SocialDevelopment , mrm:Transportation ;
       mrm:subOrganizationUnits
               mrm:CorporateServicesAndCFO , mrm:EmployeeAndBusinessServices , mrm:ExecutiveOffice , mrm:HealthServices , mrm:HumanServices , mrm:OfficeOfChiefInformationOfficer , mrm:OfficeOfStrategicInnovationAndPolicy , mrm:PublicWorks .
@@ -3380,8 +3369,7 @@ mrm:GraffitiByLawEnforcement
 mrm:GraffitiByLawViolationBroughtIntoCompliance
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PenaltiesAmpPeriodsOfSanction , mrm:Service ;
-      dcterms:title "Graffiti By-law violation brought into compliance" ;
-      mrm:producedBy mrm:GraffitiByLawEnforcement .
+      dcterms:title "Graffiti By-law violation brought into compliance" .
 
 mrm:GrantSubsidyAwardedReceived
       rdf:type mrm:Output ;
@@ -3408,8 +3396,7 @@ mrm:GrassAmpWeedByLawEnforcement
 mrm:GrassAmpWeedByLawViolationBroughtIntoCompliance
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PenaltiesAmpPeriodsOfSanction , mrm:Service ;
-      dcterms:title "Grass amp Weed By-law violation brought into compliance" ;
-      mrm:producedBy mrm:GrassAmpWeedByLawEnforcement .
+      dcterms:title "Grass amp Weed By-law violation brought into compliance" .
 
 mrm:GreaterMobilityByPersonsWithMobilityDisabilities
       rdf:type mrm:ServiceValue ;
@@ -3502,9 +3489,9 @@ mrm:Heritage
       rdf:type mrm:OrganizationUnit , mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Heritage" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:Heritage ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:Heritage ;
       mrm:administers mrm:ArtCollectionAccessAndInterpretation , mrm:HistoricDocumentsPreservationAndAccess , mrm:MuseumAccess , mrm:MuseumCollectionAccessAndInterpretation , mrm:MuseumCollectionManagement , mrm:MuseumInterpretation .
 
@@ -3691,7 +3678,7 @@ mrm:HumanResources
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Human Resources" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:HumanResourcesManagement ;
       mrm:subOrganizationUnits
               mrm:CompensationAndBenefits , mrm:CorporateHRInitiatives , mrm:EmployeeRelations , mrm:LearningAndDevelopment , mrm:WorkplaceHealthAndSafety .
@@ -3700,7 +3687,7 @@ mrm:HumanResourcesManagement
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:InternalProvider ;
       dcterms:title "Human Resources Management" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:HumanResources ;
       mrm:administers mrm:CompensationAndBenefitsManagement , mrm:EmployeeRelationsAndLabourRelations , mrm:LearningAndDevelopment , mrm:WorkplaceHealthWellnessAndSafety .
 
@@ -3929,7 +3916,7 @@ mrm:InformationAmpTechnologyManagement
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:InternalProvider ;
       dcterms:title "Information amp Technology Management" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:InformationSystemsAmpTechnologyServices ;
       mrm:administers mrm:IampTApplicationsManagement , mrm:IampTTechnologyManagement , mrm:InformationAndTechnologyGovernance , mrm:InformationManagement , mrm:MailAndCourier , mrm:PrintingAndCopying .
 
@@ -3978,7 +3965,7 @@ mrm:InformationSystemsAmpTechnologyServices
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Information Systems amp Technology Services" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:InformationAmpTechnologyManagement ;
       mrm:subOrganizationUnits
               mrm:ISTSProgramServices , mrm:ITClientRelationsAndPlanning , mrm:ITServiceDelivery , mrm:ITSolutionsDevelopment , mrm:TechnologyServicesCentre .
@@ -4066,7 +4053,7 @@ mrm:IntegratedServiceDelivery
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:InternalProvider ;
       dcterms:title "Integrated Service Delivery" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:CommunicationServicesAndCustomerContactCentre ;
       mrm:administers mrm:AccessToInformation , mrm:CustomerContactAndServiceDelivery , mrm:PublicWorksResponseCentre , mrm:a211InformationAndReferral .
 
@@ -4122,7 +4109,7 @@ mrm:InternalClientServices
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Internal Client Services" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:EmergencyManagement ;
       mrm:subOrganizationUnits
               mrm:HealthFacilityPlanning , mrm:HealthInformationManagement , mrm:HealthPerformanceAmpAccountability .
@@ -4140,7 +4127,7 @@ mrm:InternalService
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:InternalProvider ;
       dcterms:title "Internal Service" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:subPrograms mrm:AssetAndEnergyManagement , mrm:CorporateGovernanceAmpLeadership , mrm:FinancialManagement , mrm:HumanResourcesManagement , mrm:InformationAmpTechnologyManagement , mrm:IntegratedServiceDelivery .
 
@@ -4164,7 +4151,7 @@ mrm:InterpretationAndTranslation
       dcterms:contributor "KPMG" ;
       dcterms:description "An internal service provided to the corporation offering interpretation and translation of program and service information." ;
       dcterms:title "Interpretation and Translation" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ClientAndCommunityAccess ;
       mrm:administers mrm:InterpretationAndTranslation ;
       mrm:administeredBy
@@ -4242,8 +4229,7 @@ mrm:LandKilometreOfRoadAssessed
       rdfs:subClassOf mrm:Active , mrm:Service , mrm:UnitOfResource ;
       dcterms:contributor "Region of Peel" ;
       dcterms:title "Land kilometre of road assessed" ;
-      mrm:creates mrm:GoodsAndServicesMovementByVehicleFormPtAToPtB , mrm:MaintenanceLeadsToSaferRoads , mrm:SafeAccessToRoads ;
-      mrm:producedBy mrm:RoadsMaintenance .
+      mrm:creates mrm:GoodsAndServicesMovementByVehicleFormPtAToPtB , mrm:MaintenanceLeadsToSaferRoads , mrm:SafeAccessToRoads .
 
 mrm:LandUsePlanning
       rdf:type mrm:Service ;
@@ -4347,8 +4333,7 @@ mrm:LessFireLosses
 mrm:LetterAndTag
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
-      dcterms:title "Letter and Tag" ;
-      mrm:producedBy mrm:NewAnimalLicense .
+      dcterms:title "Letter and Tag" .
 
 mrm:Library
       rdf:type mrm:Service ;
@@ -4398,7 +4383,7 @@ mrm:LicensesAndPermits
       rdfs:subClassOf mrm:Active ;
       dcterms:description "The Customer receives a letter and a dog/cat tag" ;
       dcterms:title "Licenses and Permits" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ByLawAndRegulatoryServices ;
       mrm:administers mrm:AnimalControl , mrm:CarrierRegistrationAndLicensingService , mrm:DangerousAnimalInvestigationAndAssessment , mrm:DriverLicensingService , mrm:VehicleRegistrationAndLicensingService .
 
@@ -4452,8 +4437,7 @@ mrm:LitterAmpDumpingByLawEnforcement
 mrm:LitterAmpDumpingByLawViolationBroughtIntoCompliance
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PenaltiesAmpPeriodsOfSanction , mrm:Service ;
-      dcterms:title "Litter amp Dumping By-law violation brought into compliance" ;
-      mrm:producedBy mrm:LitterAmpDumpingByLawEnforcement .
+      dcterms:title "Litter amp Dumping By-law violation brought into compliance" .
 
 mrm:LitterCollection
       rdf:type mrm:Service ;
@@ -4497,9 +4481,9 @@ mrm:LongTermCare
       dcterms:contributor "KPMG" ;
       dcterms:description "A public service provided to the elderly and frail adults offering accommodation and supports." ;
       dcterms:title "Long-Term Care" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:LongTermCare ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:LongTermCare ;
       mrm:administers mrm:AdultDayCare , mrm:AdultDayMealProvision , mrm:AdultDayPsychoSocialSupport , mrm:AdultDayRecreationActivity , mrm:LongTermCare ;
       mrm:administeredBy
@@ -4618,8 +4602,7 @@ mrm:MarketValueAssessment
 mrm:MarriageLicenceIssued
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Marriage Licence Issued" ;
-      mrm:producedBy mrm:MarriageLicensing .
+      dcterms:title "Marriage Licence Issued" .
 
 mrm:MarriageLicensing
       rdf:type mrm:Service ;
@@ -4898,7 +4881,8 @@ mrm:NewAnimalLicense
       dcterms:title "New Animal License" ;
       mrm:implements mrm:AnimalRegistration ;
       mrm:produces mrm:LetterAndTag ;
-      mrm:subProcesses mrm:CreateRecord , mrm:IssueLicenseTag , mrm:ReceiveApplicationAndPayment , mrm:ReceiveLetterAndTag , mrm:ReviewPetLicenseApplication , mrm:SubmitApplicationAndPayment .
+      mrm:subProcesses mrm:CreateRecord , mrm:IssueLicenseTag , mrm:ReceiveApplicationAndPayment , mrm:ReceiveLetterAndTag , mrm:ReviewPetLicenseApplication , mrm:SubmitApplicationAndPayment ;
+      mrm:produces mrm:LetterAndTag .
 
 mrm:NewBusinessAttracted
       rdf:type mrm:Output ;
@@ -4965,8 +4949,7 @@ mrm:OfficialPlanAmendmentApproval
 mrm:OfficialPlanAmendmentApproved
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Official Plan Amendment Approved" ;
-      mrm:producedBy mrm:UrbanDesign .
+      dcterms:title "Official Plan Amendment Approved" .
 
 mrm:OfficialPlanDevelopment
       rdf:type mrm:Service ;
@@ -5002,7 +4985,7 @@ mrm:OntarioWorks
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:contributor "Region of Peel" ;
       dcterms:title "Ontario Works" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ClientRelationshipsOW ;
       mrm:administers mrm:OntarioWorksEmploymentSupport , mrm:OntarioWorksIncomeEnhancementAdministration , mrm:OntarioWorksSocialAssistance .
 
@@ -5189,7 +5172,7 @@ mrm:ParamedicServices
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Paramedic Services" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:EmergencyMedical , mrm:a911 ;
       mrm:subOrganizationUnits
               mrm:Logistics , mrm:ParamedicOperations , mrm:PlanningAndPerformance .
@@ -5335,8 +5318,7 @@ mrm:PassengerTrip
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:Movements , mrm:Service ;
       dcterms:title "Passenger Trip" ;
-      mrm:creates mrm:GreaterMobilityByPersonsWithMobilityDisabilities , mrm:ImprovedAccessToMedicalCare , mrm:ImprovedAccessToSocialAmenitiesAnActiveLifestyle ;
-      mrm:producedBy mrm:TransHelp .
+      mrm:creates mrm:GreaterMobilityByPersonsWithMobilityDisabilities , mrm:ImprovedAccessToMedicalCare , mrm:ImprovedAccessToSocialAmenitiesAnActiveLifestyle .
 
 mrm:PassiveLeisure
       rdf:type mrm:Program ;
@@ -5434,29 +5416,25 @@ mrm:PeriodOfPermissionForAMotorVehicleToBeOperatedOnRoads
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Period of permission for a motor vehicle to be operated on roads" ;
-      mrm:creates mrm:SV02 ;
-      mrm:producedBy mrm:VehicleRegistrationAndLicensingService .
+      mrm:creates mrm:SV02 .
 
 mrm:PeriodOfPermissionForCarrierToOperateCommercialMotorVehicleOnRoads
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Period of permission for carrier to operate commercial motor vehicle on roads" ;
-      mrm:creates mrm:SV03 ;
-      mrm:producedBy mrm:CarrierRegistrationAndLicensingService .
+      mrm:creates mrm:SV03 .
 
 mrm:PeriodOfPermissionToDriveMotorVehiclesOnRoads
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Period of permission to drive motor vehicles on roads" ;
-      mrm:creates mrm:SV01 ;
-      mrm:producedBy mrm:DriverLicensingService .
+      mrm:creates mrm:SV01 .
 
 mrm:PeriodOfPermissionToOwnAPet
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Period of Permission to own a Pet" ;
-      mrm:creates mrm:f09220488b6949cdA955C579b78bc56cAccessToPetLicense ;
-      mrm:producedBy mrm:AnimalRegistration .
+      mrm:creates mrm:f09220488b6949cdA955C579b78bc56cAccessToPetLicense .
 
 mrm:PerpetualCare
       rdf:type mrm:Service ;
@@ -5490,7 +5468,7 @@ mrm:PlanningPolicyAndResearch
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Planning Policy and Research" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:RegionalPlanning .
 
 mrm:PoliceIntervention
@@ -5575,7 +5553,7 @@ mrm:PotableWater
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Potable Water" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:Water ;
       mrm:administers mrm:WaterDistributionSystemOperation , mrm:WaterInfrastructureDesignAmpConstruction , mrm:WaterTreatment .
 
@@ -5917,8 +5895,7 @@ mrm:PropertyStandardsByLawEnforcement
 mrm:PropertyStandardsByLawViolationBroughtIntoCompliance
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PenaltiesAmpPeriodsOfSanction , mrm:Service ;
-      dcterms:title "Property Standards By-law violation brought into compliance" ;
-      mrm:producedBy mrm:PropertyStandardsByLawEnforcement .
+      dcterms:title "Property Standards By-law violation brought into compliance" .
 
 mrm:PropertyTaxAccountCreationAndMaintenance
       rdf:type mrm:Service ;
@@ -6029,8 +6006,7 @@ mrm:ProtectedEnvironmentalResources
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Protected Environmental Resources" ;
-      mrm:creates mrm:Output_contributesTo_Outcome_3 ;
-      mrm:producedBy mrm:EnvironmentalResourceProtectionService .
+      mrm:creates mrm:Output_contributesTo_Outcome_3 .
 
 mrm:ProtectionFromAccidentLoss
       rdf:type mrm:Need ;
@@ -6140,7 +6116,7 @@ mrm:PublicHealth
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Public Health" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:PublicHealthMOH ;
       mrm:administers mrm:AddictionAndSubstanceMisusePrevention , mrm:ChildHealthPromotionAndSupport , mrm:ChronicDiseasePrevention , mrm:CommunityMentalHealth , mrm:DentalOralTreatment , mrm:FoodSafetyPromotionInspectionAndEnforcement , mrm:HealthHazardPreventionAndManagement , mrm:InfectiousDiseasesPreventionAndControl , mrm:ReproductionHealthPromotion , mrm:ReproductiveHealthEducation , mrm:ReproductiveHealthPromotionAndEducation , mrm:SafeWaterMonitoringAndControl , mrm:SexuallyTransmittedAndBloodBorneInfectionsControl ;
       mrm:contributesTo mrm:IncreasedCommunityHealth .
@@ -6203,7 +6179,7 @@ mrm:PublicHealthMOH
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Public Health (MOH)" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:PublicHealth ;
       mrm:subOrganizationUnits
               mrm:ChronicDiseaseAmpInjuryPrevention , mrm:CommunicableDiseases , mrm:EnivronmentalHealth , mrm:FamilyHealth , mrm:OfficeOfMedicalOfficeOfHealth .
@@ -6259,7 +6235,7 @@ mrm:PublicSafety
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Public Safety" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:subPrograms mrm:EmergencyManagement , mrm:a911 .
 
@@ -6371,7 +6347,7 @@ mrm:RealPropertyAssetManagement
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Real Property Asset Management" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:AssetAndEnergyManagement ;
       mrm:subOrganizationUnits
               mrm:AssetPreservation , mrm:AssetRenewalAndConstruction , mrm:DevelopmentAndConstruction , mrm:EnergyServices , mrm:RealEstateCapitalAquisitions , mrm:RealEstateRPFacilityAquisitions , mrm:StrategicServicesAndClientRelations .
@@ -6597,7 +6573,7 @@ mrm:RegionalPlanning
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:contributor "Region of Peel" ;
       dcterms:title "Regional Planning" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:PlanningPolicyAndResearch ;
       mrm:administers mrm:DevelopmentSupportService , mrm:RegionalPlanningPolicyAndReseach .
 
@@ -6741,8 +6717,7 @@ mrm:RescuedPersonOrProperty
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:Interventions , mrm:Service ;
       dcterms:title "Rescued person or property" ;
-      mrm:creates mrm:SV04 ;
-      mrm:producedBy mrm:FireRescue .
+      mrm:creates mrm:SV04 .
 
 mrm:ResidentialConversionIntensificationSubsidy
       rdf:type mrm:Service ;
@@ -6796,8 +6771,7 @@ mrm:RestoredEnvironmentalResources
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Restored Environmental Resources" ;
-      mrm:creates mrm:SV07 ;
-      mrm:producedBy mrm:EnvironmentalResourceRestorationService .
+      mrm:creates mrm:SV07 .
 
 mrm:RetailBusinessLicence
       rdf:type mrm:Output ;
@@ -6926,8 +6900,7 @@ mrm:RoadConstructedToSpecification
       rdfs:subClassOf mrm:Active , mrm:Service , mrm:UnitOfResource ;
       dcterms:contributor "Region of Peel" ;
       dcterms:title "Road Constructed to Specification" ;
-      mrm:creates mrm:ImprovedRoadConstructionPracticesAndCompliance ;
-      mrm:producedBy mrm:RoadsDesignAndConstruction .
+      mrm:creates mrm:ImprovedRoadConstructionPracticesAndCompliance .
 
 mrm:RoadMaintenance
       rdf:type mrm:Service ;
@@ -6942,10 +6915,10 @@ mrm:Roads
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:description "Original Reference Model name - Vehicular Transportation (MRM Program)" ;
       dcterms:title "Roads" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:RoadsOpsMaintenance ;
       mrm:administers mrm:RoadsDesignAndConstruction , mrm:RoadsMaintenance , mrm:TrafficFlowControl , mrm:TransportationPlanning ;
-      mrm:assesedBy mrm:CongestedRoadSystem .
+      mrm:assessedBy mrm:CongestedRoadSystem .
 
 mrm:RoadsDesignAndConstruction
       rdf:type mrm:Service ;
@@ -6975,7 +6948,7 @@ mrm:RoadsOpsMaintenance
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Roads Ops Maintenance" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:Roads .
 
 mrm:RoadwayDesignAndConstruction
@@ -7003,18 +6976,14 @@ mrm:SA01
       rdfs:subClassOf mrm:Accountable ;
       dcterms:title "SA01" ;
       mrm:accountableOrganization
-              mrm:FireDepartment ;
-      mrm:isAccountableFor
-              mrm:FireRescue .
+              mrm:FireDepartment .
 
 mrm:SA02
       rdf:type mrm:AccountabilityElement ;
       rdfs:subClassOf mrm:Consulted ;
       dcterms:title "SA02" ;
       mrm:accountableOrganization
-              mrm:FireDepartment ;
-      mrm:isAccountableFor
-              mrm:FireRescueCallTakingAndDispatching .
+              mrm:FireDepartment .
 
 mrm:SCADAAmpInstrumentation
       rdf:type mrm:OrganizationUnit ;
@@ -7249,7 +7218,7 @@ mrm:ServiceSystemManagement
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Service System Management" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:AffordableAssistedHousing ;
       mrm:subOrganizationUnits
               mrm:EarlyYearsIntegration , mrm:HousingPolicy , mrm:QualityServiceSystem , mrm:ServiceAccess , mrm:SocialHousingAdministration .
@@ -7492,7 +7461,7 @@ mrm:SocialDevelopment
       rdf:type mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Social Development" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:subPrograms mrm:AffordableAssistedHousing , mrm:EarlyLearningAndChildCare , mrm:InterpretationAndTranslation , mrm:OntarioWorks .
 
@@ -7602,7 +7571,7 @@ mrm:SoliidWasteManagement
       rdfs:subClassOf mrm:Active , mrm:EnvironmentalProtection , mrm:Public , mrm:PublicHealth ;
       dcterms:description "Collection and reuse or disposal of solid waste including gargage, recycled material, organics and other collections items." ;
       dcterms:title "Soliid Waste Management" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:WasteOperations ;
       mrm:programVision "Provide convenient, reliable customer-focused services that minimize waste generation and maximize resource recovery." .
 
@@ -8283,14 +8252,14 @@ mrm:TrafficFlowControl
       mrm:assessedBy mrm:CongestedRoadSystem , mrm:CostAndEffortToControlTrafficByType ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
       mrm:produces mrm:TrafficFlowControlled ;
-      mrm:subServices mrm:IntelligentTransportationSystemOperation , mrm:SchoolCrossingGuard , mrm:TrafficControlMarkingsMaintenance , mrm:TrafficControlStreetSignsMaintenance , mrm:TrafficEngineeringSupport , mrm:TrafficSignalization .
+      mrm:subServices mrm:IntelligentTransportationSystemOperation , mrm:SchoolCrossingGuard , mrm:TrafficControlMarkingsMaintenance , mrm:TrafficControlStreetSignsMaintenance , mrm:TrafficEngineeringSupport , mrm:TrafficSignalization ;
+      mrm:produces mrm:TrafficFlowControlled .
 
 mrm:TrafficFlowControlled
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:Service , mrm:UnitOfResource ;
       dcterms:title "Traffic Flow Controlled" ;
-      mrm:creates mrm:ControlledAccessToIntersectionByMultipleModes , mrm:PredictableVehicularTripTime , mrm:SafeFlowOfTraffic ;
-      mrm:producedBy mrm:TrafficFlowControl .
+      mrm:creates mrm:ControlledAccessToIntersectionByMultipleModes , mrm:PredictableVehicularTripTime , mrm:SafeFlowOfTraffic .
 
 mrm:TrafficSignalization
       rdf:type mrm:Service ;
@@ -8339,7 +8308,7 @@ mrm:Transhelp
       rdf:type mrm:OrganizationUnit , mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Transhelp" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:Transportation ;
       mrm:administers mrm:TransHelp .
 
@@ -8392,9 +8361,9 @@ mrm:Transportation
       rdf:type mrm:OrganizationUnit , mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:title "Transportation" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:Transhelp ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:GothamCityMain ;
       mrm:contributesTo mrm:ReduceCommuteTimesTelecommute ;
       mrm:programVision "Mandate: Support and influence sustainable transportation systems. " ;
@@ -8416,8 +8385,7 @@ mrm:TransportationProgramPlan
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:Rules , mrm:Service ;
       dcterms:title "Transportation Program Plan" ;
-      mrm:creates mrm:ImprovedIntegrationOfTransportationServicesArossTheRegion ;
-      mrm:producedBy mrm:TransportationPlanning .
+      mrm:creates mrm:ImprovedIntegrationOfTransportationServicesArossTheRegion .
 
 mrm:TransportationRoadsCapital
       rdf:type mrm:OrganizationUnit ;
@@ -8664,8 +8632,7 @@ mrm:VisitorInformationWebSiteAdvisory
 mrm:VitalRightsRegistered
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Vital Rights Registered" ;
-      mrm:producedBy mrm:VitalRightsRegistration .
+      dcterms:title "Vital Rights Registered" .
 
 mrm:VitalRightsRegistration
       rdf:type mrm:Service ;
@@ -8675,7 +8642,8 @@ mrm:VitalRightsRegistration
       dcterms:title "Vital Rights Registration" ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
       mrm:produces mrm:VitalRightsRegistered ;
-      mrm:subServices mrm:BirthCertification , mrm:DeathRegistration , mrm:MarriageLicensing .
+      mrm:subServices mrm:BirthCertification , mrm:DeathRegistration , mrm:MarriageLicensing ;
+      mrm:produces mrm:VitalRightsRegistered .
 
 mrm:VocationalTraining
       rdf:type mrm:Program ;
@@ -8685,8 +8653,7 @@ mrm:VocationalTraining
 mrm:VoterRegistered
       rdf:type mrm:Output ;
       rdfs:subClassOf mrm:Active , mrm:PeriodsOfPermisson , mrm:Service ;
-      dcterms:title "Voter Registered" ;
-      mrm:producedBy mrm:VoterRegistration .
+      dcterms:title "Voter Registered" .
 
 mrm:VoterRegistration
       rdf:type mrm:Service ;
@@ -8757,16 +8724,17 @@ mrm:WasteCollectionAndDisposal
               mrm:WasteManagement ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
       mrm:produces mrm:CollectedWaste ;
-      mrm:subServices mrm:CurbsideSolidWasteCollection , mrm:HouseholdChemicalWasteDropOff , mrm:LandfillSiteRemediation , mrm:LitterCollection , mrm:MultiResidentialSolidWasteCollection , mrm:SolidWasteDisposal , mrm:SolidWasteTransferAndProcessing .
+      mrm:subServices mrm:CurbsideSolidWasteCollection , mrm:HouseholdChemicalWasteDropOff , mrm:LandfillSiteRemediation , mrm:LitterCollection , mrm:MultiResidentialSolidWasteCollection , mrm:SolidWasteDisposal , mrm:SolidWasteTransferAndProcessing ;
+      mrm:produces mrm:CollectedWaste .
 
 mrm:WasteManagement
       rdf:type mrm:OrganizationUnit , mrm:Program ;
       rdfs:subClassOf mrm:Active , mrm:Public ;
       dcterms:contributor "Region of Peel" ;
       dcterms:title "Waste Management" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:WasteManagement ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:WasteManagement ;
       mrm:administers mrm:CommunityRecyclingCentreOperation , mrm:GarbageCollection , mrm:LandfillSiteOperation , mrm:OrganicAndYardWaste , mrm:Recyclables , mrm:WasteCollectionAndDisposal , mrm:WasteReductionAndRecyclingPromotion , mrm:WhiteGoods ;
       mrm:subOrganizationUnits
@@ -8781,7 +8749,7 @@ mrm:WasteOperations
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Waste Operations" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:SoliidWasteManagement .
 
 mrm:WastePlanning
@@ -8922,7 +8890,7 @@ mrm:Water
       rdf:type mrm:OrganizationUnit ;
       rdfs:subClassOf mrm:Active ;
       dcterms:title "Water" ;
-      mrm:accountableForProgram
+      mrm:accountableFor
               mrm:PotableWater ;
       mrm:subOrganizationUnits
               mrm:ProgramPlanningAndCompliance , mrm:SCADAAmpInstrumentation , mrm:TransmissionAmpDistributionCapital , mrm:WaterTreatmentAmpDistribution , mrm:WaterTreatmentCapital .
@@ -9210,7 +9178,7 @@ mrm:a911
       dcterms:contributor "KPMG" , "Region of Peel" ;
       dcterms:description "An internal service provided to emergency service providers offering integrated call taking in support of emergency service providers / first responder agencies." ;
       dcterms:title "9-1-1" ;
-      mrm:accountableToOrganizationUnit
+      mrm:accountableTo
               mrm:ParamedicServices ;
       mrm:administers mrm:a911CallTakingAndDispatching ;
       mrm:fromDate "2010-02-22"^^xsd:date ;
@@ -9232,24 +9200,14 @@ mrm:accountable
       dcterms:description "Fire Department is accountable for Fire Safety Permotion" ;
       dcterms:title "accountable" ;
       mrm:accountableOrganization
-              mrm:FireDepartment ;
-      mrm:isAccountableFor
-              mrm:FireSafetyPromotion , mrm:FireSetterCounselling .
-
-mrm:newTestOwner
-      rdf:type mrm:AccountabilityElement ;
-      dcterms:title "new test owner" ;
-      mrm:isAccountableFor
-              mrm:AccessToInformation .
+              mrm:FireDepartment .
 
 mrm:notified
       rdf:type mrm:AccountabilityElement ;
       rdfs:subClassOf mrm:Informed ;
       dcterms:title "notified" ;
       mrm:accountableOrganization
-              mrm:FireDepartment ;
-      mrm:isAccountableFor
-              mrm:FireworksByLawEnforcement .
+              mrm:FireDepartment .
 
 mrm:sp1
       rdf:type mrm:Program ;
@@ -9270,29 +9228,30 @@ mrm:sp3
 # Dangling resource definitions — referenced but previously undefined
 # ================================================================
 
-mrm:NewTestOwner
-      rdf:type mrm:AccountabilityElement ;
-      dcterms:title "New Test Owner" .
-
 mrm:dd9496a388e94593BecdB21f7ef962c3SA01
       rdf:type mrm:AccountabilityElement ;
-      dcterms:title "SA01" .
+      dcterms:title "SA01" ;
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:bd3213639a974ff2Abd7Ce582b9d4ed5SA02
       rdf:type mrm:AccountabilityElement ;
-      dcterms:title "SA02" .
+      dcterms:title "SA02" ;
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:a70568a0565247baB1b740b741cc8c52Accountable
       rdf:type mrm:AccountabilityElement ;
-      dcterms:title "Accountable" .
+      dcterms:title "Accountable" ;
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:a1f3557aa3891441bB047313ae73db472Accountable
       rdf:type mrm:AccountabilityElement ;
-      dcterms:title "Accountable" .
+      dcterms:title "Accountable" ;
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:a4fc9c3e1F30d41b58801362b69c288cbNotified
       rdf:type mrm:AccountabilityElement ;
-      dcterms:title "Notified" .
+      dcterms:title "Notified" ;
+      mrm:accountableFor mrm:FireDepartment .
 
 mrm:a33c176eFafa4f16A659454f2351700eSV101
       rdf:type mrm:ServiceValue ;
@@ -9313,3 +9272,9 @@ mrm:a48f3124dD6ed434fAbb34d7054f385c1MRM_ServiceLevelAgreements_1
 <sourcecontrol://jazz/default/Municipal%20Reference%20Model/MRMv2.1.n3>
       rdf:type owl:Ontology ;
       owl:imports dc: , <http://www.misa.org.ca/mrm> , <http://www.misa.org.ca/mrms> .
+
+mrm:a843147c97fe74e8099c5Ebd1b6538933FireDepartmentAuthorizesFireTrucks
+      mrm:accountableFor mrm:FireDepartment .
+
+mrm:e28339a6F3b74c32A6ef7c2816a5592fPA01
+      mrm:accountableFor mrm:FireDepartment .
