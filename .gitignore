@@ -2,3 +2,4 @@
 .config/
 /coverage/
 .worktrees/
+node_modules/
