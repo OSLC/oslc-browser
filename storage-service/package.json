@@ -1,0 +1,30 @@
+{
+  "name": "storage-service",
+  "version": "1.0.0",
+  "description": "Abstract storage service interface for OSLC servers",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "author": "Jim Amsden",
+  "dependencies": {
+    "rdflib": "^2.2.35"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/node": "^22.0.0"
+  },
+  "engines": {
+    "node": "^22.11.0"
+  }
+}
