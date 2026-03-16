@@ -20,6 +20,7 @@ export { useNavigation } from './hooks/useNavigation.js';
 export { useFavorites } from './hooks/useFavorites.js';
 export { useDiagramData, parseDiagramResource } from './hooks/useDiagramData.js';
 export { traverseLinks, generateDiagramTurtle } from './hooks/diagramGenerator.js';
+export { useShapeCache, isLinkValueType } from './hooks/useShapeCache.js';
 
 // Types
 export type {
@@ -36,3 +37,7 @@ export type {
   ParsedDiagram,
 } from './models/diagram-types.js';
 export { DD_NS, isDDProperty, isDiagramType } from './models/diagram-types.js';
+
+export type {
+  ParsedShape, ShapePropertyInfo,
+} from './hooks/useShapeCache.js';
