@@ -1,0 +1,422 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Access-Control-Allow-Methods: GET, HEAD, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Accept, OSLC-Core-Version, If-Match, If-None-Match, Slug
+Access-Control-Expose-Headers: ETag, Link, Location, Content-Type, Accept-Post, Allow
+Link: <http://www.w3.org/ns/ldp#Resource>; rel="type", <http://localhost:3002/constraints.html>; rel="http://www.w3.org/ns/ldp#constrainedBy"
+Vary: Accept
+Allow: GET,HEAD,DELETE,OPTIONS,PUT
+ETag: W/"226346e7bcfb33aeaa5529e156d90c47"
+Content-Type: text/turtle; charset=utf-8
+Content-Length: 22645
+Date: Sun, 15 Mar 2026 15:30:34 GMT
+Connection: close
+
+@prefix : <#>.
+@prefix dct: <http://purl.org/dc/terms/>.
+@prefix MRM: <http://localhost:3002/shapes/MRMS-Shapes#>.
+@prefix MRMS: <http://localhost:3002/shapes/MRMS-DiagramShapes#>.
+@prefix core: <http://open-services.net/ns/core#>.
+@prefix dd: <http://www.omg.org/spec/DD#>.
+@prefix mrm: <http://www.misa.org.ca/mrm#>.
+@prefix oslc: <http://localhost:3002/oslc/>.
+@prefix cit: <http://localhost:3002/oslc/city-of-ottawa/>.
+
+oslc:city-of-ottawa
+    a core:ServiceProvider;
+    core:details oslc:city-of-ottawa;
+    core:service
+            [
+                a core:Service;
+                core:creationDialog
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23NeedDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Need Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Need Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23OrgUnitDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New OrgUnit Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Organization Unit Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23OutcomeDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Outcome Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Outcome Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23OutputDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Output Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Output Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23PLMDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New PLM Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create PLM Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23ProcessDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Process Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Process Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23ProgramDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Program Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Program Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23ResourceDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Resource Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Resource Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23SIAMDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New SIAM Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create SIAM Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23ServiceDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New Service Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Service Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-DiagramShapes%23TargetGroupDiagramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "New TargetGroup Diagram";
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Target Group Diagram"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23NeedShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Need";
+                            core:resourceType mrm:Need;
+                            dct:title "New Need"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23OrganizationUnitShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Organization Unit";
+                            core:resourceType mrm:OrganizationUnit;
+                            dct:title "New Organization Unit"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23OutcomeShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Outcome";
+                            core:resourceType mrm:Outcome;
+                            dct:title "New Outcome"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23ProcessShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Process";
+                            core:resourceType mrm:Process;
+                            dct:title "New Process"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23ProgramShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Program";
+                            core:resourceType mrm:Program;
+                            dct:title "New Program"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23ResourceShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Resource";
+                            core:resourceType mrm:Resource;
+                            dct:title "New Resource"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23ServiceShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Service";
+                            core:resourceType mrm:Service;
+                            dct:title "New Service"
+                        ],
+                        [
+                            a core:Dialog;
+                            core:dialog
+                                <http://localhost:3002/dialog/create?shape=http%3A%2F%2Flocalhost%3A3002%2Fshapes%2FMRMS-Shapes%23TargetGroupShape&creation=http%3A%2F%2Flocalhost%3A3002%2Foslc%2Fcity-of-ottawa%2Fresources>;
+                            core:hintHeight "505px";
+                            core:hintWidth "680px";
+                            core:label "Target Group";
+                            core:resourceType mrm:TargetGroup;
+                            dct:title "New Target Group"
+                        ];
+                core:creationFactory
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:NeedDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Need Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:OrgUnitDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Organization Unit Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:OutcomeDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Outcome Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:OutputDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Output Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:PLMDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create PLM Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:ProcessDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Process Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:ProgramDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Program Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:ResourceDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Resource Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:SIAMDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create SIAM Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:ServiceDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Service Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRMS:TargetGroupDiagramShape;
+                            core:resourceType dd:Diagram;
+                            dct:title "Create Target Group Diagram"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:NeedShape;
+                            core:resourceType mrm:Need;
+                            dct:title "Needs"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:OrganizationUnitShape;
+                            core:resourceType mrm:OrganizationUnit;
+                            dct:title "Organization Units"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:OutcomeShape;
+                            core:resourceType mrm:Outcome;
+                            dct:title "Outcomes"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:ProcessShape;
+                            core:resourceType mrm:Process;
+                            dct:title "Processes"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:ProgramShape;
+                            core:resourceType mrm:Program;
+                            dct:title "Programs"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:ResourceShape;
+                            core:resourceType mrm:Resource;
+                            dct:title "Resources"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:ServiceShape;
+                            core:resourceType mrm:Service;
+                            dct:title "Services"
+                        ],
+                        [
+                            a core:CreationFactory;
+                            core:creation cit:resources;
+                            core:resourceShape MRM:TargetGroupShape;
+                            core:resourceType mrm:TargetGroup;
+                            dct:title "Target Groups"
+                        ];
+                core:domain mrm:, dd:;
+                core:queryCapability
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:NeedShape;
+                            core:resourceType mrm:Need;
+                            dct:title "Query Needs"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:OrganizationUnitShape;
+                            core:resourceType mrm:OrganizationUnit;
+                            dct:title "Query Organization Units"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:OutcomeShape;
+                            core:resourceType mrm:Outcome;
+                            dct:title "Query Outcomes"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:ProcessShape;
+                            core:resourceType mrm:Process;
+                            dct:title "Query Processes"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:ProgramShape;
+                            core:resourceType mrm:Program;
+                            dct:title "Query Programs"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:ResourceShape;
+                            core:resourceType mrm:Resource;
+                            dct:title "Query Resources"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:ServiceShape;
+                            core:resourceType mrm:Service;
+                            dct:title "Query Services"
+                        ],
+                        [
+                            a core:QueryCapability;
+                            core:queryBase cit:query;
+                            core:resourceShape MRM:TargetGroupShape;
+                            core:resourceType mrm:TargetGroup;
+                            dct:title "Query Target Groups"
+                        ]
+            ];
+    dct:description "Municipal Reference Model for the City of Ottawa.";
+    dct:publisher
+            [
+                a core:Publisher;
+                dct:identifier "mrm";
+                dct:title "MISA Municipal Reference Model"
+            ];
+    dct:title "City of Ottawa".
