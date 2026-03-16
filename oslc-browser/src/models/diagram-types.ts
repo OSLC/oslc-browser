@@ -1,18 +1,6 @@
 /** The DD namespace URI — used only for type detection, not property matching */
 export const DD_NS = 'http://www.omg.org/spec/DD#';
 
-/**
- * Extract the local name from a URI (the part after # or last /).
- * Used to map RDF predicate URIs to property keys generically.
- */
-export function localName(uri: string): string {
-  const hashIdx = uri.lastIndexOf('#');
-  if (hashIdx >= 0) return uri.substring(hashIdx + 1);
-  const slashIdx = uri.lastIndexOf('/');
-  if (slashIdx >= 0) return uri.substring(slashIdx + 1);
-  return uri;
-}
-
 /** Check if a URI belongs to the DD namespace */
 export function isDDProperty(predicateURI: string): boolean {
   return predicateURI.startsWith(DD_NS);

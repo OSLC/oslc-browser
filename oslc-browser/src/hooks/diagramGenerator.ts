@@ -1,5 +1,5 @@
 import OSLCClient, { type OSLCResource } from 'oslc-client';
-import { localName } from '../models/diagram-types.js';
+import { localName } from '../models/types.js';
 
 // Map MRM resource type URIs to inline style properties.
 // Inlined as dd:localStyle because the parser doesn't yet resolve sharedStyle URIs.

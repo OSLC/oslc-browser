@@ -8,7 +8,7 @@ import { useOslcClient } from './hooks/useOslcClient.js';
 import { useNavigation } from './hooks/useNavigation.js';
 import { useFavorites } from './hooks/useFavorites.js';
 import { traverseLinks, generateDiagramTurtle } from './hooks/diagramGenerator.js';
-import { localName } from './models/diagram-types.js';
+import { localName } from './models/types.js';
 import type { LoadedResource } from './models/types.js';
 
 const DD_DIAGRAM = 'http://www.omg.org/spec/DD#Diagram';

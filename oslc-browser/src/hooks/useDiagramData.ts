@@ -4,13 +4,13 @@ import {
   DD_NS,
   isDDProperty,
   isDiagramType,
-  localName,
   type DiagramBounds,
   type DiagramElementData,
   type DiagramPoint,
   type DiagramStyle,
   type ParsedDiagram,
 } from '../models/diagram-types.js';
+import { localName } from '../models/types.js';
 
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 const DCTERMS_TITLE = 'http://purl.org/dc/terms/title';
