@@ -5,16 +5,17 @@ import { PropertiesTabComponent } from './PropertiesTab.js';
 import { ExplorerTabComponent } from './ExplorerTab.js';
 import { DiagramTabComponent } from './DiagramTab.js';
 import { isDiagramType } from '../models/diagram-types.js';
-import type { LoadedResource } from '../models/types.js';
+import type { LoadedResource, ExtraTab } from '../models/types.js';
 
 interface DetailsPanelProps {
   resource: LoadedResource | null;
   diagramResource?: OSLCResource | null;
+  extraTabs?: ExtraTab[];
   onLinkClick: (uri: string) => void;
   fetchRawResource?: (uri: string) => Promise<OSLCResource | null>;
 }
 
-export function DetailsPanelComponent({ resource, diagramResource, onLinkClick, fetchRawResource }: DetailsPanelProps) {
+export function DetailsPanelComponent({ resource, diagramResource, extraTabs, onLinkClick, fetchRawResource }: DetailsPanelProps) {
   const [tab, setTab] = useState(0);
   const [rawResource, setRawResource] = useState<OSLCResource | null>(null);
 
@@ -63,6 +64,9 @@ export function DetailsPanelComponent({ resource, diagramResource, onLinkClick, 
         <Tab label="Properties" sx={{ minHeight: 36, fontSize: 12, textTransform: 'none' }} />
         <Tab label="Explorer" sx={{ minHeight: 36, fontSize: 12, textTransform: 'none' }} />
         {hasDiagram && <Tab label="Diagram" sx={{ minHeight: 36, fontSize: 12, textTransform: 'none' }} />}
+        {extraTabs?.map((et, i) => (
+          <Tab key={`extra-${i}`} label={et.label} />
+        ))}
       </Tabs>
       <Box sx={{ flexGrow: 1, overflow: 'hidden' }}>
         {effectiveTab === 0 && <PropertiesTabComponent resource={resource} onLinkClick={onLinkClick} />}
@@ -70,6 +74,13 @@ export function DetailsPanelComponent({ resource, diagramResource, onLinkClick, 
         {effectiveTab === 2 && hasDiagram && activeDiagramResource && (
           <DiagramTabComponent resource={activeDiagramResource} onNavigate={onLinkClick} />
         )}
+        {extraTabs?.map((et, i) => (
+          tab === 3 + i && resource ? (
+            <Box key={`extra-panel-${i}`} sx={{ p: 1, overflow: 'auto', flexGrow: 1 }}>
+              {et.render(resource)}
+            </Box>
+          ) : null
+        ))}
       </Box>
     </Box>
   );

@@ -4,13 +4,14 @@ import type { OSLCResource } from 'oslc-client';
 import { ColumnViewComponent } from './ColumnView.js';
 import { FavoritesPanelComponent } from './FavoritesPanel.js';
 import { DetailsPanelComponent } from './DetailsPanel.js';
-import type { NavigationColumn, LoadedResource, FavoriteItem } from '../models/types.js';
+import type { NavigationColumn, LoadedResource, FavoriteItem, ExtraTab } from '../models/types.js';
 
 interface MainLayoutProps {
   columns: NavigationColumn[];
   selectedResource: LoadedResource | null;
   favorites: FavoriteItem[];
   diagramResource?: OSLCResource | null;
+  extraTabs?: ExtraTab[];
   onPredicateClick: (columnIndex: number, resource: LoadedResource, predicate: string) => void;
   onResourceSelect: (resource: LoadedResource, columnIndex: number) => void;
   onResourceContextMenu: (event: React.MouseEvent, resource: LoadedResource) => void;
@@ -32,6 +33,7 @@ export function MainLayoutComponent({
   selectedResource,
   favorites,
   diagramResource,
+  extraTabs,
   onPredicateClick,
   onResourceSelect,
   onResourceContextMenu,
@@ -110,6 +112,7 @@ export function MainLayoutComponent({
         <DetailsPanelComponent
           resource={selectedResource}
           diagramResource={diagramResource}
+          extraTabs={extraTabs}
           onLinkClick={onLinkClick}
           fetchRawResource={fetchRawResource}
         />
