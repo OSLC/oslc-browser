@@ -36,13 +36,14 @@ The MCP server is a pure client of the OSLC REST API. It has no dependency on ld
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `OSLC_SERVER_URL` | Yes | Base URL of the OSLC server (e.g., `http://localhost:3002`) |
+| `OSLC_CATALOG_URL` | No | Direct URL to the ServiceProviderCatalog. If omitted, defaults to `{OSLC_SERVER_URL}/oslc/catalog` |
 | `OSLC_USERNAME` | No | Username for authentication, passed to oslc-client |
 | `OSLC_PASSWORD` | No | Password for authentication, passed to oslc-client |
 
 ### CLI Arguments (override env vars)
 
 ```bash
-oslc-mcp-server --server http://localhost:3002 --username admin --password secret
+oslc-mcp-server --server http://localhost:3002 --catalog http://localhost:3002/oslc/catalog --username admin --password secret
 ```
 
 ### Claude Desktop Configuration
@@ -61,10 +62,10 @@ oslc-mcp-server --server http://localhost:3002 --username admin --password secre
 ## Startup Sequence
 
 1. Parse configuration (CLI args override env vars)
-2. Create oslc-client instance, connect to the OSLC server
-3. Fetch the service provider catalog
+2. Create oslc-client instance using `OSLCClient` (for RDF parsing and HTTP). Note: the discovery module does **not** use `OSLCClient.use()` because that method assumes Jazz-style rootservices and a single domain/service provider. Instead, discovery uses `OSLCClient.getResource()` directly to fetch and parse the catalog, service providers, and shapes as generic RDF documents.
+3. Fetch the service provider catalog from `OSLC_CATALOG_URL` (or `{OSLC_SERVER_URL}/oslc/catalog`)
 4. For each service provider, fetch creation factories and query capabilities
-5. For each creation factory, fetch the associated resource shape
+5. For each creation factory, fetch the associated resource shape (parallelized for performance; individual failures log a warning and skip that type rather than aborting startup)
 6. Convert each resource shape to JSON Schema (see mapping below)
 7. Generate per-type MCP tools from the discovered shapes
 8. Register generic CRUD tools
@@ -78,19 +79,23 @@ oslc-mcp-server --server http://localhost:3002 --username admin --password secre
 
 For each creation factory discovered in the service provider catalog, two tools are generated:
 
+**Tool naming:** The tool name is derived from the creation factory's `dcterms:title`, lowercased and sanitized (spaces/hyphens replaced with underscores). For example, a factory titled "Program" produces `create_program` and `query_program`. When multiple factories share the same `oslc:resourceType` (e.g., the 11 diagram factories all use `dd:Diagram`), the factory title disambiguates: `create_orgunitdiagram`, `create_programdiagram`, etc.
+
 #### `create_<type>(properties)`
 
 - **Description:** Generated from the creation factory's `dcterms:title` and the resource shape's `dcterms:description`
-- **Parameters:** JSON Schema derived from the resource shape's `oslc:Property` definitions (see mapping table below)
-- **Implementation:** Constructs an RDF resource from the provided properties and POSTs it to the creation factory URL via oslc-client
-- **Returns:** The URI of the created resource and its properties
+- **Parameters:** JSON Schema derived from the resource shape's `oslc:Property` definitions (see mapping table below). Each JSON property key corresponds to an `oslc:name`; the implementation stores the `oslc:propertyDefinition` URI internally to map short names back to full RDF predicates when constructing the resource.
+- **Implementation:** Constructs an RDF resource from the provided properties using rdflib (via oslc-client). Uses `fetch` or oslc-client's low-level HTTP methods to POST to the creation factory URL (not `OSLCClient.createResource()`, which requires Jazz-style `use()` setup). Sets `Content-Type: text/turtle` and `OSLC-Core-Version: 3.0`.
+- **Returns:** The URI of the created resource (from the `Location` header) and its properties
 
-#### `query_<type>(filter?)`
+#### `query_<type>(filter?, select?, orderBy?)`
 
 - **Description:** Query resources of this type
 - **Parameters:**
-  - `filter` (optional, string) — OSLC query filter expression (e.g., `dcterms:title="My Program"`)
-- **Implementation:** GETs the query capability URL with the optional `oslc.where` parameter via oslc-client
+  - `filter` (optional, string) — OSLC query filter expression mapped to `oslc.where` (e.g., `dcterms:title="My Program"`)
+  - `select` (optional, string) — Property projection mapped to `oslc.select` (e.g., `dcterms:title,dcterms:description`)
+  - `orderBy` (optional, string) — Sort order mapped to `oslc.orderBy`
+- **Implementation:** GETs the query capability URL with the optional query parameters via oslc-client
 - **Returns:** Array of matching resources with their URIs and properties
 
 ### Generic Tools (always available)
@@ -105,8 +110,8 @@ For each creation factory discovered in the service provider catalog, two tools 
 
 - **Parameters:**
   - `uri` (string, required) — the URI of the resource to update
-  - `properties` (object, required) — properties to set (replaces existing values for specified properties)
-- **Implementation:** Fetches the current resource, merges the new properties, PUTs the result via oslc-client
+  - `properties` (object, required) — properties to set. For each property provided, the existing value(s) for that predicate are fully replaced. Properties not mentioned in the update are left unchanged.
+- **Implementation:** GETs the current resource (capturing the ETag), applies the property changes to the RDF graph, PUTs the updated resource with `If-Match` set to the captured ETag for optimistic concurrency. Property names are mapped back to full predicate URIs using the discovered resource shapes.
 - **Returns:** The updated resource
 
 #### `delete_resource(uri)`
@@ -125,12 +130,14 @@ For each creation factory discovered in the service provider catalog, two tools 
   - Query capability URL
   - Property summary (names, types, required/optional)
 
-#### `query_resources(queryBase, filter?)`
+#### `query_resources(queryBase, filter?, select?, orderBy?)`
 
 - **Parameters:**
   - `queryBase` (string, required) — the query capability URL
-  - `filter` (optional, string) — OSLC query filter expression
-- **Implementation:** GETs the query base URL with optional `oslc.where` parameter
+  - `filter` (optional, string) — OSLC query filter expression mapped to `oslc.where`
+  - `select` (optional, string) — Property projection mapped to `oslc.select`
+  - `orderBy` (optional, string) — Sort order mapped to `oslc.orderBy`
+- **Implementation:** GETs the query base URL with optional query parameters
 - **Returns:** Array of matching resources
 
 ## MCP Resources
@@ -162,6 +169,11 @@ When the server discovers a resource shape, it converts `oslc:Property` definiti
 | `oslc:valueType xsd:boolean` | `type: "boolean"` |
 | `oslc:valueType xsd:dateTime` | `type: "string", format: "date-time"` |
 | `oslc:valueType oslc:Resource` | `type: "string"` (URI) with description noting it's a resource reference |
+| `oslc:valueType oslc:AnyResource` | `type: "string"` (URI), same as `oslc:Resource` |
+| `oslc:valueType oslc:LocalResource` | `type: "string"` (URI), same as `oslc:Resource` — inline objects are not supported in tool input |
+| `oslc:allowedValue` / `oslc:allowedValues` | `enum` array of allowed values |
+| `oslc:propertyDefinition` | stored internally to map `oslc:name` back to the full predicate URI; not exposed in JSON Schema |
+| `oslc:representation` | all resource-valued properties map to URI strings regardless of `oslc:Reference` / `oslc:Inline` / `oslc:Either` |
 | `oslc:occurs oslc:Exactly-one` | added to `required` array |
 | `oslc:occurs oslc:One-or-more` | `type: "array"`, added to `required` |
 | `oslc:occurs oslc:Zero-or-one` | optional, scalar |
@@ -215,10 +227,20 @@ oslc-mcp-server/
 ## Build Order
 
 ```
-storage-service → ldp-service → oslc-service → oslc-client → oslc-mcp-server
+oslc-client → oslc-mcp-server
 ```
 
 The MCP server depends only on oslc-client at build time. At runtime it communicates with any OSLC server via HTTP.
+
+## oslc-client Usage Notes
+
+The MCP server uses oslc-client for RDF parsing, HTTP communication, and authentication, but does **not** use the high-level `OSLCClient.use()` or `OSLCClient.createResource()` methods. Those methods assume Jazz-style rootservices discovery and a single domain/service provider, which is too opinionated for a generic OSLC 3.0 client.
+
+Instead, the discovery module uses:
+- `OSLCClient.getResource(url)` — to fetch and parse any RDF resource (catalog, service providers, shapes, vocabulary)
+- The underlying HTTP client (via oslc-client) for POST/PUT/DELETE operations with explicit URLs and headers
+
+Since oslc-client is plain JavaScript with no TypeScript declarations, the MCP server includes a minimal `oslc-client.d.ts` type declaration file declaring the methods and types it uses.
 
 ## Document-to-Resource Workflow
 
