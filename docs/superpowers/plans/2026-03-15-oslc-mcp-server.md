@@ -356,7 +356,7 @@ interface JsonSchemaProperty {
   type: string;
   description?: string;
   format?: string;
-  items?: { type: string; description?: string };
+  items?: { type: string; description?: string; format?: string; enum?: string[] };
   enum?: string[];
 }
 
@@ -445,12 +445,12 @@ export function shapeToJsonSchema(
         type: 'array',
         items: {
           type,
-          ...(format ? { description: `format: ${format}` } : {}),
+          ...(format ? { format } : {}),
         },
       };
       if (description) schemaProp.description = description;
       if (prop.allowedValues.length > 0) {
-        schemaProp.items = { ...schemaProp.items!, enum: prop.allowedValues } as any;
+        schemaProp.items = { ...schemaProp.items!, enum: prop.allowedValues };
       }
       properties[prop.name] = schemaProp;
     } else {
@@ -536,7 +536,6 @@ import type {
 
 const oslcNS = Namespace('http://open-services.net/ns/core#');
 const dctermsNS = Namespace('http://purl.org/dc/terms/');
-const rdfNS = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#');
 const xsdNS = Namespace('http://www.w3.org/2001/XMLSchema#');
 
 const OSLC = 'http://open-services.net/ns/core#';
@@ -1210,7 +1209,7 @@ Create `oslc-mcp-server/src/tools/factory.ts`:
 
 ```typescript
 import { OSLCClient } from 'oslc-client';
-import { graph, sym, lit, serialize, Namespace, NamedNode } from 'rdflib';
+import { graph, sym, lit, serialize, Namespace } from 'rdflib';
 import type { DiscoveryResult, DiscoveredFactory, DiscoveredQuery } from '../types.js';
 import { shapeToJsonSchema, buildPredicateMap } from '../schema.js';
 
