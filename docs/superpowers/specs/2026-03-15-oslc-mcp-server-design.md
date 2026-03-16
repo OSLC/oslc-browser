@@ -232,6 +232,23 @@ oslc-client → oslc-mcp-server
 
 The MCP server depends only on oslc-client at build time. At runtime it communicates with any OSLC server via HTTP.
 
+## JSON-LD Optimization
+
+At startup, the discovery module tests whether the OSLC server supports JSON-LD by requesting the catalog with `Accept: application/ld+json`. If the server returns a valid JSON-LD response, the MCP server enables JSON-LD mode for that connection.
+
+**When JSON-LD is supported:**
+- Create tools wrap the LLM's JSON properties in a JSON-LD document with the appropriate `@context` and POST as `application/ld+json`. No rdflib RDF graph construction needed.
+- Update tools send JSON-LD PUT requests similarly.
+- GET responses requested as `application/ld+json` return JSON that can be passed almost directly back to the LLM as tool results.
+- The `@context` provides the short-name-to-URI mapping, reducing the need for internal `oslc:propertyDefinition` mapping.
+
+**When JSON-LD is not supported (fallback):**
+- Create/update tools construct RDF graphs using rdflib (via oslc-client) and serialize as Turtle.
+- GET responses are parsed from Turtle/RDF+XML via rdflib and converted to JSON for tool results.
+- The `oslc:propertyDefinition` mapping is used to convert between JSON property names and full predicate URIs.
+
+This keeps the MCP server generic — works with any OSLC 3.0 server — while taking advantage of JSON-LD when available for simpler, more efficient data flows.
+
 ## oslc-client Usage Notes
 
 The MCP server uses oslc-client for RDF parsing, HTTP communication, and authentication, but does **not** use the high-level `OSLCClient.use()` or `OSLCClient.createResource()` methods. Those methods assume Jazz-style rootservices discovery and a single domain/service provider, which is too opinionated for a generic OSLC 3.0 client.
