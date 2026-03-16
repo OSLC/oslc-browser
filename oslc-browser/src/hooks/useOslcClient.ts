@@ -7,6 +7,8 @@ import {
   type ResourceLink,
   localName,
 } from '../models/types.js';
+import { useShapeCache, isLinkValueType } from './useShapeCache';
+import type { ParsedShape } from './useShapeCache';
 
 export interface UseOslcClientReturn {
   connection: ConnectionState;
@@ -30,6 +32,7 @@ interface RdfStatement {
 const RDF_TYPE = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type';
 const DCTERMS_TITLE = 'http://purl.org/dc/terms/title';
 const LDP_CONTAINS = 'http://www.w3.org/ns/ldp#contains';
+const OSLC_INSTANCE_SHAPE = 'http://open-services.net/ns/core#instanceShape';
 const LDP_CONTAINER_TYPES = new Set([
   'http://www.w3.org/ns/ldp#Container',
   'http://www.w3.org/ns/ldp#BasicContainer',
@@ -188,7 +191,39 @@ function tryParseQueryResult(
   };
 }
 
-function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource {
+/**
+ * Classify a NamedNode value as either a link or a property, using the
+ * resource shape when available.  Returns 'link' | 'property'.
+ */
+function classifyNamedNode(
+  pred: string,
+  shape: ParsedShape | null | undefined
+): 'link' | 'property' {
+  if (!shape) return 'link'; // No shape → legacy behaviour: treat as link
+  const valueType = shape.predicateValueTypes.get(pred);
+  if (valueType === undefined) return 'link'; // Predicate not in shape → assume link
+  return isLinkValueType(valueType) ? 'link' : 'property';
+}
+
+/**
+ * Extract the oslc:instanceShape URI from the resource's statements.
+ * Returns undefined when no shape reference is present.
+ */
+function findInstanceShapeURI(statements: RdfStatement[]): string | undefined {
+  for (const st of statements) {
+    if (st.subject.termType === 'BlankNode') continue;
+    if (st.predicate.value === OSLC_INSTANCE_SHAPE && st.object.termType === 'NamedNode') {
+      return st.object.value;
+    }
+  }
+  return undefined;
+}
+
+async function parseOslcResource(
+  resource: OSLCResource,
+  uri: string,
+  shapeLookup?: (shapeURI: string) => Promise<ParsedShape | null>
+): Promise<LoadedResource> {
   const properties: ResourceProperty[] = [];
   const resourceTypes: string[] = [];
   const inlineResources: Record<string, LoadedResource> = {};
@@ -199,6 +234,21 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
       resource.store.statements as RdfStatement[], uri
     );
     if (queryResult) return queryResult;
+  }
+
+  // Resolve the resource shape if present
+  let shape: ParsedShape | null | undefined;
+  if (resource.store?.statements?.length > 0) {
+    const instanceShapeURI = findInstanceShapeURI(
+      resource.store.statements as RdfStatement[]
+    );
+    if (instanceShapeURI && shapeLookup) {
+      try {
+        shape = await shapeLookup(instanceShapeURI);
+      } catch {
+        shape = null; // Fetch failed — fall back to link-for-all
+      }
+    }
   }
 
   // The resource.uri may not match the store subjects (e.g., trailing slash mismatch).
@@ -220,6 +270,9 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
 
       if (pred === RDF_TYPE) {
         resourceTypes.push(obj.value);
+      } else if (pred === OSLC_INSTANCE_SHAPE) {
+        // Filter out instanceShape — already consumed above
+        continue;
       } else if (pred === DCTERMS_TITLE && obj.termType === 'Literal') {
         extractedTitle = obj.value;
         properties.push({
@@ -229,12 +282,21 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
           isLink: false,
         });
       } else if (obj.termType === 'NamedNode') {
-        links.push({
-          predicate: pred,
-          predicateLabel: localName(pred),
-          targetURI: obj.value,
-          targetTitle: localName(obj.value),
-        });
+        if (classifyNamedNode(pred, shape) === 'link') {
+          links.push({
+            predicate: pred,
+            predicateLabel: localName(pred),
+            targetURI: obj.value,
+            targetTitle: localName(obj.value),
+          });
+        } else {
+          properties.push({
+            predicate: pred,
+            predicateLabel: localName(pred),
+            value: localName(obj.value),
+            isLink: false,
+          });
+        }
       } else if (obj.termType === 'BlankNode') {
         const bnUri = '_:' + obj.value;
         const bnResource = extractBlankNode(
@@ -269,12 +331,24 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
       resourceTypes.push(link.targetURL);
       continue;
     }
-    links.push({
-      predicate: link.linkType,
-      predicateLabel: localName(link.linkType),
-      targetURI: link.targetURL,
-      targetTitle: localName(link.targetURL),
-    });
+    // Filter out instanceShape from links
+    if (link.linkType === OSLC_INSTANCE_SHAPE) continue;
+
+    if (classifyNamedNode(link.linkType, shape) === 'link') {
+      links.push({
+        predicate: link.linkType,
+        predicateLabel: localName(link.linkType),
+        targetURI: link.targetURL,
+        targetTitle: localName(link.targetURL),
+      });
+    } else {
+      properties.push({
+        predicate: link.linkType,
+        predicateLabel: localName(link.linkType),
+        value: localName(link.targetURL),
+        isLink: false,
+      });
+    }
     linkSet.add(link.linkType + '|' + link.targetURL);
   }
 
@@ -284,6 +358,7 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
     for (const st of statements) {
       if (st.subject.termType === 'BlankNode') continue;
       if (st.predicate.value === RDF_TYPE) continue;
+      if (st.predicate.value === OSLC_INSTANCE_SHAPE) continue;
       if (st.object.termType === 'BlankNode') {
         const bnUri = '_:' + st.object.value;
         const bnResource = extractBlankNode(
@@ -306,6 +381,7 @@ function parseOslcResource(resource: OSLCResource, uri: string): LoadedResource 
   const allProps = resource.getProperties();
   for (const [predicate, value] of Object.entries(allProps)) {
     if (predicate === RDF_TYPE) continue;
+    if (predicate === OSLC_INSTANCE_SHAPE) continue;
     const values = Array.isArray(value) ? value : [value];
     for (const v of values) {
       if (linkSet.has(predicate + '|' + v)) continue;
@@ -352,6 +428,15 @@ export function useOslcClient(): UseOslcClientReturn {
     };
   });
   const clientRef = useRef<OSLCClient | null>(null);
+  const { getShape } = useShapeCache();
+
+  /** Fetch a shape using the current OSLCClient */
+  const shapeLookup = useCallback(async (shapeURI: string): Promise<ParsedShape | null> => {
+    const client = clientRef.current;
+    if (!client) return null;
+    const fetchFn = async (uri: string) => client.getResource(uri, '3.0', 'text/turtle');
+    return getShape(shapeURI, fetchFn);
+  }, [getShape]);
 
   const setServerURL = useCallback((url: string) => {
     setConnection(prev => ({ ...prev, serverURL: url }));
@@ -381,12 +466,12 @@ export function useOslcClient(): UseOslcClientReturn {
       }
 
       const resource = await client.getResource(fetchURI);
-      return parseOslcResource(resource, uri);
+      return await parseOslcResource(resource, uri, shapeLookup);
     } catch (err) {
       console.error('Error fetching resource:', uri, err);
       return null;
     }
-  }, [connection.serverURL]);
+  }, [connection.serverURL, shapeLookup]);
 
   const connect = useCallback(async (): Promise<LoadedResource | null> => {
     setConnection(prev => ({ ...prev, connecting: true, error: undefined }));
@@ -397,7 +482,7 @@ export function useOslcClient(): UseOslcClientReturn {
 
       // Fetch the resource at the entered URL
       const resource = await client.getResource(connection.serverURL);
-      const loaded = parseOslcResource(resource, connection.serverURL);
+      const loaded = await parseOslcResource(resource, connection.serverURL, shapeLookup);
 
       setConnection(prev => {
         const next = { ...prev, connected: true, connecting: false, error: undefined };
@@ -416,7 +501,7 @@ export function useOslcClient(): UseOslcClientReturn {
       clientRef.current = null;
       return null;
     }
-  }, [connection.serverURL, connection.username, connection.password]);
+  }, [connection.serverURL, connection.username, connection.password, shapeLookup]);
 
   const fetchRawResource = useCallback(async (uri: string): Promise<OSLCResource | null> => {
     const client = clientRef.current;
