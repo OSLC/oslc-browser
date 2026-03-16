@@ -36,17 +36,15 @@ function normalizeOccurs(occursURI: string): string {
 
 /**
  * Test if the OSLC server supports JSON-LD content negotiation.
+ * Note: Disabled for now because oslc-client's getResource doesn't properly
+ * propagate rdflib JSON-LD parse errors, causing unhandled rejections.
+ * All fetches explicitly request text/turtle instead.
  */
 async function testJsonLdSupport(
-  client: OSLCClient,
-  catalogURL: string
+  _client: OSLCClient,
+  _catalogURL: string
 ): Promise<boolean> {
-  try {
-    await client.getResource(catalogURL, '3.0', 'application/ld+json');
-    return true;
-  } catch {
-    return false;
-  }
+  return false;
 }
 
 /**
@@ -127,16 +125,24 @@ export async function discover(
 
   // Fetch catalog
   console.error(`[discovery] Fetching catalog: ${catalogURL}`);
-  const catalogResource = await client.getResource(catalogURL, '3.0');
+  const catalogResource = await client.getResource(catalogURL, '3.0', 'text/turtle');
   const catalogStore = catalogResource.store;
   const catalogSym = catalogStore.sym(catalogURL);
 
-  // Find service providers
-  const spNodes = catalogStore.each(
+  // Find service providers (try oslc:serviceProvider first, fall back to ldp:contains)
+  const ldpNS = Namespace('http://www.w3.org/ns/ldp#');
+  let spNodes = catalogStore.each(
     catalogSym,
     oslcNS('serviceProvider'),
     null
   );
+  if (spNodes.length === 0) {
+    spNodes = catalogStore.each(
+      catalogSym,
+      ldpNS('contains'),
+      null
+    );
+  }
 
   const serviceProviders: DiscoveredServiceProvider[] = [];
   const shapes = new Map<string, DiscoveredShape>();
@@ -147,7 +153,7 @@ export async function discover(
 
     let spResource: OSLCResource;
     try {
-      spResource = await client.getResource(spURI, '3.0');
+      spResource = await client.getResource(spURI, '3.0', 'text/turtle');
     } catch (err) {
       console.error(`[discovery] Failed to fetch SP ${spURI}:`, err);
       continue;
@@ -204,7 +210,7 @@ export async function discover(
               // Fetch the shape document (the shape URI may be a fragment)
               const shapeDocURI = shapeURI.split('#')[0];
               console.error(`[discovery] Fetching shape: ${shapeDocURI}`);
-              const shapeResource = await client.getResource(shapeDocURI, '3.0');
+              const shapeResource = await client.getResource(shapeDocURI, '3.0', 'text/turtle');
               // If the shape URI has a fragment, parse using the fragment URI directly
               // rather than relying on OSLCResource.getURI() which returns the document URI
               shape = parseShape(shapeResource, shapeURI !== shapeDocURI ? shapeURI : undefined);
