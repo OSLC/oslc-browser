@@ -187,7 +187,7 @@ Expected: Compiles without error.
 
 ```bash
 cd oslc-mcp-server
-git add -A
+git add package.json package-lock.json tsconfig.json .gitignore src/oslc-client.d.ts
 git commit -m "feat: scaffold oslc-mcp-server package"
 ```
 
@@ -443,10 +443,12 @@ export function shapeToJsonSchema(
     if (isArray) {
       const schemaProp: JsonSchemaProperty = {
         type: 'array',
-        items: { type, ...(format ? {} : {}) },
+        items: {
+          type,
+          ...(format ? { description: `format: ${format}` } : {}),
+        },
       };
       if (description) schemaProp.description = description;
-      if (format) schemaProp.items = { type, description: `format: ${format}` };
       if (prop.allowedValues.length > 0) {
         schemaProp.items = { ...schemaProp.items!, enum: prop.allowedValues } as any;
       }
@@ -575,9 +577,9 @@ async function testJsonLdSupport(
 /**
  * Parse a resource shape document into a DiscoveredShape.
  */
-function parseShape(shapeResource: OSLCResource): DiscoveredShape {
+function parseShape(shapeResource: OSLCResource, overrideURI?: string): DiscoveredShape {
   const store = shapeResource.store;
-  const shapeURI = shapeResource.getURI();
+  const shapeURI = overrideURI ?? shapeResource.getURI();
   const shapeSym = store.sym(shapeURI);
 
   const title =
@@ -725,11 +727,9 @@ export async function discover(
               const shapeDocURI = shapeURI.split('#')[0];
               console.error(`[discovery] Fetching shape: ${shapeDocURI}`);
               const shapeResource = await client.getResource(shapeDocURI, '3.0');
-              // If the shape URI has a fragment, we need to re-root
-              if (shapeURI !== shapeDocURI) {
-                (shapeResource as any).uri = shapeResource.store.sym(shapeURI);
-              }
-              shape = parseShape(shapeResource);
+              // If the shape URI has a fragment, parse using the fragment URI directly
+              // rather than relying on OSLCResource.getURI() which returns the document URI
+              shape = parseShape(shapeResource, shapeURI !== shapeDocURI ? shapeURI : undefined);
               shapes.set(shapeURI, shape);
             } catch (err) {
               console.error(
@@ -974,8 +974,8 @@ function resourceToJson(store: IndexedFormula, uri: string): Record<string, any>
   for (const st of statements) {
     const predicate = st.predicate.value;
     const key = predicate.split(/[#/]/).pop() ?? predicate;
-    const value = st.object.termType === 'Literal'
-      ? st.object.value
+    const value = st.object.termType === 'NamedNode'
+      ? { uri: st.object.value }
       : st.object.value;
 
     if (!grouped[key]) {
@@ -1125,11 +1125,20 @@ export async function handleQueryResources(
   // Extract member resources from the query result
   const ldpContains = Namespace('http://www.w3.org/ns/ldp#')('contains');
   const rdfsMember = Namespace('http://www.w3.org/2000/01/rdf-schema#')('member');
-  const containerSym = store.sym(args.queryBase);
+  // Use the actual fetched URL as the container subject (includes query params)
+  const containerSym = store.sym(url);
 
   let memberNodes = store.each(containerSym, ldpContains, null);
   if (memberNodes.length === 0) {
     memberNodes = store.each(containerSym, rdfsMember, null);
+  }
+  // Fallback: try with base URL (some servers use it as container subject)
+  if (memberNodes.length === 0) {
+    const baseSym = store.sym(args.queryBase);
+    memberNodes = store.each(baseSym, ldpContains, null);
+    if (memberNodes.length === 0) {
+      memberNodes = store.each(baseSym, rdfsMember, null);
+    }
   }
 
   const results = memberNodes.map((node: any) =>
@@ -1201,7 +1210,7 @@ Create `oslc-mcp-server/src/tools/factory.ts`:
 
 ```typescript
 import { OSLCClient } from 'oslc-client';
-import { graph, sym, lit, serialize, Namespace } from 'rdflib';
+import { graph, sym, lit, serialize, Namespace, NamedNode } from 'rdflib';
 import type { DiscoveryResult, DiscoveredFactory, DiscoveredQuery } from '../types.js';
 import { shapeToJsonSchema, buildPredicateMap } from '../schema.js';
 
@@ -1352,8 +1361,8 @@ function createCreateHandler(
       }
     }
 
-    // Serialize to Turtle
-    const turtle = serialize(null, store, undefined, 'text/turtle') ?? '';
+    // Serialize all statements to Turtle
+    const turtle = serialize(undefined, store, undefined, 'text/turtle') ?? '';
 
     // POST to creation factory
     const response = await client.client.post(factory.creationURI, turtle, {
@@ -1419,11 +1428,20 @@ function createQueryHandler(
 
     const ldpContains = Namespace('http://www.w3.org/ns/ldp#')('contains');
     const rdfsMember = Namespace('http://www.w3.org/2000/01/rdf-schema#')('member');
-    const containerSym = store.sym(queryCapability.queryBase);
+    // Use the actual fetched URL as the container subject (includes query params)
+    const containerSym = store.sym(url);
 
     let memberNodes = store.each(containerSym, ldpContains, null);
     if (memberNodes.length === 0) {
       memberNodes = store.each(containerSym, rdfsMember, null);
+    }
+    // Fallback: try with base URL (some servers use it as container subject)
+    if (memberNodes.length === 0) {
+      const baseSym = store.sym(queryCapability.queryBase);
+      memberNodes = store.each(baseSym, ldpContains, null);
+      if (memberNodes.length === 0) {
+        memberNodes = store.each(baseSym, rdfsMember, null);
+      }
     }
 
     const results = memberNodes.map((node: any) => {
@@ -1697,7 +1715,7 @@ export async function startServer(
             result = await handleDeleteResource(client, args as any);
             break;
           case 'list_resource_types':
-            result = handleListResourceTypes(discovery);
+            result = await handleListResourceTypes(discovery);
             break;
           case 'query_resources':
             result = await handleQueryResources(client, args as any);
@@ -1918,7 +1936,17 @@ Start mrm-server first (requires Fuseki running on localhost:3030/mrm):
 
 ```bash
 cd mrm-server && npm start &
+MRM_PID=$!
+sleep 3
 ```
+
+Wait for mrm-server to be ready:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/oslc/catalog
+```
+
+Expected: `200`. If not `200`, wait and retry.
 
 Then test the MCP server startup (it will connect, discover, and exit when stdin closes):
 
@@ -1935,28 +1963,28 @@ Expected in stderr.log:
 - `[startup] Generated N per-type tools`
 - `[server] OSLC MCP server running on stdio`
 
-- [ ] **Step 3: Test list_resource_types tool**
+- [ ] **Step 3: Test tools/list via MCP protocol**
 
 ```bash
-echo -e '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}\n{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | node dist/index.js --server http://localhost:3002 2>/dev/null
+printf '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}\n{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | node dist/index.js --server http://localhost:3002 2>/dev/null
 ```
 
 Expected: JSON output listing all tools (generic + per-type).
 
-- [ ] **Step 4: Update build order documentation**
-
-Update `docs/system_patterns.md` to add oslc-mcp-server to the build order:
-
-Add after the existing build order:
-
-```
-oslc-client → oslc-mcp-server
-```
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Stop mrm-server**
 
 ```bash
-cd oslc-mcp-server
-git add -A
+kill $MRM_PID 2>/dev/null
+rm -f oslc-mcp-server/stderr.log
+```
+
+- [ ] **Step 5: Update build order documentation**
+
+Update `docs/system_patterns.md` to add oslc-mcp-server to the build order. Find the existing build order section and append `oslc-client → oslc-mcp-server` as a new entry.
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add oslc-mcp-server/package.json oslc-mcp-server/package-lock.json oslc-mcp-server/tsconfig.json oslc-mcp-server/.gitignore oslc-mcp-server/src/ docs/system_patterns.md
 git commit -m "feat: oslc-mcp-server complete — OSLC MCP adapter with dynamic tool generation"
 ```
