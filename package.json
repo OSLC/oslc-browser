@@ -1,0 +1,46 @@
+{
+  "name": "oslc-browser",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/oslc-browser.js",
+  "module": "dist/oslc-browser.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/oslc-browser.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "vite build",
+    "lint": "eslint ."
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@mui/material": "^7.0.0",
+    "@mui/icons-material": "^7.0.0",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "oslc-client": "*",
+    "rdflib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.1",
+    "@mui/material": "^7.3.1",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.5.2",
+    "eslint": "^9.32.0",
+    "oslc-client": "file:../oslc-client",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "rdflib": "^2.2.35",
+    "typescript": "~5.8.3",
+    "vite": "^7.1.0",
+    "vite-plugin-dts": "^4.5.0"
+  }
+}
