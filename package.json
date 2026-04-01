@@ -10,7 +10,7 @@
     "carbon-icons": "^7.0.7",
     "cytoscape-context-menus": "^3.0.6",
     "jquery": "^3.3.1",
-    "oslc-client": "~1.0.6",
+    "oslc-client": "~3.1.2",
     "prop-types": "^15.6.2",
     "psl": "^1.8.0",
     "react": "^16.5.2",
