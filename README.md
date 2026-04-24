@@ -143,11 +143,14 @@ The `/discover-links` endpoint is the standard OSLC Link Discovery Management (L
 
 ## App Shells
 
-Three thin app shells consume this library:
+Thin app shells consume this library. Features implemented here — column navigation, favorites, properties/explorer/diagram tabs, and **incoming-link visualization** — are inherited automatically by each shell; they don't re-implement any of it:
 
 - **oslc-server/ui** -- Web front-end served by oslc-server. Provides the default OSLC browser experience in a standard browser tab.
+- **bmm-server/ui** -- Web front-end served by bmm-server. Same experience specialized for the BMM (Business Motivation Model) domain.
 - **mrm-server/ui** -- Web front-end served by mrm-server. Adds MRM-specific extra tabs and menu items via the `ExtraTab` and `ExtraMenuItem` extension points.
 - **oslc-browser/app** -- Electron desktop application wrapping the same components for offline or local use.
+
+For server-hosted shells, the incoming-links story also depends on the server exposing `POST /discover-links` (provided by `oslc-service` when the storage backend implements `getIncomingLinks`) and its shapes declaring `oslc:inversePropertyDefinition` / `oslc:inverseLabel` on link properties. Shells themselves contribute nothing to that pipeline.
 
 ## Development
 
