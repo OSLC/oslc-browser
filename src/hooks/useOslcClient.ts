@@ -645,6 +645,9 @@ export function useOslcClient(): UseOslcClientReturn {
   });
   const clientRef = useRef<OSLCClient | null>(null);
   const { getShape, getInverseLabel } = useShapeCache();
+  // Tracks ServiceProvider URIs whose shapes have already been seeded
+  // into the cache, so repeat visits don't re-crawl the catalog.
+  const seededSPs = useRef<Set<string>>(new Set());
 
   /** Fetch a shape using the current OSLCClient */
   const shapeLookup = useCallback(async (shapeURI: string): Promise<ParsedShape | null> => {
@@ -653,6 +656,62 @@ export function useOslcClient(): UseOslcClientReturn {
     const fetchFn = async (uri: string) => client.getResource(uri, '3.0', 'text/turtle');
     return getShape(shapeURI, fetchFn);
   }, [getShape]);
+
+  /**
+   * Walk a ServiceProvider's CreationFactories and pre-fetch every
+   * declared oslc:resourceShape into the shape cache.
+   *
+   * Why: `getInverseLabel(predicate)` searches cached shapes for an
+   * inverseLabel declared on the property definition for `predicate`.
+   * That definition lives on the *source* side of the relationship
+   * (e.g., `channelsEffortsToward` is declared on StrategyShape). When
+   * the user navigates to a Vision resource, only VisionShape ends up
+   * cached by instanceShape parsing — so incoming-link inverse labels
+   * would miss. Seeding the cache from the catalog fixes that.
+   *
+   * This runs once per ServiceProvider URI. Failures are swallowed —
+   * labels will fall back to the forward predicate's local name.
+   */
+  const seedShapesFromServiceProvider = useCallback(async (spURI: string): Promise<void> => {
+    if (seededSPs.current.has(spURI)) return;
+    seededSPs.current.add(spURI);
+
+    const client = clientRef.current;
+    if (!client) return;
+
+    try {
+      const sp = await client.getResource(spURI, '3.0', 'text/turtle');
+      const store = sp?.store;
+      if (!store) return;
+
+      const spSym = store.sym(spURI);
+      const oslcSym = (local: string) => store.sym(`http://open-services.net/ns/core#${local}`);
+
+      const shapeURIs = new Set<string>();
+
+      // Walk Services → CreationFactories → resourceShape
+      const services = store.each(spSym, oslcSym('service'), null);
+      for (const service of services) {
+        const factories = store.each(service, oslcSym('creationFactory'), null);
+        for (const factory of factories) {
+          const shapeNodes = store.each(factory, oslcSym('resourceShape'), null);
+          for (const sn of shapeNodes) {
+            if (sn.termType === 'NamedNode') shapeURIs.add(sn.value);
+          }
+        }
+      }
+
+      // Fetch each unique shape URI in parallel (bounded by shape count,
+      // which is fixed per domain).
+      await Promise.all(
+        [...shapeURIs].map(uri =>
+          shapeLookup(uri).catch(() => null)
+        )
+      );
+    } catch {
+      // Seeding is best-effort; silently continue
+    }
+  }, [shapeLookup]);
 
   const setServerURL = useCallback((url: string) => {
     setConnection(prev => ({ ...prev, serverURL: url }));
@@ -714,6 +773,20 @@ export function useOslcClient(): UseOslcClientReturn {
       const resource = await client.getResource(fetchURI);
       const loaded = await parseOslcResource(resource, uri, shapeLookup);
 
+      // Seed the shape cache from the resource's ServiceProvider before
+      // fetching incoming links. Inverse labels for incoming predicates
+      // live on the source-side shape (e.g., Strategy's
+      // channelsEffortsToward), which otherwise would never be fetched
+      // when the user is viewing just a Vision.
+      const spLink = loaded.links.find(
+        l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
+      ) ?? loaded.members?.[0]?.links.find(
+        l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
+      );
+      if (spLink) {
+        await seedShapesFromServiceProvider(spLink.targetURI);
+      }
+
       // Resolve human-readable titles for link targets
       await resolveLinkTitles(loaded.links, client, connection.serverURL);
 
@@ -732,7 +805,7 @@ export function useOslcClient(): UseOslcClientReturn {
       console.error('Error fetching resource:', uri, err);
       return null;
     }
-  }, [connection.serverURL, shapeLookup, fetchIncomingLinks]);
+  }, [connection.serverURL, shapeLookup, fetchIncomingLinks, seedShapesFromServiceProvider]);
 
   const connect = useCallback(async (): Promise<LoadedResource | null> => {
     setConnection(prev => ({ ...prev, connecting: true, error: undefined }));
