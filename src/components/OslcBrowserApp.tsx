@@ -43,8 +43,13 @@ export function OslcBrowserAppComponent({
     if (resource) navigateToRoot(resource);
   }, [connect, navigateToRoot]);
 
-  const handlePredicateClick = useCallback(async (columnIndex: number, resource: LoadedResource, predicate: string) => {
-    await navigateToItem(columnIndex, resource, predicate, fetchResource);
+  const handlePredicateClick = useCallback(async (
+    columnIndex: number,
+    resource: LoadedResource,
+    predicate: string,
+    direction?: 'outgoing' | 'incoming'
+  ) => {
+    await navigateToItem(columnIndex, resource, predicate, fetchResource, direction);
   }, [navigateToItem, fetchResource]);
 
   const handleNavigateToResource = useCallback(async (uri: string) => {

@@ -75,22 +75,50 @@ function reducer(state: NavigationState, action: NavigationAction): NavigationSt
   }
 }
 
-/** Build unique predicate items from a resource's links. */
+/** Build unique predicate items from a resource's outgoing and incoming links. */
 function buildPredicates(resource: LoadedResource): PredicateItem[] {
-  const countMap = new Map<string, { label: string; count: number }>();
+  const items: PredicateItem[] = [];
+
+  // Outgoing predicates
+  const outgoing = new Map<string, { label: string; count: number }>();
   for (const link of resource.links) {
-    const existing = countMap.get(link.predicate);
-    if (existing) {
-      existing.count++;
-    } else {
-      countMap.set(link.predicate, { label: link.predicateLabel, count: 1 });
+    const existing = outgoing.get(link.predicate);
+    if (existing) existing.count++;
+    else outgoing.set(link.predicate, { label: link.predicateLabel, count: 1 });
+  }
+  for (const [predicate, { label, count }] of outgoing) {
+    items.push({
+      predicate,
+      predicateLabel: label,
+      targetCount: count,
+      direction: 'outgoing',
+    });
+  }
+
+  // Incoming predicates — grouped by forward predicate URI, labeled
+  // with the inverse wording from the source property's shape when
+  // available so the user sees link ownership transparently (e.g.,
+  // "Amplifies" appears on the Vision that is pointed at, even though
+  // the underlying triple is owned by the Goal's `amplifiedBy`).
+  if (resource.incomingLinks && resource.incomingLinks.length > 0) {
+    const incoming = new Map<string, { label: string; count: number }>();
+    for (const link of resource.incomingLinks) {
+      const label = link.inverseLabel ?? link.predicateLabel;
+      const existing = incoming.get(link.predicate);
+      if (existing) existing.count++;
+      else incoming.set(link.predicate, { label, count: 1 });
+    }
+    for (const [predicate, { label, count }] of incoming) {
+      items.push({
+        predicate,
+        predicateLabel: label,
+        targetCount: count,
+        direction: 'incoming',
+      });
     }
   }
-  return Array.from(countMap.entries()).map(([predicate, { label, count }]) => ({
-    predicate,
-    predicateLabel: label,
-    targetCount: count,
-  }));
+
+  return items;
 }
 
 /** Create a ColumnResource from a LoadedResource. */
@@ -131,7 +159,8 @@ export interface UseNavigationReturn {
     columnIndex: number,
     resource: LoadedResource,
     predicate: string,
-    fetchResource: (uri: string) => Promise<LoadedResource | null>
+    fetchResource: (uri: string) => Promise<LoadedResource | null>,
+    direction?: 'outgoing' | 'incoming'
   ) => Promise<void>;
   selectResource: (resource: LoadedResource, columnIndex?: number) => void;
 }
@@ -157,10 +186,21 @@ export function useNavigation(): UseNavigationReturn {
     columnIndex: number,
     resource: LoadedResource,
     predicate: string,
-    fetchResource: (uri: string) => Promise<LoadedResource | null>
+    fetchResource: (uri: string) => Promise<LoadedResource | null>,
+    direction: 'outgoing' | 'incoming' = 'outgoing'
   ) => {
-    const targetLinks = resource.links.filter(l => l.predicate === predicate);
-    if (targetLinks.length === 0) return;
+    // Resolve the URIs to fetch based on direction: outgoing → targets
+    // from this resource's own links; incoming → source URIs from links
+    // owned elsewhere that point at this resource.
+    let fetchURIs: string[] = [];
+    if (direction === 'outgoing') {
+      const targetLinks = resource.links.filter(l => l.predicate === predicate);
+      fetchURIs = targetLinks.map(l => l.targetURI);
+    } else {
+      const incoming = resource.incomingLinks?.filter(l => l.predicate === predicate) ?? [];
+      fetchURIs = incoming.map(l => l.sourceURI);
+    }
+    if (fetchURIs.length === 0) return;
 
     const predicateLabel = localName(predicate);
     dispatch({
@@ -175,12 +215,12 @@ export function useNavigation(): UseNavigationReturn {
 
     // Fetch all target resources in parallel
     const results = await Promise.all(
-      targetLinks.map(async (link) => {
-        if (link.targetURI.startsWith('_:') && resource.inlineResources?.[link.targetURI]) {
-          return resource.inlineResources[link.targetURI];
+      fetchURIs.map(async (uri) => {
+        if (uri.startsWith('_:') && resource.inlineResources?.[uri]) {
+          return resource.inlineResources[uri];
         }
         try {
-          return await fetchResource(link.targetURI);
+          return await fetchResource(uri);
         } catch {
           return null;
         }

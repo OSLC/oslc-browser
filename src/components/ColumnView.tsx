@@ -5,7 +5,7 @@ import type { NavigationColumn, LoadedResource } from '../models/types.js';
 
 interface ColumnViewProps {
   columns: NavigationColumn[];
-  onPredicateClick: (columnIndex: number, resource: LoadedResource, predicate: string) => void;
+  onPredicateClick: (columnIndex: number, resource: LoadedResource, predicate: string, direction?: 'outgoing' | 'incoming') => void;
   onResourceSelect: (resource: LoadedResource, columnIndex: number) => void;
   onResourceContextMenu: (event: React.MouseEvent, resource: LoadedResource) => void;
 }
@@ -65,7 +65,7 @@ export function ColumnViewComponent({ columns, onPredicateClick, onResourceSelec
           columnIndex={i}
           width={widths[i] ?? DEFAULT_COLUMN_WIDTH}
           onResize={setColumnWidth}
-          onPredicateClick={(resource, predicate) => onPredicateClick(i, resource, predicate)}
+          onPredicateClick={(resource, predicate, direction) => onPredicateClick(i, resource, predicate, direction)}
           onResourceSelect={onResourceSelect}
           onResourceContextMenu={onResourceContextMenu}
         />

@@ -61,6 +61,11 @@ export interface PredicateItem {
   predicate: string;
   predicateLabel: string;
   targetCount: number;
+  /** Direction: 'outgoing' for links this resource owns, 'incoming' for
+   *  links owned by another resource pointing at this one. Defaults to
+   *  outgoing when omitted for compatibility with callers that only
+   *  handle the original direction. */
+  direction?: 'outgoing' | 'incoming';
 }
 
 export interface ColumnResource {

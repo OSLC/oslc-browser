@@ -12,7 +12,7 @@ interface MainLayoutProps {
   favorites: FavoriteItem[];
   diagramResource?: OSLCResource | null;
   extraTabs?: ExtraTab[];
-  onPredicateClick: (columnIndex: number, resource: LoadedResource, predicate: string) => void;
+  onPredicateClick: (columnIndex: number, resource: LoadedResource, predicate: string, direction?: 'outgoing' | 'incoming') => void;
   onResourceSelect: (resource: LoadedResource, columnIndex: number) => void;
   onResourceContextMenu: (event: React.MouseEvent, resource: LoadedResource) => void;
   onLinkClick: (uri: string) => void;

@@ -12,7 +12,7 @@ import {
   AccordionDetails,
   Badge,
 } from '@mui/material';
-import { ChevronRight } from '@mui/icons-material';
+import { ChevronRight, ArrowBack } from '@mui/icons-material';
 import type { NavigationColumn, ColumnResource, LoadedResource } from '../models/types.js';
 
 interface ResourceColumnProps {
@@ -22,7 +22,7 @@ interface ResourceColumnProps {
   minWidth?: number;
   maxWidth?: number;
   onResize: (columnIndex: number, newWidth: number) => void;
-  onPredicateClick: (resource: LoadedResource, predicate: string) => void;
+  onPredicateClick: (resource: LoadedResource, predicate: string, direction: 'outgoing' | 'incoming') => void;
   onResourceSelect: (resource: LoadedResource, columnIndex: number) => void;
   onResourceContextMenu: (event: React.MouseEvent, resource: LoadedResource) => void;
 }
@@ -151,7 +151,7 @@ interface ResourceAccordionProps {
   columnIndex: number;
   isSelected: boolean;
   selectedPredicate?: string;
-  onPredicateClick: (resource: LoadedResource, predicate: string) => void;
+  onPredicateClick: (resource: LoadedResource, predicate: string, direction: 'outgoing' | 'incoming') => void;
   onResourceSelect: (resource: LoadedResource, columnIndex: number) => void;
   onResourceContextMenu: (event: React.MouseEvent, resource: LoadedResource) => void;
 }
@@ -220,36 +220,52 @@ function ResourceAccordion({
       <AccordionDetails sx={{ p: 0 }}>
         {predicates.length === 0 && (
           <Typography sx={{ p: 2, color: 'text.secondary', fontSize: 13 }}>
-            No outgoing links
+            No links
           </Typography>
         )}
         <List dense disablePadding>
-          {predicates.map((pred) => (
-            <ListItemButton
-              key={pred.predicate}
-              selected={isSelected && selectedPredicate === pred.predicate}
-              onClick={() => onPredicateClick(resource, pred.predicate)}
-              // Indent predicate items so they visually align under the
-              // accordion title, past where the expand icon sat.
-              sx={{ py: 0.5, pl: 4 }}
-            >
-              <ListItemText
-                primary={pred.predicateLabel}
-                primaryTypographyProps={{ fontSize: 13, noWrap: true, textAlign: 'left' }}
-                title={pred.predicate}
-              />
-              {pred.targetCount > 1 && (
-                <Badge
-                  badgeContent={pred.targetCount}
-                  color="default"
-                  sx={{
-                    ml: 1,
-                    '& .MuiBadge-badge': { fontSize: 10, height: 16, minWidth: 16 },
-                  }}
+          {predicates.map((pred) => {
+            const isIncoming = pred.direction === 'incoming';
+            // Incoming predicates share a URI with the forward direction
+            // in the cache key space — include direction to avoid collisions.
+            const key = `${pred.predicate}|${pred.direction ?? 'outgoing'}`;
+            return (
+              <ListItemButton
+                key={key}
+                selected={isSelected && selectedPredicate === pred.predicate}
+                onClick={() => onPredicateClick(resource, pred.predicate, pred.direction ?? 'outgoing')}
+                // Indent predicate items so they visually align under the
+                // accordion title, past where the expand icon sat.
+                sx={{
+                  py: 0.5,
+                  pl: 4,
+                  ...(isIncoming ? { color: '#8e44ad' } : {}),
+                }}
+              >
+                {isIncoming && (
+                  <ArrowBack
+                    sx={{ fontSize: 14, mr: 0.75, color: '#8e44ad' }}
+                    titleAccess="Incoming link"
+                  />
+                )}
+                <ListItemText
+                  primary={pred.predicateLabel}
+                  primaryTypographyProps={{ fontSize: 13, noWrap: true, textAlign: 'left' }}
+                  title={pred.predicate}
                 />
-              )}
-            </ListItemButton>
-          ))}
+                {pred.targetCount > 1 && (
+                  <Badge
+                    badgeContent={pred.targetCount}
+                    color="default"
+                    sx={{
+                      ml: 1,
+                      '& .MuiBadge-badge': { fontSize: 10, height: 16, minWidth: 16 },
+                    }}
+                  />
+                )}
+              </ListItemButton>
+            );
+          })}
         </List>
       </AccordionDetails>
     </Accordion>
