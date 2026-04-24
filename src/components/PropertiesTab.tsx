@@ -65,8 +65,11 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
         </>
       )}
 
-      {/* Link properties */}
-      {resource.links.length > 0 && (
+      {/* Link properties — outgoing links and incoming links rendered
+          uniformly, with incoming links using their inverseLabel from
+          the source property's shape so link ownership is transparent. */}
+      {(resource.links.length > 0 ||
+        (resource.incomingLinks && resource.incomingLinks.length > 0)) && (
         <>
           <Divider sx={{ my: 1 }} />
           <Typography variant="overline" sx={{ fontSize: 11 }}>Links</Typography>
@@ -79,7 +82,7 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
             </TableHead>
             <TableBody>
               {resource.links.map((link, i) => (
-                <TableRow key={link.predicate + link.targetURI + i}>
+                <TableRow key={'out-' + link.predicate + link.targetURI + i}>
                   <TableCell sx={{ fontSize: 12 }} title={link.predicate}>
                     {link.predicateLabel}
                   </TableCell>
@@ -95,45 +98,16 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
                   </TableCell>
                 </TableRow>
               ))}
-            </TableBody>
-          </Table>
-        </>
-      )}
-
-      {/* Incoming links — resources elsewhere that point at this one */}
-      {resource.incomingLinks && resource.incomingLinks.length > 0 && (
-        <>
-          <Divider sx={{ my: 1 }} />
-          <Typography variant="overline" sx={{ fontSize: 11, color: '#8e44ad' }}>
-            Incoming Links
-          </Typography>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontSize: 12, fontWeight: 600, width: '30%' }}>Relationship</TableCell>
-                <TableCell sx={{ fontSize: 12, fontWeight: 600 }}>Source</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {resource.incomingLinks.map((link, i) => (
-                <TableRow key={link.predicate + link.sourceURI + i}>
+              {(resource.incomingLinks ?? []).map((link, i) => (
+                <TableRow key={'in-' + link.predicate + link.sourceURI + i}>
                   <TableCell sx={{ fontSize: 12 }} title={link.predicate}>
                     {link.inverseLabel ?? link.predicateLabel}
-                    {link.origin === 'cross-server' && (
-                      <Typography
-                        component="span"
-                        sx={{ ml: 0.5, fontSize: 10, color: 'text.secondary' }}
-                        title="Link stored on another server"
-                      >
-                        ↗
-                      </Typography>
-                    )}
                   </TableCell>
                   <TableCell sx={{ fontSize: 12 }}>
                     <Link
                       component="button"
                       onClick={() => onLinkClick(link.sourceURI)}
-                      sx={{ fontSize: 12, textAlign: 'left', color: '#8e44ad' }}
+                      sx={{ fontSize: 12, textAlign: 'left' }}
                       title={link.sourceURI}
                     >
                       {link.sourceTitle ?? link.sourceURI}

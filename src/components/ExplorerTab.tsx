@@ -19,10 +19,6 @@ interface GraphEdge {
   source: GraphNode;
   target: GraphNode;
   label: string;
-  /** 'outgoing' edges originate at the center; 'incoming' edges
-   *  terminate at it. Used for styling (dashed + purple) so link
-   *  ownership is visible at a glance. */
-  direction: 'outgoing' | 'incoming';
 }
 
 function computeLayout(resource: LoadedResource, width: number, height: number): { nodes: GraphNode[]; edges: GraphEdge[] } {
@@ -37,24 +33,23 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
     isCenter: true,
   };
 
-  // Collect outgoing and incoming neighbors — a single resource that is
-  // both a target (outgoing) and a source (incoming) appears once with
-  // both edges.
+  // Collect neighbors — outgoing links contribute directly; incoming
+  // links are rendered in the same direction using the inverseLabel
+  // declared on the source property's shape, so link ownership is
+  // transparent (the user sees a single bidirectional relationship).
   interface Neighbor {
     title: string;
-    outgoingLabels: string[];
-    incomingLabels: string[];
+    labels: string[];
   }
   const neighbors = new Map<string, Neighbor>();
 
   for (const link of resource.links) {
     const existing = neighbors.get(link.targetURI) ?? {
       title: link.targetTitle ?? link.targetURI.split('/').pop() ?? link.targetURI,
-      outgoingLabels: [],
-      incomingLabels: [],
+      labels: [],
     };
-    if (!existing.outgoingLabels.includes(link.predicateLabel)) {
-      existing.outgoingLabels.push(link.predicateLabel);
+    if (!existing.labels.includes(link.predicateLabel)) {
+      existing.labels.push(link.predicateLabel);
     }
     neighbors.set(link.targetURI, existing);
   }
@@ -64,11 +59,10 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
       const label = link.inverseLabel ?? link.predicateLabel;
       const existing = neighbors.get(link.sourceURI) ?? {
         title: link.sourceTitle ?? link.sourceURI.split('/').pop() ?? link.sourceURI,
-        outgoingLabels: [],
-        incomingLabels: [],
+        labels: [],
       };
-      if (!existing.incomingLabels.includes(label)) {
-        existing.incomingLabels.push(label);
+      if (!existing.labels.includes(label)) {
+        existing.labels.push(label);
       }
       neighbors.set(link.sourceURI, existing);
     }
@@ -90,23 +84,11 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
       isCenter: false,
     };
     nodes.push(neighborNode);
-
-    if (info.outgoingLabels.length > 0) {
-      edges.push({
-        source: centerNode,
-        target: neighborNode,
-        label: info.outgoingLabels.join(', '),
-        direction: 'outgoing',
-      });
-    }
-    if (info.incomingLabels.length > 0) {
-      edges.push({
-        source: neighborNode,
-        target: centerNode,
-        label: info.incomingLabels.join(', '),
-        direction: 'incoming',
-      });
-    }
+    edges.push({
+      source: centerNode,
+      target: neighborNode,
+      label: info.labels.join(', '),
+    });
     i++;
   }
 
@@ -145,9 +127,6 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
           <marker id="arrowhead" markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE} refX={ARROW_SIZE} refY={ARROW_SIZE / 2} orient="auto">
             <polygon points={`0 0, ${ARROW_SIZE} ${ARROW_SIZE / 2}, 0 ${ARROW_SIZE}`} fill="#999" />
           </marker>
-          <marker id="arrowhead-incoming" markerWidth={ARROW_SIZE} markerHeight={ARROW_SIZE} refX={ARROW_SIZE} refY={ARROW_SIZE / 2} orient="auto">
-            <polygon points={`0 0, ${ARROW_SIZE} ${ARROW_SIZE / 2}, 0 ${ARROW_SIZE}`} fill="#8e44ad" />
-          </marker>
         </defs>
 
         {/* Edges */}
@@ -164,34 +143,13 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
           const y1 = edge.source.y + ny * (NODE_HEIGHT / 2);
           const x2 = edge.target.x - nx * (NODE_WIDTH / 2 + ARROW_SIZE);
           const y2 = edge.target.y - ny * (NODE_HEIGHT / 2 + ARROW_SIZE);
-
-          // Offset the label perpendicular to the edge so parallel
-          // outgoing/incoming edges between the same two nodes don't
-          // overlap their text.
-          const perpX = -ny;
-          const perpY = nx;
-          const labelOffset = edge.direction === 'incoming' ? 10 : -6;
-          const mx = (x1 + x2) / 2 + perpX * labelOffset;
-          const my = (y1 + y2) / 2 + perpY * labelOffset;
-
-          const isIncoming = edge.direction === 'incoming';
-          const stroke = isIncoming ? '#8e44ad' : '#999';
-          const dash = isIncoming ? '4 3' : undefined;
-          const marker = isIncoming ? 'url(#arrowhead-incoming)' : 'url(#arrowhead)';
-          const textColor = isIncoming ? '#8e44ad' : '#666';
+          const mx = (x1 + x2) / 2;
+          const my = (y1 + y2) / 2;
 
           return (
             <g key={`edge-${i}`}>
-              <line
-                x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke={stroke}
-                strokeWidth={1}
-                strokeDasharray={dash}
-                markerEnd={marker}
-              />
-              <text x={mx} y={my} textAnchor="middle" fontSize={10} fill={textColor}>
-                {edge.label}
-              </text>
+              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#999" strokeWidth={1} markerEnd="url(#arrowhead)" />
+              <text x={mx} y={my - 4} textAnchor="middle" fontSize={10} fill="#666">{edge.label}</text>
             </g>
           );
         })}

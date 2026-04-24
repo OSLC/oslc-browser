@@ -12,7 +12,7 @@ import {
   AccordionDetails,
   Badge,
 } from '@mui/material';
-import { ChevronRight, ArrowBack } from '@mui/icons-material';
+import { ChevronRight } from '@mui/icons-material';
 import type { NavigationColumn, ColumnResource, LoadedResource } from '../models/types.js';
 
 interface ResourceColumnProps {
@@ -225,7 +225,6 @@ function ResourceAccordion({
         )}
         <List dense disablePadding>
           {predicates.map((pred) => {
-            const isIncoming = pred.direction === 'incoming';
             // Incoming predicates share a URI with the forward direction
             // in the cache key space — include direction to avoid collisions.
             const key = `${pred.predicate}|${pred.direction ?? 'outgoing'}`;
@@ -236,18 +235,8 @@ function ResourceAccordion({
                 onClick={() => onPredicateClick(resource, pred.predicate, pred.direction ?? 'outgoing')}
                 // Indent predicate items so they visually align under the
                 // accordion title, past where the expand icon sat.
-                sx={{
-                  py: 0.5,
-                  pl: 4,
-                  ...(isIncoming ? { color: '#8e44ad' } : {}),
-                }}
+                sx={{ py: 0.5, pl: 4 }}
               >
-                {isIncoming && (
-                  <ArrowBack
-                    sx={{ fontSize: 14, mr: 0.75, color: '#8e44ad' }}
-                    titleAccess="Incoming link"
-                  />
-                )}
                 <ListItemText
                   primary={pred.predicateLabel}
                   primaryTypographyProps={{ fontSize: 13, noWrap: true, textAlign: 'left' }}
