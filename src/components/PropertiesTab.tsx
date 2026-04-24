@@ -100,7 +100,10 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
               ))}
               {(resource.incomingLinks ?? []).map((link, i) => (
                 <TableRow key={'in-' + link.predicate + link.sourceURI + i}>
-                  <TableCell sx={{ fontSize: 12 }} title={link.predicate}>
+                  <TableCell
+                    sx={{ fontSize: 12, fontStyle: 'italic' }}
+                    title={`${link.predicate} (incoming — stored on source)`}
+                  >
                     {link.inverseLabel ?? link.predicateLabel}
                   </TableCell>
                   <TableCell sx={{ fontSize: 12 }}>

@@ -15,10 +15,17 @@ interface GraphNode {
   isCenter: boolean;
 }
 
+interface EdgeLabel {
+  text: string;
+  /** Incoming labels are italicized to indicate the underlying triple
+   *  is stored on another resource (this resource doesn't own it). */
+  italic: boolean;
+}
+
 interface GraphEdge {
   source: GraphNode;
   target: GraphNode;
-  label: string;
+  labels: EdgeLabel[];
 }
 
 function computeLayout(resource: LoadedResource, width: number, height: number): { nodes: GraphNode[]; edges: GraphEdge[] } {
@@ -34,36 +41,39 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
   };
 
   // Collect neighbors — outgoing links contribute directly; incoming
-  // links are rendered in the same direction using the inverseLabel
-  // declared on the source property's shape, so link ownership is
-  // transparent (the user sees a single bidirectional relationship).
+  // links are rendered in the same center→neighbor direction using the
+  // inverseLabel declared on the source property's shape (so link
+  // ownership is transparent), but italicized to signal the underlying
+  // triple is stored on the source side.
   interface Neighbor {
     title: string;
-    labels: string[];
+    labels: EdgeLabel[];
   }
   const neighbors = new Map<string, Neighbor>();
+
+  const pushUnique = (labels: EdgeLabel[], next: EdgeLabel): void => {
+    if (!labels.some(l => l.text === next.text && l.italic === next.italic)) {
+      labels.push(next);
+    }
+  };
 
   for (const link of resource.links) {
     const existing = neighbors.get(link.targetURI) ?? {
       title: link.targetTitle ?? link.targetURI.split('/').pop() ?? link.targetURI,
       labels: [],
     };
-    if (!existing.labels.includes(link.predicateLabel)) {
-      existing.labels.push(link.predicateLabel);
-    }
+    pushUnique(existing.labels, { text: link.predicateLabel, italic: false });
     neighbors.set(link.targetURI, existing);
   }
 
   if (resource.incomingLinks) {
     for (const link of resource.incomingLinks) {
-      const label = link.inverseLabel ?? link.predicateLabel;
+      const text = link.inverseLabel ?? link.predicateLabel;
       const existing = neighbors.get(link.sourceURI) ?? {
         title: link.sourceTitle ?? link.sourceURI.split('/').pop() ?? link.sourceURI,
         labels: [],
       };
-      if (!existing.labels.includes(label)) {
-        existing.labels.push(label);
-      }
+      pushUnique(existing.labels, { text, italic: true });
       neighbors.set(link.sourceURI, existing);
     }
   }
@@ -87,7 +97,7 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
     edges.push({
       source: centerNode,
       target: neighborNode,
-      label: info.labels.join(', '),
+      labels: info.labels,
     });
     i++;
   }
@@ -149,7 +159,16 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
           return (
             <g key={`edge-${i}`}>
               <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#999" strokeWidth={1} markerEnd="url(#arrowhead)" />
-              <text x={mx} y={my - 4} textAnchor="middle" fontSize={10} fill="#666">{edge.label}</text>
+              <text x={mx} y={my - 4} textAnchor="middle" fontSize={10} fill="#666">
+                {edge.labels.map((lab, li) => (
+                  <tspan
+                    key={li}
+                    fontStyle={lab.italic ? 'italic' : 'normal'}
+                  >
+                    {li > 0 ? ', ' : ''}{lab.text}
+                  </tspan>
+                ))}
+              </text>
             </g>
           );
         })}

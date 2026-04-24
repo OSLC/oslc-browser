@@ -225,6 +225,7 @@ function ResourceAccordion({
         )}
         <List dense disablePadding>
           {predicates.map((pred) => {
+            const isIncoming = pred.direction === 'incoming';
             // Incoming predicates share a URI with the forward direction
             // in the cache key space — include direction to avoid collisions.
             const key = `${pred.predicate}|${pred.direction ?? 'outgoing'}`;
@@ -239,8 +240,13 @@ function ResourceAccordion({
               >
                 <ListItemText
                   primary={pred.predicateLabel}
-                  primaryTypographyProps={{ fontSize: 13, noWrap: true, textAlign: 'left' }}
-                  title={pred.predicate}
+                  primaryTypographyProps={{
+                    fontSize: 13,
+                    noWrap: true,
+                    textAlign: 'left',
+                    ...(isIncoming ? { fontStyle: 'italic' } : {}),
+                  }}
+                  title={isIncoming ? `${pred.predicate} (incoming — stored on source)` : pred.predicate}
                 />
                 {pred.targetCount > 1 && (
                   <Badge
