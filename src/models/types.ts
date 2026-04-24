@@ -16,11 +16,39 @@ export interface ResourceLink {
   targetTitle?: string;
 }
 
+/**
+ * A link into this resource from another resource — i.e. some other
+ * resource has a property whose value is this resource's URI. Discovered
+ * via the LDM /discover-links endpoint (same-server) or an LDM provider
+ * / LQE (cross-server); oslc-browser merges both sources.
+ *
+ * `inverseLabel` (from the source property's oslc:inverseLabel in the
+ * shape) is what we display in the UI — the outgoing predicate is
+ * meaningful on the source side, but we render it on the target side
+ * using the inverse wording so link ownership is transparent.
+ */
+export interface IncomingLink {
+  sourceURI: string;
+  sourceTitle?: string;
+  /** The forward predicate URI on the source resource. */
+  predicate: string;
+  /** Short label derived from the forward predicate (fallback when
+   *  no inverse metadata is available). */
+  predicateLabel: string;
+  /** Human-readable inverse label from the source property's
+   *  oslc:inverseLabel, if the shape declared one. */
+  inverseLabel?: string;
+  /** Origin of the discovery — used for display hinting. */
+  origin: 'same-server' | 'cross-server';
+}
+
 export interface LoadedResource {
   uri: string;
   title: string;
   properties: ResourceProperty[];
   links: ResourceLink[];
+  /** Links that target this resource (populated on demand). */
+  incomingLinks?: IncomingLink[];
   resourceTypes: string[];
   inlineResources?: Record<string, LoadedResource>;
   /** True when this represents OSLC query results (multiple subjects). */

@@ -10,6 +10,11 @@ export interface ShapePropertyInfo {
   predicateURI: string;
   /** Value type URI (e.g., oslc:Resource, xsd:string) */
   valueType: string;
+  /** Inverse property URI from oslc:inversePropertyDefinition.
+   *  Identifier only — never asserted as a triple. */
+  inversePropertyDefinition?: string;
+  /** Human-readable inverse label from oslc:inverseLabel. */
+  inverseLabel?: string;
 }
 
 /**
@@ -20,6 +25,8 @@ export interface ParsedShape {
   properties: ShapePropertyInfo[];
   /** Quick lookup: predicate URI → valueType */
   predicateValueTypes: Map<string, string>;
+  /** Quick lookup: predicate URI → oslc:inverseLabel (if declared) */
+  predicateInverseLabels: Map<string, string>;
 }
 
 const OSLC_NS = 'http://open-services.net/ns/core#';
@@ -78,6 +85,7 @@ export function useShapeCache() {
 
           const properties: ShapePropertyInfo[] = [];
           const predicateValueTypes = new Map<string, string>();
+          const predicateInverseLabels = new Map<string, string>();
 
           for (const propNode of propNodes) {
             const propDefNode = store.any(
@@ -94,14 +102,28 @@ export function useShapeCache() {
               propNode,
               store.sym(`${OSLC_NS}name`)
             );
+            const inversePropDefNode = store.any(
+              propNode,
+              store.sym(`${OSLC_NS}inversePropertyDefinition`),
+              null
+            );
+            const inverseLabel = store.anyValue(
+              propNode,
+              store.sym(`${OSLC_NS}inverseLabel`)
+            );
 
             const predicateURI = propDefNode?.value ?? '';
             const valueType = valueTypeNode?.value ?? '';
             const name = nameNode ?? '';
+            const inversePropertyDefinition = inversePropDefNode?.value;
 
             if (predicateURI) {
-              properties.push({ name, predicateURI, valueType });
+              const prop: ShapePropertyInfo = { name, predicateURI, valueType };
+              if (inversePropertyDefinition) prop.inversePropertyDefinition = inversePropertyDefinition;
+              if (inverseLabel) prop.inverseLabel = inverseLabel;
+              properties.push(prop);
               predicateValueTypes.set(predicateURI, valueType);
+              if (inverseLabel) predicateInverseLabels.set(predicateURI, inverseLabel);
             }
           }
 
@@ -109,6 +131,7 @@ export function useShapeCache() {
             shapeURI,
             properties,
             predicateValueTypes,
+            predicateInverseLabels,
           };
           cache.current.set(shapeURI, parsed);
           return parsed;
@@ -127,5 +150,27 @@ export function useShapeCache() {
     []
   );
 
-  return { getShape };
+  /**
+   * Look up the inverse label for a forward predicate URI by searching
+   * all cached shapes. Returns undefined when no cached shape declares
+   * an inverseLabel for the predicate.
+   *
+   * This is used to render incoming links on the target side using the
+   * inverse wording declared on the source property — e.g., an incoming
+   * `bmm:amplifies` link appears as "Amplified By" when the VisionShape's
+   * `amplifiedBy` property declared that inverseLabel.
+   */
+  const getInverseLabel = useCallback(
+    (predicateURI: string): string | undefined => {
+      for (const shape of cache.current.values()) {
+        if (!shape) continue;
+        const label = shape.predicateInverseLabels.get(predicateURI);
+        if (label) return label;
+      }
+      return undefined;
+    },
+    []
+  );
+
+  return { getShape, getInverseLabel };
 }
