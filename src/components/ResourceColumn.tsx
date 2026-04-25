@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   Box,
   List,
@@ -167,41 +167,72 @@ function ResourceAccordion({
 }: ResourceAccordionProps) {
   const { resource, predicates } = colRes;
 
+  // Fully controlled expansion state. The default Accordion behavior
+  // toggles whenever AccordionSummary is clicked, but the user wants
+  // a row click to *select* the resource (so menu items, properties,
+  // etc., apply to the selected resource) and reserve expansion to
+  // explicit chevron clicks.
+  const [expanded, setExpanded] = useState(false);
+
+  const handleSummaryClick = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      // Determine whether the click landed on the expand-icon wrapper.
+      // If so, toggle expansion; otherwise, just select the resource.
+      const iconEl = e.currentTarget.querySelector(
+        '.MuiAccordionSummary-expandIconWrapper'
+      );
+      const onIcon = iconEl !== null && iconEl.contains(e.target as Node);
+      if (onIcon) {
+        const next = !expanded;
+        setExpanded(next);
+        // Selecting on expand keeps the details panel in sync with
+        // the row whose links the user just opened.
+        if (next) onResourceSelect(resource, columnIndex);
+      } else {
+        onResourceSelect(resource, columnIndex);
+      }
+    },
+    [expanded, resource, columnIndex, onResourceSelect]
+  );
+
   return (
     <Accordion
       disableGutters
       square
       elevation={0}
-      onChange={(_, expanded) => {
-        if (expanded) onResourceSelect(resource, columnIndex);
-      }}
+      expanded={expanded}
       sx={{ '&::before': { display: 'none' } }}
     >
       <AccordionSummary
         // ChevronRight rotates 90deg when expanded — cleaner than
         // ExpandMore when the icon sits at the left of the row.
         expandIcon={<ChevronRight fontSize="small" />}
+        onClick={handleSummaryClick}
         onContextMenu={(e) => onResourceContextMenu(e, resource)}
         sx={{
           minHeight: 36,
-          pl: 0.5,
-          pr: 1.5,
+          pl: 0,
+          pr: 1,
           bgcolor: isSelected ? 'primary.light' : 'grey.50',
           color: isSelected ? 'primary.contrastText' : 'text.primary',
           borderBottom: 1,
           borderColor: 'divider',
           cursor: 'pointer',
           // Put the expand icon on the left of the row and left-align
-          // the title next to it.
+          // the title immediately next to it. Without these overrides,
+          // MUI default styles (margin/padding around content) push the
+          // title inward and the row reads as visually centered.
           flexDirection: 'row-reverse',
           '& .MuiAccordionSummary-content': {
             my: 0.5,
-            ml: 0.5,
+            ml: 0,
+            mr: 0,
             justifyContent: 'flex-start',
           },
           '& .MuiAccordionSummary-expandIconWrapper': {
             color: isSelected ? 'primary.contrastText' : undefined,
             transform: 'rotate(0deg)',
+            p: 0.25,
           },
           '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
             transform: 'rotate(90deg)',
@@ -210,7 +241,13 @@ function ResourceAccordion({
       >
         <Typography
           variant="subtitle2"
-          sx={{ fontSize: 13, fontWeight: 600, textAlign: 'left' }}
+          sx={{
+            fontSize: 13,
+            fontWeight: 600,
+            textAlign: 'left',
+            flex: 1,
+            minWidth: 0,
+          }}
           noWrap
           title={resource.title}
         >
@@ -235,8 +272,10 @@ function ResourceAccordion({
                 selected={isSelected && selectedPredicate === pred.predicate}
                 onClick={() => onPredicateClick(resource, pred.predicate, pred.direction ?? 'outgoing')}
                 // Indent predicate items so they visually align under the
-                // accordion title, past where the expand icon sat.
-                sx={{ py: 0.5, pl: 4 }}
+                // accordion title text, past where the expand icon sat.
+                // Matches the chevron+padding width used in
+                // AccordionSummary above.
+                sx={{ py: 0.5, pl: 3, pr: 1 }}
               >
                 <ListItemText
                   primary={pred.predicateLabel}
