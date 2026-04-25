@@ -176,13 +176,12 @@ function ResourceAccordion({
 
   const handleSummaryClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      // Determine whether the click landed on the expand-icon wrapper.
-      // If so, toggle expansion; otherwise, just select the resource.
-      const iconEl = e.currentTarget.querySelector(
-        '.MuiAccordionSummary-expandIconWrapper'
-      );
-      const onIcon = iconEl !== null && iconEl.contains(e.target as Node);
-      if (onIcon) {
+      // Determine whether the click landed on the chevron we render
+      // manually (see expandIcon={null} below). If so, toggle
+      // expansion; otherwise, just select the resource.
+      const chevronEl = e.currentTarget.querySelector('.resource-row-chevron');
+      const onChevron = chevronEl !== null && chevronEl.contains(e.target as Node);
+      if (onChevron) {
         const next = !expanded;
         setExpanded(next);
         // Selecting on expand keeps the details panel in sync with
@@ -204,9 +203,13 @@ function ResourceAccordion({
       sx={{ '&::before': { display: 'none' } }}
     >
       <AccordionSummary
-        // ChevronRight rotates 90deg when expanded — cleaner than
-        // ExpandMore when the icon sits at the left of the row.
-        expandIcon={<ChevronRight fontSize="small" />}
+        // We render the chevron manually as the first child (instead
+        // of using MUI's expandIcon slot + row-reverse), so the row
+        // is a plain flex-direction:row layout: chevron pinned left,
+        // title shrinks/ellipsizes in the middle, overflow always
+        // happens on the right. Using row-reverse caused the chevron
+        // to be clipped on the visual left when long titles overflowed.
+        expandIcon={null}
         onClick={handleSummaryClick}
         onContextMenu={(e) => onResourceContextMenu(e, resource)}
         sx={{
@@ -218,27 +221,30 @@ function ResourceAccordion({
           borderBottom: 1,
           borderColor: 'divider',
           cursor: 'pointer',
-          // Put the expand icon on the left of the row and left-align
-          // the title immediately next to it. Without these overrides,
-          // MUI default styles (margin/padding around content) push the
-          // title inward and the row reads as visually centered.
-          flexDirection: 'row-reverse',
           '& .MuiAccordionSummary-content': {
             my: 0.5,
             ml: 0,
             mr: 0,
-            justifyContent: 'flex-start',
-          },
-          '& .MuiAccordionSummary-expandIconWrapper': {
-            color: isSelected ? 'primary.contrastText' : undefined,
-            transform: 'rotate(0deg)',
-            p: 0.25,
-          },
-          '& .MuiAccordionSummary-expandIconWrapper.Mui-expanded': {
-            transform: 'rotate(90deg)',
+            minWidth: 0,
+            width: '100%',
+            alignItems: 'center',
           },
         }}
       >
+        <Box
+          className="resource-row-chevron"
+          sx={{
+            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            px: 0.25,
+            transition: 'transform 0.2s',
+            transform: expanded ? 'rotate(90deg)' : 'rotate(0deg)',
+            color: isSelected ? 'primary.contrastText' : undefined,
+          }}
+        >
+          <ChevronRight fontSize="small" />
+        </Box>
         <Typography
           variant="subtitle2"
           sx={{
