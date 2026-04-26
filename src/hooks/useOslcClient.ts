@@ -754,6 +754,54 @@ export function useOslcClient(): UseOslcClientReturn {
     return [...seen.values()];
   }, [connection.username, connection.password, getInverseLabel]);
 
+  /**
+   * Run the post-parse enrichment pipeline on a LoadedResource:
+   * seed source-side shapes from the resource's ServiceProvider,
+   * resolve human-readable titles for link targets, and (for
+   * non-container resources) fetch and label incoming links.
+   *
+   * For query-result containers, recurses into each member so the
+   * column accordions and Properties tabs see real titles + incoming
+   * links for every member, not just the first one the user clicks
+   * through to via fetchResource.
+   */
+  const enrichLoadedResource = useCallback(async (
+    loaded: LoadedResource,
+    client: OSLCClient
+  ): Promise<void> => {
+    // Seed the shape cache once from any ServiceProvider link we can
+    // see — either on the resource itself or on its first member.
+    const spLink = loaded.links.find(
+      l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
+    ) ?? loaded.members?.[0]?.links.find(
+      l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
+    );
+    if (spLink) {
+      await seedShapesFromServiceProvider(spLink.targetURI);
+    }
+
+    // Resolve titles + incoming links on a single non-container resource.
+    const enrichSingle = async (r: LoadedResource): Promise<void> => {
+      await resolveLinkTitles(r.links, client, connection.serverURL);
+      if (!r.isQueryResult && !r.uri.startsWith('_:')) {
+        const incoming = await fetchIncomingLinks(r.uri);
+        if (incoming.length > 0) {
+          await resolveIncomingLinkSourceTitles(incoming, client, connection.serverURL);
+          r.incomingLinks = incoming;
+        }
+      }
+    };
+
+    if (loaded.isQueryResult && loaded.members) {
+      // Process each member in parallel — the container itself has no
+      // domain links to resolve, but the user expects to see real
+      // titles and incoming links for every member shown in the column.
+      await Promise.all(loaded.members.map(enrichSingle));
+    } else {
+      await enrichSingle(loaded);
+    }
+  }, [connection.serverURL, fetchIncomingLinks, seedShapesFromServiceProvider]);
+
   const fetchResource = useCallback(async (uri: string): Promise<LoadedResource | null> => {
     const client = clientRef.current;
     if (!client) return null;
@@ -771,40 +819,13 @@ export function useOslcClient(): UseOslcClientReturn {
 
       const resource = await client.getResource(fetchURI);
       const loaded = await parseOslcResource(resource, uri, shapeLookup);
-
-      // Seed the shape cache from the resource's ServiceProvider before
-      // fetching incoming links. Inverse labels for incoming predicates
-      // live on the source-side shape (e.g., Strategy's
-      // channelsEffortsToward), which otherwise would never be fetched
-      // when the user is viewing just a Vision.
-      const spLink = loaded.links.find(
-        l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
-      ) ?? loaded.members?.[0]?.links.find(
-        l => l.predicate === 'http://open-services.net/ns/core#serviceProvider'
-      );
-      if (spLink) {
-        await seedShapesFromServiceProvider(spLink.targetURI);
-      }
-
-      // Resolve human-readable titles for link targets
-      await resolveLinkTitles(loaded.links, client, connection.serverURL);
-
-      // Incoming link discovery — skip for query results (they are
-      // containers, not individual resources) and for blank nodes.
-      if (!loaded.isQueryResult && !uri.startsWith('_:')) {
-        const incoming = await fetchIncomingLinks(uri);
-        if (incoming.length > 0) {
-          await resolveIncomingLinkSourceTitles(incoming, client, connection.serverURL);
-          loaded.incomingLinks = incoming;
-        }
-      }
-
+      await enrichLoadedResource(loaded, client);
       return loaded;
     } catch (err) {
       console.error('Error fetching resource:', uri, err);
       return null;
     }
-  }, [connection.serverURL, shapeLookup, fetchIncomingLinks, seedShapesFromServiceProvider]);
+  }, [connection.serverURL, shapeLookup, enrichLoadedResource]);
 
   const connect = useCallback(async (): Promise<LoadedResource | null> => {
     setConnection(prev => ({ ...prev, connecting: true, error: undefined }));
@@ -816,6 +837,7 @@ export function useOslcClient(): UseOslcClientReturn {
       // Fetch the resource at the entered URL
       const resource = await client.getResource(connection.serverURL);
       const loaded = await parseOslcResource(resource, connection.serverURL, shapeLookup);
+      await enrichLoadedResource(loaded, client);
 
       setConnection(prev => {
         const next = { ...prev, connected: true, connecting: false, error: undefined };
