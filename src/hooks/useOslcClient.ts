@@ -466,14 +466,15 @@ async function resolveLinkTitles(
     await Promise.all(batch.map(async ([uri, linkRefs]) => {
       let title: string | undefined;
 
-      // Try compact representation first
-      if (serverOrigin) {
-        try {
-          const compactURL = `${serverOrigin}/compact?uri=${encodeURIComponent(uri)}`;
-          const compactResource = await client.getResource(compactURL, '3.0', 'text/turtle');
-          title = compactResource.getTitle();
-        } catch { /* compact not available, fall through */ }
-      }
+      // Try OSLC Compact first via the standard Accept-header path
+      // (application/x-oslc-compact+xml on the resource URL itself).
+      // OSLCClient.getCompactResource handles the full request +
+      // RDF/XML parse and returns a Compact whose getTitle() reads
+      // dcterms:title (or oslc:shortTitle).
+      try {
+        const compact = await client.getCompactResource(uri);
+        title = compact.getTitle?.();
+      } catch { /* compact not available — fall through */ }
 
       // Fall back to GET the resource and extract dcterms:title
       if (!title) {
@@ -538,13 +539,11 @@ async function resolveIncomingLinkSourceTitles(
     await Promise.all(batch.map(async ([uri, linkRefs]) => {
       let title: string | undefined;
 
-      if (serverOrigin) {
-        try {
-          const compactURL = `${serverOrigin}/compact?uri=${encodeURIComponent(uri)}`;
-          const compactResource = await client.getResource(compactURL, '3.0', 'text/turtle');
-          title = compactResource.getTitle();
-        } catch { /* compact not available */ }
-      }
+      // Try OSLC Compact first via the standard Accept-header path.
+      try {
+        const compact = await client.getCompactResource(uri);
+        title = compact.getTitle?.();
+      } catch { /* compact not available */ }
 
       if (!title) {
         try {
