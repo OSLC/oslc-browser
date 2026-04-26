@@ -25,12 +25,19 @@ function reducer(state: NavigationState, action: NavigationAction): NavigationSt
 
     case 'SELECT_RESOURCE': {
       if (action.columnIndex !== undefined) {
-        // Update selectedResourceURI on the specified column
-        const columns = [...state.columns];
-        const col = columns[action.columnIndex];
-        if (col) {
-          columns[action.columnIndex] = { ...col, selectedResourceURI: action.resource.uri };
-        }
+        // Selecting a resource in column N starts a new navigation
+        // path from there: drop every column to the right, set the
+        // selected resource on column N, and clear any predicate
+        // selection on N (its previous predicate opened a now-removed
+        // child column).
+        const columns = state.columns.slice(0, action.columnIndex + 1).map((col, i) => {
+          if (i !== action.columnIndex) return col;
+          return {
+            ...col,
+            selectedResourceURI: action.resource.uri,
+            selectedPredicate: undefined,
+          };
+        });
         return { ...state, columns, selectedResource: action.resource };
       }
       return { ...state, selectedResource: action.resource };
