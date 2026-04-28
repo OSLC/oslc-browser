@@ -421,18 +421,65 @@ function saveConnection(state: ConnectionState): void {
   } catch { /* ignore */ }
 }
 
-/** Cache of resolved resource titles (URI → title string). */
-const titleCache = new Map<string, string>();
+/**
+ * Cache of compact-resolved metadata per resource URI: human-readable
+ * title plus an optional icon URL sourced from the resource's
+ * instanceShape via oslc:icon.
+ */
+interface CompactMeta {
+  title: string;
+  icon?: string;
+}
+const compactCache = new Map<string, CompactMeta>();
 
 /**
- * Resolve human-readable titles for link targets.
- *
- * Fallback chain per link target:
- * 1. Title cache (already resolved)
- * 2. Compact representation (GET /compact?uri=... Accept: text/turtle → oslc:shortTitle or dcterms:title)
- * 3. GET the resource directly → dcterms:title
- * 4. localName(uri) — last URI path segment
- *
+ * Resolve a single resource URI to its CompactMeta (title + icon),
+ * trying the OSLC-standard Compact path first and falling back to a
+ * direct GET. Caches the result so repeat calls are cheap.
+ */
+async function resolveCompactMeta(
+  uri: string,
+  client: OSLCClient,
+  serverOrigin: string
+): Promise<CompactMeta> {
+  const cached = compactCache.get(uri);
+  if (cached) return cached;
+
+  let title: string | undefined;
+  let icon: string | undefined;
+
+  // Standard OSLC Compact path: GET <resourceURI> with
+  // Accept: application/x-oslc-compact+xml. Carries dcterms:title
+  // (or oslc:shortTitle) and the proposed oslc:icon from the
+  // resource's instanceShape.
+  try {
+    const compact = await client.getCompactResource(uri);
+    title = compact.getTitle?.();
+    icon = compact.getIcon?.();
+  } catch { /* compact not available — fall through */ }
+
+  // Fall back to GET the resource and extract dcterms:title
+  if (!title) {
+    try {
+      let fetchURI = uri;
+      if (serverOrigin && !uri.startsWith(serverOrigin)) {
+        fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
+      }
+      const resource = await client.getResource(fetchURI, '3.0', 'text/turtle');
+      title = resource.getTitle();
+    } catch { /* resource not fetchable, fall through */ }
+  }
+
+  if (!title) title = localName(uri);
+
+  const meta: CompactMeta = { title };
+  if (icon) meta.icon = icon;
+  compactCache.set(uri, meta);
+  return meta;
+}
+
+/**
+ * Resolve human-readable titles (and icon URLs) for link targets.
  * Mutates the links array in place for efficiency.
  */
 async function resolveLinkTitles(
@@ -444,8 +491,10 @@ async function resolveLinkTitles(
   const toResolve = new Map<string, ResourceLink[]>();
   for (const link of links) {
     if (link.targetURI.startsWith('_:')) continue;
-    if (titleCache.has(link.targetURI)) {
-      link.targetTitle = titleCache.get(link.targetURI);
+    const cached = compactCache.get(link.targetURI);
+    if (cached) {
+      link.targetTitle = cached.title;
+      if (cached.icon) link.targetIcon = cached.icon;
       continue;
     }
     if (!toResolve.has(link.targetURI)) {
@@ -457,53 +506,19 @@ async function resolveLinkTitles(
   if (toResolve.size === 0) return;
 
   const serverOrigin = serverURL ? new URL(serverURL).origin : '';
-
-  // Resolve titles in parallel (with concurrency limit to avoid flooding)
   const entries = [...toResolve.entries()];
   const batchSize = 10;
   for (let i = 0; i < entries.length; i += batchSize) {
     const batch = entries.slice(i, i + batchSize);
     await Promise.all(batch.map(async ([uri, linkRefs]) => {
-      let title: string | undefined;
-
-      // Try OSLC Compact first via the standard Accept-header path
-      // (application/x-oslc-compact+xml on the resource URL itself).
-      // OSLCClient.getCompactResource handles the full request +
-      // RDF/XML parse and returns a Compact whose getTitle() reads
-      // dcterms:title (or oslc:shortTitle).
-      try {
-        const compact = await client.getCompactResource(uri);
-        title = compact.getTitle?.();
-      } catch { /* compact not available — fall through */ }
-
-      // Fall back to GET the resource and extract dcterms:title
-      if (!title) {
-        try {
-          let fetchURI = uri;
-          if (serverOrigin && !uri.startsWith(serverOrigin)) {
-            fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
-          }
-          const resource = await client.getResource(fetchURI, '3.0', 'text/turtle');
-          title = resource.getTitle();
-        } catch { /* resource not fetchable, fall through */ }
-      }
-
-      // Final fallback
-      if (!title) {
-        title = localName(uri);
-      }
-
-      // Cache and apply to all links targeting this URI
-      titleCache.set(uri, title);
+      const meta = await resolveCompactMeta(uri, client, serverOrigin);
       for (const ref of linkRefs) {
-        ref.targetTitle = title;
+        ref.targetTitle = meta.title;
+        if (meta.icon) ref.targetIcon = meta.icon;
       }
     }));
   }
 }
-
-/** Cache of resolved resource titles used as link labels. */
-const incomingTitleCache = titleCache;
 
 /**
  * Resolve source titles for a list of incoming links, mutating in place.
@@ -519,8 +534,10 @@ async function resolveIncomingLinkSourceTitles(
 ): Promise<void> {
   const toResolve = new Map<string, IncomingLink[]>();
   for (const link of incoming) {
-    if (incomingTitleCache.has(link.sourceURI)) {
-      link.sourceTitle = incomingTitleCache.get(link.sourceURI);
+    const cached = compactCache.get(link.sourceURI);
+    if (cached) {
+      link.sourceTitle = cached.title;
+      if (cached.icon) link.sourceIcon = cached.icon;
       continue;
     }
     if (!toResolve.has(link.sourceURI)) {
@@ -537,28 +554,11 @@ async function resolveIncomingLinkSourceTitles(
   for (let i = 0; i < entries.length; i += batchSize) {
     const batch = entries.slice(i, i + batchSize);
     await Promise.all(batch.map(async ([uri, linkRefs]) => {
-      let title: string | undefined;
-
-      // Try OSLC Compact first via the standard Accept-header path.
-      try {
-        const compact = await client.getCompactResource(uri);
-        title = compact.getTitle?.();
-      } catch { /* compact not available */ }
-
-      if (!title) {
-        try {
-          let fetchURI = uri;
-          if (serverOrigin && !uri.startsWith(serverOrigin)) {
-            fetchURI = `${serverOrigin}/resource?uri=${encodeURIComponent(uri)}`;
-          }
-          const resource = await client.getResource(fetchURI, '3.0', 'text/turtle');
-          title = resource.getTitle();
-        } catch { /* resource not fetchable */ }
+      const meta = await resolveCompactMeta(uri, client, serverOrigin);
+      for (const ref of linkRefs) {
+        ref.sourceTitle = meta.title;
+        if (meta.icon) ref.sourceIcon = meta.icon;
       }
-
-      if (!title) title = localName(uri);
-      incomingTitleCache.set(uri, title);
-      for (const ref of linkRefs) ref.sourceTitle = title;
     }));
   }
 }
@@ -782,6 +782,23 @@ export function useOslcClient(): UseOslcClientReturn {
 
     // Resolve titles + incoming links on a single non-container resource.
     const enrichSingle = async (r: LoadedResource): Promise<void> => {
+      // Resource's own icon — sourced from its Compact (server-side
+      // looks up oslc:icon on the resource's instanceShape).
+      if (!r.uri.startsWith('_:')) {
+        const serverOrigin = connection.serverURL
+          ? new URL(connection.serverURL).origin
+          : '';
+        try {
+          const meta = await resolveCompactMeta(r.uri, client, serverOrigin);
+          if (meta.icon) r.iconURL = meta.icon;
+          // If parseOslcResource didn't get a title from the resource
+          // body (e.g., compact-only servers), use the meta title.
+          if (!r.title || r.title === r.uri || r.title === localName(r.uri)) {
+            r.title = meta.title;
+          }
+        } catch { /* icon resolution is best-effort */ }
+      }
+
       await resolveLinkTitles(r.links, client, connection.serverURL);
       if (!r.isQueryResult && !r.uri.startsWith('_:')) {
         const incoming = await fetchIncomingLinks(r.uri);

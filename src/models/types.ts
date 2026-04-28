@@ -14,6 +14,10 @@ export interface ResourceLink {
   predicateLabel: string;
   targetURI: string;
   targetTitle?: string;
+  /** URL of an icon representing the target's type, sourced from the
+   *  oslc:icon on the target's resource shape and surfaced through
+   *  the target's oslc:Compact representation. */
+  targetIcon?: string;
 }
 
 /**
@@ -30,6 +34,9 @@ export interface ResourceLink {
 export interface IncomingLink {
   sourceURI: string;
   sourceTitle?: string;
+  /** URL of an icon representing the source's type, sourced from the
+   *  oslc:icon on the source's resource shape. */
+  sourceIcon?: string;
   /** The forward predicate URI on the source resource. */
   predicate: string;
   /** Short label derived from the forward predicate (fallback when
@@ -45,6 +52,10 @@ export interface IncomingLink {
 export interface LoadedResource {
   uri: string;
   title: string;
+  /** URL of an icon representing this resource's type, sourced from
+   *  oslc:icon on the resource's instanceShape via the Compact
+   *  representation. */
+  iconURL?: string;
   properties: ResourceProperty[];
   links: ResourceLink[];
   /** Links that target this resource (populated on demand). */

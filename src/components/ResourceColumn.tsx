@@ -245,6 +245,21 @@ function ResourceAccordion({
         >
           <ChevronRight fontSize="small" />
         </Box>
+        {resource.iconURL && (
+          <Box
+            component="img"
+            src={resource.iconURL}
+            alt=""
+            sx={{
+              flexShrink: 0,
+              width: 16,
+              height: 16,
+              mr: 0.5,
+              opacity: 0.75,
+              filter: isSelected ? 'brightness(0) invert(1)' : undefined,
+            }}
+          />
+        )}
         <Typography
           variant="subtitle2"
           sx={{

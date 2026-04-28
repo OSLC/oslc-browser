@@ -22,9 +22,19 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
   return (
     <Box sx={{ overflow: 'auto', height: '100%', p: 1 }}>
       {/* Resource header */}
-      <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-        {resource.title}
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, mb: 0.5 }}>
+        {resource.iconURL && (
+          <Box
+            component="img"
+            src={resource.iconURL}
+            alt=""
+            sx={{ width: 18, height: 18, flexShrink: 0, opacity: 0.8 }}
+          />
+        )}
+        <Typography variant="subtitle2">
+          {resource.title}
+        </Typography>
+      </Box>
       <Typography variant="caption" color="text.secondary" sx={{ mb: 1, display: 'block', wordBreak: 'break-all' }}>
         {resource.uri}
       </Typography>
@@ -87,14 +97,24 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
                     {link.predicateLabel}
                   </TableCell>
                   <TableCell sx={{ fontSize: 12 }}>
-                    <Link
-                      component="button"
-                      onClick={() => onLinkClick(link.targetURI)}
-                      sx={{ fontSize: 12, textAlign: 'left' }}
-                      title={link.targetURI}
-                    >
-                      {link.targetTitle ?? link.targetURI}
-                    </Link>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {link.targetIcon && (
+                        <Box
+                          component="img"
+                          src={link.targetIcon}
+                          alt=""
+                          sx={{ width: 14, height: 14, flexShrink: 0, opacity: 0.75 }}
+                        />
+                      )}
+                      <Link
+                        component="button"
+                        onClick={() => onLinkClick(link.targetURI)}
+                        sx={{ fontSize: 12, textAlign: 'left' }}
+                        title={link.targetURI}
+                      >
+                        {link.targetTitle ?? link.targetURI}
+                      </Link>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}
@@ -107,14 +127,24 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
                     {link.inverseLabel ?? link.predicateLabel}
                   </TableCell>
                   <TableCell sx={{ fontSize: 12 }}>
-                    <Link
-                      component="button"
-                      onClick={() => onLinkClick(link.sourceURI)}
-                      sx={{ fontSize: 12, textAlign: 'left' }}
-                      title={link.sourceURI}
-                    >
-                      {link.sourceTitle ?? link.sourceURI}
-                    </Link>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      {link.sourceIcon && (
+                        <Box
+                          component="img"
+                          src={link.sourceIcon}
+                          alt=""
+                          sx={{ width: 14, height: 14, flexShrink: 0, opacity: 0.75 }}
+                        />
+                      )}
+                      <Link
+                        component="button"
+                        onClick={() => onLinkClick(link.sourceURI)}
+                        sx={{ fontSize: 12, textAlign: 'left' }}
+                        title={link.sourceURI}
+                      >
+                        {link.sourceTitle ?? link.sourceURI}
+                      </Link>
+                    </Box>
                   </TableCell>
                 </TableRow>
               ))}

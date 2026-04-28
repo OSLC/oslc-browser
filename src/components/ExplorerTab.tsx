@@ -10,6 +10,7 @@ interface ExplorerTabProps {
 interface GraphNode {
   uri: string;
   label: string;
+  iconURL?: string;
   x: number;
   y: number;
   isCenter: boolean;
@@ -35,6 +36,7 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
   const centerNode: GraphNode = {
     uri: resource.uri,
     label: resource.title,
+    iconURL: resource.iconURL,
     x: cx,
     y: cy,
     isCenter: true,
@@ -47,6 +49,7 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
   // triple is stored on the source side.
   interface Neighbor {
     title: string;
+    iconURL?: string;
     labels: EdgeLabel[];
   }
   const neighbors = new Map<string, Neighbor>();
@@ -60,8 +63,10 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
   for (const link of resource.links) {
     const existing = neighbors.get(link.targetURI) ?? {
       title: link.targetTitle ?? link.targetURI.split('/').pop() ?? link.targetURI,
+      iconURL: link.targetIcon,
       labels: [],
     };
+    if (!existing.iconURL && link.targetIcon) existing.iconURL = link.targetIcon;
     pushUnique(existing.labels, { text: link.predicateLabel, italic: false });
     neighbors.set(link.targetURI, existing);
   }
@@ -71,8 +76,10 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
       const text = link.inverseLabel ?? link.predicateLabel;
       const existing = neighbors.get(link.sourceURI) ?? {
         title: link.sourceTitle ?? link.sourceURI.split('/').pop() ?? link.sourceURI,
+        iconURL: link.sourceIcon,
         labels: [],
       };
+      if (!existing.iconURL && link.sourceIcon) existing.iconURL = link.sourceIcon;
       pushUnique(existing.labels, { text, italic: true });
       neighbors.set(link.sourceURI, existing);
     }
@@ -89,6 +96,7 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
     const neighborNode: GraphNode = {
       uri,
       label: info.title,
+      iconURL: info.iconURL,
       x: cx + radius * Math.cos(angle),
       y: cy + radius * Math.sin(angle),
       isCenter: false,
@@ -174,33 +182,58 @@ export function ExplorerTabComponent({ resource, onNodeClick }: ExplorerTabProps
         })}
 
         {/* Nodes */}
-        {nodes.map(node => (
-          <g
-            key={node.uri}
-            transform={`translate(${node.x - NODE_WIDTH / 2}, ${node.y - NODE_HEIGHT / 2})`}
-            onClick={() => onNodeClick(node.uri)}
-            style={{ cursor: 'pointer' }}
-          >
-            <title>{node.label}</title>
-            <rect
-              width={NODE_WIDTH}
-              height={NODE_HEIGHT}
-              rx={4}
-              fill={node.isCenter ? '#1976d2' : '#fff'}
-              stroke={node.isCenter ? '#1565c0' : '#bbb'}
-              strokeWidth={1}
-            />
-            <text
-              x={NODE_WIDTH / 2}
-              y={NODE_HEIGHT / 2 + 4}
-              textAnchor="middle"
-              fontSize={11}
-              fill={node.isCenter ? '#fff' : '#333'}
+        {nodes.map(node => {
+          const ICON_SIZE = 16;
+          const ICON_PAD = 6;
+          const hasIcon = !!node.iconURL;
+          // When an icon is present, shift the label rightward to leave
+          // room and slightly tighten the truncation budget.
+          const textX = hasIcon
+            ? (ICON_PAD + ICON_SIZE + (NODE_WIDTH - ICON_PAD - ICON_SIZE)) / 2
+            : NODE_WIDTH / 2;
+          const maxLen = hasIcon ? 17 : 20;
+          return (
+            <g
+              key={node.uri}
+              transform={`translate(${node.x - NODE_WIDTH / 2}, ${node.y - NODE_HEIGHT / 2})`}
+              onClick={() => onNodeClick(node.uri)}
+              style={{ cursor: 'pointer' }}
             >
-              {node.label.length > 20 ? node.label.substring(0, 18) + '...' : node.label}
-            </text>
-          </g>
-        ))}
+              <title>{node.label}</title>
+              <rect
+                width={NODE_WIDTH}
+                height={NODE_HEIGHT}
+                rx={4}
+                fill={node.isCenter ? '#1976d2' : '#fff'}
+                stroke={node.isCenter ? '#1565c0' : '#bbb'}
+                strokeWidth={1}
+              />
+              {hasIcon && (
+                <image
+                  href={node.iconURL}
+                  x={ICON_PAD}
+                  y={(NODE_HEIGHT - ICON_SIZE) / 2}
+                  width={ICON_SIZE}
+                  height={ICON_SIZE}
+                  // Invert dark icons to white when sitting on the
+                  // selected (blue) center node, matching the row
+                  // treatment in ResourceColumn.
+                  style={node.isCenter ? { filter: 'brightness(0) invert(1)' } : { opacity: 0.8 }}
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              )}
+              <text
+                x={textX}
+                y={NODE_HEIGHT / 2 + 4}
+                textAnchor="middle"
+                fontSize={11}
+                fill={node.isCenter ? '#fff' : '#333'}
+              >
+                {node.label.length > maxLen ? node.label.substring(0, maxLen - 2) + '...' : node.label}
+              </text>
+            </g>
+          );
+        })}
       </svg>
     </Box>
   );
