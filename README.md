@@ -2,6 +2,8 @@
 
 React component library for browsing and visualizing OSLC resources, built with Material-UI and Vite library mode. It provides column-based navigation, favorites, property inspection, diagram visualization, and an explorer graph -- all as composable React components, hooks, and types.
 
+oslc-browser is the human-facing surface for **AI Assisted Knowledge Integration (AAKI)** — column navigation, link traversal (including incoming links via OSLC LDM), and visualization over any OSLC server. See the [AAKI framework](../docs/AAKI.md) for the architectural context.
+
 ## Build
 
 ```bash
