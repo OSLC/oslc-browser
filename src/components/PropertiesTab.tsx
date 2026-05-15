@@ -76,8 +76,10 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
       )}
 
       {/* Link properties — outgoing links and incoming links rendered
-          uniformly, with incoming links using their inverseLabel from
-          the source property's shape so link ownership is transparent. */}
+          uniformly, with incoming links using their inversePropertyLabel
+          from the source property's shape so link ownership is
+          transparent. When no inversePropertyLabel is declared, the
+          fallback is the SPARQL-style "^<predicateName>" inverse marker. */}
       {(resource.links.length > 0 ||
         (resource.incomingLinks && resource.incomingLinks.length > 0)) && (
         <>
@@ -124,7 +126,7 @@ export function PropertiesTabComponent({ resource, onLinkClick }: PropertiesTabP
                     sx={{ fontSize: 12, fontStyle: 'italic' }}
                     title={`${link.predicate} (incoming — stored on source)`}
                   >
-                    {link.inverseLabel ?? link.predicateLabel}
+                    {link.inversePropertyLabel ?? `^${link.predicateLabel}`}
                   </TableCell>
                   <TableCell sx={{ fontSize: 12 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

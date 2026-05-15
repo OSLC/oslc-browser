@@ -44,9 +44,10 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
 
   // Collect neighbors — outgoing links contribute directly; incoming
   // links are rendered in the same center→neighbor direction using the
-  // inverseLabel declared on the source property's shape (so link
-  // ownership is transparent), but italicized to signal the underlying
-  // triple is stored on the source side.
+  // inversePropertyLabel declared on the source property's shape (so
+  // link ownership is transparent), italicized to signal the underlying
+  // triple is stored on the source side. When no inverse label is
+  // declared, falls back to the SPARQL-style "^<predicateName>" form.
   interface Neighbor {
     title: string;
     iconURL?: string;
@@ -73,7 +74,7 @@ function computeLayout(resource: LoadedResource, width: number, height: number):
 
   if (resource.incomingLinks) {
     for (const link of resource.incomingLinks) {
-      const text = link.inverseLabel ?? link.predicateLabel;
+      const text = link.inversePropertyLabel ?? `^${link.predicateLabel}`;
       const existing = neighbors.get(link.sourceURI) ?? {
         title: link.sourceTitle ?? link.sourceURI.split('/').pop() ?? link.sourceURI,
         iconURL: link.sourceIcon,

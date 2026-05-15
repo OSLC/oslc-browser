@@ -110,7 +110,7 @@ function buildPredicates(resource: LoadedResource): PredicateItem[] {
   if (resource.incomingLinks && resource.incomingLinks.length > 0) {
     const incoming = new Map<string, { label: string; count: number }>();
     for (const link of resource.incomingLinks) {
-      const label = link.inverseLabel ?? link.predicateLabel;
+      const label = link.inversePropertyLabel ?? `^${link.predicateLabel}`;
       const existing = incoming.get(link.predicate);
       if (existing) existing.count++;
       else incoming.set(link.predicate, { label, count: 1 });

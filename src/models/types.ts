@@ -26,10 +26,13 @@ export interface ResourceLink {
  * via the LDM /discover-links endpoint (same-server) or an LDM provider
  * / LQE (cross-server); oslc-browser merges both sources.
  *
- * `inverseLabel` (from the source property's oslc:inverseLabel in the
- * shape) is what we display in the UI — the outgoing predicate is
+ * `inversePropertyLabel` (from the source property's oslc:inversePropertyLabel
+ * in the shape) is what we display in the UI — the outgoing predicate is
  * meaningful on the source side, but we render it on the target side
- * using the inverse wording so link ownership is transparent.
+ * using the inverse wording so link ownership is transparent. When no
+ * inverse label is declared, the renderer falls back to `^<predicateLabel>`
+ * — the SPARQL property-path inverse convention (see
+ * docs/OSLC-Shape-Extensions.md, "Recommended fallback rendering").
  */
 export interface IncomingLink {
   sourceURI: string;
@@ -39,12 +42,13 @@ export interface IncomingLink {
   sourceIcon?: string;
   /** The forward predicate URI on the source resource. */
   predicate: string;
-  /** Short label derived from the forward predicate (fallback when
-   *  no inverse metadata is available). */
+  /** Short label derived from the forward predicate. Used as the
+   *  basis for the `^<name>` fallback when no inversePropertyLabel
+   *  is declared on the source-side shape. */
   predicateLabel: string;
   /** Human-readable inverse label from the source property's
-   *  oslc:inverseLabel, if the shape declared one. */
-  inverseLabel?: string;
+   *  oslc:inversePropertyLabel, if the shape declared one. */
+  inversePropertyLabel?: string;
   /** Origin of the discovery — used for display hinting. */
   origin: 'same-server' | 'cross-server';
 }

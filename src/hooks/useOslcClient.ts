@@ -626,7 +626,7 @@ async function fetchSameServerIncomingLinks(
       sourceURI: st.subject.value,
       predicate: st.predicate.value,
       predicateLabel: localName(st.predicate.value),
-      inverseLabel: getInverseLabel(st.predicate.value),
+      inversePropertyLabel: getInverseLabel(st.predicate.value),
       origin: 'same-server' as const,
     }));
 }
@@ -661,7 +661,8 @@ export function useOslcClient(): UseOslcClientReturn {
    * declared oslc:resourceShape into the shape cache.
    *
    * Why: `getInverseLabel(predicate)` searches cached shapes for an
-   * inverseLabel declared on the property definition for `predicate`.
+   * oslc:inversePropertyLabel declared on the property definition for
+   * `predicate`.
    * That definition lives on the *source* side of the relationship
    * (e.g., `channelsEffortsToward` is declared on StrategyShape). When
    * the user navigates to a Vision resource, only VisionShape ends up
